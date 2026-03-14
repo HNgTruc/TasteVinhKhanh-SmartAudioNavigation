@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh Admin — Điểm thuyết minh</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🍜 TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="poi.html" class="active">
+                    <span class="icon">📍</span> Điểm thuyết minh
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Quản trị viên</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center"
+                        onclick="logout()">
+                    🚪 Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="topbar">
+                <h2>📍 Điểm thuyết minh (POI)</h2>
+            </div>
+
+            <div class="content">
+                <div class="card">
+                    <div class="table-header">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" class="form-control"
+                                   placeholder="Tìm kiếm..." oninput="filterTable()">
+                        </div>
+                        <button class="btn btn-primary" onclick="openCreateModal()">
+                            ➕ Thêm điểm mới
+                        </button>
+                    </div>
+
+                    <div id="tableLoading" class="loading"><div class="spinner"></div></div>
+
+                    <table id="poiTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>Tên điểm</th>
+                                <th>Toạ độ</th>
+                                <th>Bán kính</th>
+                                <th>Ưu tiên</th>
+                                <th>Ngôn ngữ</th>
+                                <th>Trạng thái</th>
+                                <th style="width:120px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poiBody"></tbody>
+                    </table>
+
+                    <div id="poiEmpty" class="empty-state" style="display:none">
+                        <div class="empty-icon">📭</div>
+                        <p>Chưa có điểm thuyết minh nào</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: THÊM/SỬA POI -->
+    <div class="modal-overlay" id="poiModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle">Thêm điểm mới</h3>
+                <button class="btn-icon" onclick="closeModal('poiModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAlert" class="alert alert-error" style="display:none"></div>
+                <input type="hidden" id="poiId">
+                <div class="form-group">
+                    <label>Tên điểm *</label>
+                    <input type="text" id="poiName" class="form-control" placeholder="Bánh mì Cô Ba">
+                </div>
+                <div class="form-group">
+                    <label>Mô tả ngắn</label>
+                    <textarea id="poiDesc" class="form-control" rows="2"
+                              placeholder="Tiệm bánh mì lâu đời..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Vĩ độ *</label>
+                        <input type="text" id="poiLat" class="form-control" placeholder="10.7570">
+                    </div>
+                    <div class="form-group">
+                        <label>Kinh độ *</label>
+                        <input type="text" id="poiLng" class="form-control" placeholder="106.7000">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Bán kính kích hoạt (m)</label>
+                        <input type="number" id="poiRadius" class="form-control" value="50" min="10" max="500">
+                    </div>
+                    <div class="form-group">
+                        <label>Mức ưu tiên (1-10)</label>
+                        <input type="number" id="poiPriority" class="form-control" value="1" min="1" max="10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>URL ảnh minh hoạ</label>
+                    <input type="text" id="poiImage" class="form-control" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>Link Google Maps</label>
+                    <input type="text" id="poiMap" class="form-control" placeholder="https://maps.google.com/...">
+                </div>
+                <div class="form-group" id="activeGroup" style="display:none">
+                    <label>
+                        <input type="checkbox" id="poiActive" checked> Đang hoạt động
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('poiModal')">Huỷ</button>
+                <button class="btn btn-primary" onclick="savePoi()" id="saveBtn">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: QUẢN LÝ SCRIPT -->
+    <div class="modal-overlay" id="scriptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="scriptModalTitle">Quản lý script thuyết minh</h3>
+                <button class="btn-icon" onclick="closeModal('scriptModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:12px; color:var(--gray-500); margin-bottom:14px">
+                    App ưu tiên phát file audio nếu có URL. Nếu không có thì dùng TTS.
+                </p>
+                <input type="hidden" id="scriptPoiId">
+
+                <div id="scriptTabs">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="tab-vi">🇻🇳 VI</div>
+                        <div class="tab" data-tab="tab-en">🇬🇧 EN</div>
+                        <div class="tab" data-tab="tab-zh">🇨🇳 ZH</div>
+                        <div class="tab" data-tab="tab-ko">🇰🇷 KO</div>
+                        <div class="tab" data-tab="tab-ja">🇯🇵 JA</div>
+                    </div>
+
+                    <!-- Tab VI -->
+                    <div class="tab-content active" id="tab-vi">
+                        <div class="form-group">
+                            <label>Nội dung TTS — Tiếng Việt</label>
+                            <textarea id="tts-vi" class="form-control" rows="4"
+                                      placeholder="Nhập nội dung thuyết minh bằng tiếng Việt..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>URL audio thu sẵn (tuỳ chọn)</label>
+                            <input type="text" id="audio-vi" class="form-control" placeholder="https://...">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveScript('vi')">💾 Lưu VI</button>
+                    </div>
+
+                    <!-- Tab EN -->
+                    <div class="tab-content" id="tab-en">
+                        <div class="form-group">
+                            <label>TTS Script — English</label>
+                            <textarea id="tts-en" class="form-control" rows="4"
+                                      placeholder="Enter narration in English..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Audio URL (optional)</label>
+                            <input type="text" id="audio-en" class="form-control" placeholder="https://...">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveScript('en')">💾 Save EN</button>
+                    </div>
+
+                    <!-- Tab ZH -->
+                    <div class="tab-content" id="tab-zh">
+                        <div class="form-group">
+                            <label>TTS Script — 中文</label>
+                            <textarea id="tts-zh" class="form-control" rows="4"
+                                      placeholder="请输入中文讲解内容..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>音频 URL（可选）</label>
+                            <input type="text" id="audio-zh" class="form-control" placeholder="https://...">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveScript('zh')">💾 保存 ZH</button>
+                    </div>
+
+                    <!-- Tab KO -->
+                    <div class="tab-content" id="tab-ko">
+                        <div class="form-group">
+                            <label>TTS Script — 한국어</label>
+                            <textarea id="tts-ko" class="form-control" rows="4"
+                                      placeholder="한국어 해설을 입력하세요..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>오디오 URL (선택사항)</label>
+                            <input type="text" id="audio-ko" class="form-control" placeholder="https://...">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveScript('ko')">💾 저장 KO</button>
+                    </div>
+
+                    <!-- Tab JA -->
+                    <div class="tab-content" id="tab-ja">
+                        <div class="form-group">
+                            <label>TTS Script — 日本語</label>
+                            <textarea id="tts-ja" class="form-control" rows="4"
+                                      placeholder="日本語のナレーションを入力してください..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>音声URL（任意）</label>
+                            <input type="text" id="audio-ja" class="form-control" placeholder="https://...">
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="saveScript('ja')">💾 保存 JA</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('scriptModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    if (!requireAuth()) throw new Error('Not authenticated');
+
+    let allPois = [];
+
+    // ── LOAD TABLE ────────────────────────────────────────────────────────────
+
+    async function loadPois() {
+        document.getElementById('tableLoading').style.display = 'block';
+        document.getElementById('poiTable').style.display = 'none';
+        document.getElementById('poiEmpty').style.display = 'none';
+
+        try {
+            allPois = await getAllPois(true) || [];
+            renderTable(allPois);
+        } catch (e) {
+            showToast('Không thể tải danh sách POI', 'error');
+        }
+
+        document.getElementById('tableLoading').style.display = 'none';
+    }
+
+    function renderTable(pois) {
+        if (pois.length === 0) {
+            document.getElementById('poiEmpty').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('poiTable').style.display = 'table';
+        document.getElementById('poiBody').innerHTML = pois.map(p => `
+            <tr>
+                <td>
+                    <div style="font-weight:600">${p.name}</div>
+                    <div style="font-size:12px; color:var(--gray-500)">${p.shortDescription || ''}</div>
+                </td>
+                <td style="font-size:12px; color:var(--gray-500)">
+                    ${formatCoord(p.latitude)}, ${formatCoord(p.longitude)}
+                </td>
+                <td>${p.triggerRadiusMeters}m</td>
+                <td><span class="badge badge-gray">${p.priority}</span></td>
+                <td>
+                    ${(p.audioScripts || []).map(s =>
+                        `<span class="badge badge-info" style="margin:1px">${s.languageCode.toUpperCase()}</span>`
+                    ).join('')}
+                </td>
+                <td>
+                    <span class="badge ${p.isActive ? 'badge-success' : 'badge-danger'}">
+                        ${p.isActive ? 'Hoạt động' : 'Ẩn'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-icon edit" onclick="openEditModal(${p.id})" title="Sửa">✏️</button>
+                    <button class="btn-icon script" onclick="openScriptModal(${p.id})" title="Quản lý script">🎤</button>
+                    <button class="btn-icon delete" onclick="confirmDelete(${p.id}, '${p.name.replace(/'/g, "\\'")}')" title="Xoá">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function filterTable() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = allPois.filter(p =>
+            p.name.toLowerCase().includes(q) ||
+            (p.shortDescription || '').toLowerCase().includes(q)
+        );
+        renderTable(filtered);
+    }
+
+    // ── CREATE / EDIT POI ─────────────────────────────────────────────────────
+
+    function openCreateModal() {
+        document.getElementById('modalTitle').textContent = 'Thêm điểm mới';
+        document.getElementById('poiId').value = '';
+        document.getElementById('poiName').value = '';
+        document.getElementById('poiDesc').value = '';
+        document.getElementById('poiLat').value = '';
+        document.getElementById('poiLng').value = '';
+        document.getElementById('poiRadius').value = '50';
+        document.getElementById('poiPriority').value = '1';
+        document.getElementById('poiImage').value = '';
+        document.getElementById('poiMap').value = '';
+        document.getElementById('activeGroup').style.display = 'none';
+        document.getElementById('modalAlert').style.display = 'none';
+        openModal('poiModal');
+    }
+
+    function openEditModal(id) {
+        const poi = allPois.find(p => p.id === id);
+        if (!poi) return;
+
+        document.getElementById('modalTitle').textContent = 'Chỉnh sửa điểm';
+        document.getElementById('poiId').value = poi.id;
+        document.getElementById('poiName').value = poi.name;
+        document.getElementById('poiDesc').value = poi.shortDescription || '';
+        document.getElementById('poiLat').value = poi.latitude;
+        document.getElementById('poiLng').value = poi.longitude;
+        document.getElementById('poiRadius').value = poi.triggerRadiusMeters;
+        document.getElementById('poiPriority').value = poi.priority;
+        document.getElementById('poiImage').value = poi.imageUrl || '';
+        document.getElementById('poiMap').value = poi.mapUrl || '';
+        document.getElementById('poiActive').checked = poi.isActive;
+        document.getElementById('activeGroup').style.display = 'block';
+        document.getElementById('modalAlert').style.display = 'none';
+        openModal('poiModal');
+    }
+
+    async function savePoi() {
+        const id = document.getElementById('poiId').value;
+        const name = document.getElementById('poiName').value.trim();
+        const lat = parseFloat(document.getElementById('poiLat').value.replace(',', '.'));
+        const lng = parseFloat(document.getElementById('poiLng').value.replace(',', '.'));
+        const alertBox = document.getElementById('modalAlert');
+
+        if (!name) { alertBox.textContent = 'Tên điểm không được để trống.'; alertBox.style.display = 'block'; return; }
+        if (isNaN(lat) || isNaN(lng)) { alertBox.textContent = 'Toạ độ không hợp lệ.'; alertBox.style.display = 'block'; return; }
+
+        alertBox.style.display = 'none';
+        const btn = document.getElementById('saveBtn');
+        btn.textContent = 'Đang lưu...';
+        btn.disabled = true;
+
+        const data = {
+            name,
+            shortDescription: document.getElementById('poiDesc').value,
+            latitude: lat,
+            longitude: lng,
+            triggerRadiusMeters: parseFloat(document.getElementById('poiRadius').value),
+            priority: parseInt(document.getElementById('poiPriority').value),
+            imageUrl: document.getElementById('poiImage').value || null,
+            mapUrl: document.getElementById('poiMap').value || null,
+            isActive: document.getElementById('poiActive').checked
+        };
+
+        try {
+            if (id) {
+                await updatePoi(id, data);
+                showToast('Cập nhật thành công!');
+            } else {
+                await createPoi(data);
+                showToast('Thêm điểm mới thành công!');
+            }
+            closeModal('poiModal');
+            await loadPois();
+        } catch (e) {
+            alertBox.textContent = 'Lưu thất bại. Vui lòng thử lại.';
+            alertBox.style.display = 'block';
+        }
+
+        btn.textContent = 'Lưu';
+        btn.disabled = false;
+    }
+
+    // ── DELETE POI ────────────────────────────────────────────────────────────
+
+    async function confirmDelete(id, name) {
+        if (!confirm(`Ẩn điểm "${name}"?`)) return;
+        try {
+            await deletePoi(id);
+            showToast('Đã ẩn điểm thuyết minh');
+            await loadPois();
+        } catch (e) {
+            showToast('Xoá thất bại!', 'error');
+        }
+    }
+
+    // ── SCRIPT MODAL ──────────────────────────────────────────────────────────
+
+    function openScriptModal(poiId) {
+        const poi = allPois.find(p => p.id === poiId);
+        if (!poi) return;
+
+        document.getElementById('scriptPoiId').value = poiId;
+        document.getElementById('scriptModalTitle').textContent = `🎤 Scripts: ${poi.name}`;
+
+        // Điền dữ liệu script hiện có vào các tab
+        ['vi', 'en', 'zh', 'ko', 'ja'].forEach(lang => {
+            const script = (poi.audioScripts || []).find(s => s.languageCode === lang);
+            document.getElementById(`tts-${lang}`).value = script?.ttsScript || '';
+            document.getElementById(`audio-${lang}`).value = script?.audioFileUrl || '';
+        });
+
+        // Init tabs
+        initTabs('scriptTabs');
+        openModal('scriptModal');
+    }
+
+    async function saveScript(lang) {
+        const poiId = document.getElementById('scriptPoiId').value;
+        const tts = document.getElementById(`tts-${lang}`).value;
+        const audioUrl = document.getElementById(`audio-${lang}`).value;
+
+        try {
+            await upsertScript(poiId, {
+                languageCode: lang,
+                ttsScript: tts,
+                audioFileUrl: audioUrl || null
+            });
+            showToast(`Đã lưu script ${lang.toUpperCase()}`);
+            await loadPois();
+        } catch (e) {
+            showToast(`Lưu ${lang.toUpperCase()} thất bại!`, 'error');
+        }
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────────────────
+    loadPois();
+    </script>
+
+</body>
+</html>

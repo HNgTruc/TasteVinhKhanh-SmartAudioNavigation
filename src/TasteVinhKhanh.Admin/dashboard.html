@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh Admin — Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🍜 TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="poi.html">
+                    <span class="icon">📍</span> Điểm thuyết minh
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Quản trị viên</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center"
+                        onclick="logout()">
+                    🚪 Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="topbar">
+                <h2>Dashboard</h2>
+            </div>
+
+            <div class="content">
+
+                <!-- STAT CARDS -->
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">🎵</div>
+                        <div>
+                            <div class="stat-value" id="totalPlays">—</div>
+                            <div class="stat-label">Tổng lượt nghe</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">📅</div>
+                        <div>
+                            <div class="stat-value" id="todayPlays">—</div>
+                            <div class="stat-label">Hôm nay</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">📱</div>
+                        <div>
+                            <div class="stat-value" id="uniqueDevices">—</div>
+                            <div class="stat-label">Thiết bị duy nhất</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOP POI TABLE -->
+                <div class="card">
+                    <div class="table-header">
+                        <h3>🏆 Top điểm được nghe nhiều nhất</h3>
+                    </div>
+
+                    <div id="topLoading" class="loading">
+                        <div class="spinner"></div>
+                    </div>
+
+                    <table id="topTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th style="width:50px">Hạng</th>
+                                <th>Tên điểm</th>
+                                <th style="width:120px">Lượt nghe</th>
+                                <th style="width:160px">Lần cuối</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topBody"></tbody>
+                    </table>
+
+                    <div id="topEmpty" class="empty-state" style="display:none">
+                        <div class="empty-icon">📭</div>
+                        <p>Chưa có dữ liệu thống kê</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    if (!requireAuth()) throw new Error('Not authenticated');
+
+    async function loadDashboard() {
+        try {
+            // Load song song
+            const [summary, topPois] = await Promise.all([getSummary(), getTopPois()]);
+
+            // Stats
+            document.getElementById('totalPlays').textContent = summary?.totalPlays ?? 0;
+            document.getElementById('todayPlays').textContent = summary?.todayPlays ?? 0;
+            document.getElementById('uniqueDevices').textContent = summary?.uniqueDevices ?? 0;
+
+            // Top POI table
+            document.getElementById('topLoading').style.display = 'none';
+
+            if (!topPois || topPois.length === 0) {
+                document.getElementById('topEmpty').style.display = 'block';
+                return;
+            }
+
+            document.getElementById('topTable').style.display = 'table';
+            const tbody = document.getElementById('topBody');
+            tbody.innerHTML = topPois.map((p, i) => `
+                <tr>
+                    <td><b>#${i + 1}</b></td>
+                    <td>${p.poiName}</td>
+                    <td><span class="badge badge-primary">${p.playCount}</span></td>
+                    <td>${formatDate(p.lastPlayedAt)}</td>
+                </tr>
+            `).join('');
+
+        } catch (e) {
+            document.getElementById('topLoading').style.display = 'none';
+            document.getElementById('topEmpty').style.display = 'block';
+        }
+    }
+
+    loadDashboard();
+    </script>
+
+</body>
+</html>
