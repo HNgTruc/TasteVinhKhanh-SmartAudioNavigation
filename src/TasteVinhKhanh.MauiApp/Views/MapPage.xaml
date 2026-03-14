@@ -3,17 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
              xmlns:data="clr-namespace:TasteVinhKhanh.MauiApp.Data"
+             xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              x:Class="TasteVinhKhanh.MauiApp.Views.MapPage"
              x:DataType="vm:MapViewModel"
              Title="🍜 Phố Vĩnh Khánh">
-    <Shell.TitleView>
-        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-            <Label Text="🍜 Phố Vĩnh Khánh" FontSize="18" FontAttributes="Bold"
-                   VerticalOptions="Center" TextColor="White"/>
-        </HorizontalStackLayout>
-    </Shell.TitleView>
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,300,*,Auto">
 
         <!-- STATUS BAR -->
         <Frame Grid.Row="0" BackgroundColor="#4f46e5" Padding="12,8" CornerRadius="0">
@@ -21,9 +16,16 @@
                    FontSize="13" HorizontalOptions="Center"/>
         </Frame>
 
+        <!-- GOOGLE MAP -->
+        <maps:Map Grid.Row="1"
+                  x:Name="googleMap"
+                  IsShowingUser="True"
+                  MapType="Street"/>
+
         <!-- POI LIST -->
-        <CollectionView Grid.Row="1" ItemsSource="{Binding Pois}"
-                        Margin="0" BackgroundColor="#f3f4f6">
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Pois}"
+                        BackgroundColor="#f3f4f6">
             <CollectionView.Header>
                 <StackLayout Padding="16,12,16,4">
                     <Label Text="Các điểm thuyết minh gần bạn"
@@ -33,13 +35,13 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="data:LocalPoi">
-                    <Frame Margin="12,4" Padding="14" CornerRadius="10"
-               BackgroundColor="White" HasShadow="True">
-                        <Frame.GestureRecognizers>
+                    <Border Margin="12,4" Padding="14" StrokeShape="RoundRectangle 10"
+                            BackgroundColor="White">
+                        <Border.GestureRecognizers>
                             <TapGestureRecognizer
-                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=GoToDetailCommand}"
-                    CommandParameter="{Binding Id}"/>
-                        </Frame.GestureRecognizers>
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=GoToDetailCommand}"
+                                CommandParameter="{Binding Id}"/>
+                        </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="*,Auto">
                             <StackLayout Grid.Column="0" Spacing="4">
                                 <Label Text="{Binding Name}"
@@ -59,22 +61,22 @@
                             <Label Grid.Column="1" Text="›" FontSize="22"
                                    TextColor="#9ca3af" VerticalOptions="Center"/>
                         </Grid>
-                    </Frame>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 
             <CollectionView.EmptyView>
                 <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
                     <Label Text="📭" FontSize="40" HorizontalOptions="Center"/>
-                    <Label Text="Chưa có dữ liệu. Kiểm tra kết nối mạng."
+                    <Label Text="Chưa có dữ liệu."
                            TextColor="#6b7280" HorizontalOptions="Center"/>
                 </StackLayout>
             </CollectionView.EmptyView>
         </CollectionView>
 
         <!-- BOTTOM BAR: CHỌN NGÔN NGỮ -->
-        <Frame Grid.Row="2" BackgroundColor="White" Padding="12,8"
-               HasShadow="True" CornerRadius="0">
+        <Border Grid.Row="3" BackgroundColor="White" Padding="12,8"
+                StrokeShape="RoundRectangle 0">
             <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
                 <Label Text="Ngôn ngữ:" VerticalOptions="Center"
                        FontSize="13" TextColor="#374151"/>
@@ -99,7 +101,7 @@
                         BackgroundColor="#6b7280" TextColor="White"
                         CornerRadius="6" Padding="10,4"/>
             </HorizontalStackLayout>
-        </Frame>
+        </Border>
 
     </Grid>
 </ContentPage>
