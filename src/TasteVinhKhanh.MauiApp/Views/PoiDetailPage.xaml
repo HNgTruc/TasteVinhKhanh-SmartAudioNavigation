@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
+             xmlns:data="clr-namespace:TasteVinhKhanh.MauiApp.Data"
+             x:Class="TasteVinhKhanh.MauiApp.Views.PoiDetailPage"
+             x:DataType="vm:PoiDetailViewModel"
+             Title="{Binding Poi.Name}">
+
+    <ScrollView>
+        <StackLayout Padding="16" Spacing="16">
+
+            <!-- ẢNH -->
+            <Frame CornerRadius="12" Padding="0" IsClippedToBounds="True" HeightRequest="200"
+                   IsVisible="{Binding Poi.ImageUrl, Converter={StaticResource NullToBoolConverter}}">
+                <Image Source="{Binding Poi.ImageUrl}" Aspect="AspectFill"/>
+            </Frame>
+
+            <!-- TÊN + MÔ TẢ -->
+            <StackLayout Spacing="8">
+                <Label Text="{Binding Poi.Name}"
+                       FontSize="22" FontAttributes="Bold" TextColor="#111827"/>
+                <Label Text="{Binding Poi.ShortDescription}"
+                       FontSize="15" TextColor="#6b7280"/>
+            </StackLayout>
+
+            <!-- NÚT PHÁT -->
+            <Button Text="🔊 Nghe thuyết minh"
+                    Command="{Binding PlayNarrationCommand}"
+                    BackgroundColor="#4f46e5" TextColor="White"
+                    CornerRadius="10" FontSize="16" HeightRequest="50"/>
+
+            <!-- NÚT XEM BẢN ĐỒ -->
+            <Button Text="🗺️ Xem trên bản đồ"
+                    Command="{Binding OpenMapCommand}"
+                    BackgroundColor="White" TextColor="#4f46e5"
+                    BorderColor="#4f46e5" BorderWidth="1"
+                    CornerRadius="10" FontSize="15" HeightRequest="46"
+                    IsVisible="{Binding Poi.MapUrl, Converter={StaticResource NullToBoolConverter}}"/>
+
+            <!-- NGÔN NGỮ CÓ SẴN -->
+            <Frame BackgroundColor="White" CornerRadius="10" Padding="14">
+                <StackLayout Spacing="10">
+                    <Label Text="Ngôn ngữ thuyết minh" FontAttributes="Bold"
+                           FontSize="14" TextColor="#374151"/>
+                    <FlexLayout BindableLayout.ItemsSource="{Binding Scripts}"
+                                Wrap="Wrap" Direction="Row" JustifyContent="Start">
+                        <BindableLayout.ItemTemplate>
+							<DataTemplate x:DataType="data:LocalAudioScript">
+                                <Frame BackgroundColor="#e0e7ff" CornerRadius="20"
+                                       Padding="10,4" Margin="4,2">
+                                    <Label Text="{Binding LanguageCode, StringFormat='{0}'}"
+                                           FontSize="12" FontAttributes="Bold"
+                                           TextColor="#3730a3"/>
+                                </Frame>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </StackLayout>
+            </Frame>
+
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

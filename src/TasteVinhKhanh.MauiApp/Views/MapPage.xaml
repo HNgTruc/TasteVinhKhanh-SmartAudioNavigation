@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
+             xmlns:data="clr-namespace:TasteVinhKhanh.MauiApp.Data"
+             x:Class="TasteVinhKhanh.MauiApp.Views.MapPage"
+             x:DataType="vm:MapViewModel"
+             Title="🍜 Phố Vĩnh Khánh">
+    <Shell.TitleView>
+        <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+            <Label Text="🍜 Phố Vĩnh Khánh" FontSize="18" FontAttributes="Bold"
+                   VerticalOptions="Center" TextColor="White"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- STATUS BAR -->
+        <Frame Grid.Row="0" BackgroundColor="#4f46e5" Padding="12,8" CornerRadius="0">
+            <Label Text="{Binding StatusMessage}" TextColor="White"
+                   FontSize="13" HorizontalOptions="Center"/>
+        </Frame>
+
+        <!-- POI LIST -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Pois}"
+                        Margin="0" BackgroundColor="#f3f4f6">
+            <CollectionView.Header>
+                <StackLayout Padding="16,12,16,4">
+                    <Label Text="Các điểm thuyết minh gần bạn"
+                           FontSize="15" FontAttributes="Bold" TextColor="#374151"/>
+                </StackLayout>
+            </CollectionView.Header>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="data:LocalPoi">
+                    <Frame Margin="12,4" Padding="14" CornerRadius="10"
+               BackgroundColor="White" HasShadow="True">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=GoToDetailCommand}"
+                    CommandParameter="{Binding Id}"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackLayout Grid.Column="0" Spacing="4">
+                                <Label Text="{Binding Name}"
+                                       FontSize="15" FontAttributes="Bold" TextColor="#111827"/>
+                                <Label Text="{Binding ShortDescription}"
+                                       FontSize="13" TextColor="#6b7280" MaxLines="2"/>
+                                <Label FontSize="12" TextColor="#9ca3af">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="📍 Bán kính: "/>
+                                            <Span Text="{Binding TriggerRadiusMeters}"/>
+                                            <Span Text="m"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </StackLayout>
+                            <Label Grid.Column="1" Text="›" FontSize="22"
+                                   TextColor="#9ca3af" VerticalOptions="Center"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <StackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8">
+                    <Label Text="📭" FontSize="40" HorizontalOptions="Center"/>
+                    <Label Text="Chưa có dữ liệu. Kiểm tra kết nối mạng."
+                           TextColor="#6b7280" HorizontalOptions="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <!-- BOTTOM BAR: CHỌN NGÔN NGỮ -->
+        <Frame Grid.Row="2" BackgroundColor="White" Padding="12,8"
+               HasShadow="True" CornerRadius="0">
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="8">
+                <Label Text="Ngôn ngữ:" VerticalOptions="Center"
+                       FontSize="13" TextColor="#374151"/>
+                <Button Text="VI" Command="{Binding ChangeLanguageCommand}"
+                        CommandParameter="vi" FontSize="12"
+                        BackgroundColor="#4f46e5" TextColor="White"
+                        CornerRadius="6" Padding="10,4"/>
+                <Button Text="EN" Command="{Binding ChangeLanguageCommand}"
+                        CommandParameter="en" FontSize="12"
+                        BackgroundColor="#6b7280" TextColor="White"
+                        CornerRadius="6" Padding="10,4"/>
+                <Button Text="ZH" Command="{Binding ChangeLanguageCommand}"
+                        CommandParameter="zh" FontSize="12"
+                        BackgroundColor="#6b7280" TextColor="White"
+                        CornerRadius="6" Padding="10,4"/>
+                <Button Text="KO" Command="{Binding ChangeLanguageCommand}"
+                        CommandParameter="ko" FontSize="12"
+                        BackgroundColor="#6b7280" TextColor="White"
+                        CornerRadius="6" Padding="10,4"/>
+                <Button Text="JA" Command="{Binding ChangeLanguageCommand}"
+                        CommandParameter="ja" FontSize="12"
+                        BackgroundColor="#6b7280" TextColor="White"
+                        CornerRadius="6" Padding="10,4"/>
+            </HorizontalStackLayout>
+        </Frame>
+
+    </Grid>
+</ContentPage>

@@ -1,7 +1,5 @@
-// ── CẤU HÌNH ─────────────────────────────────────────────────────────────────
-const API_BASE = 'https://localhost:7001'; // Đổi thành URL server thật khi deploy
-
-// ── HÀM GỌI API ──────────────────────────────────────────────────────────────
+// Mở file HTML trực tiếp (file://) nên phải ghi đầy đủ URL API
+const API_BASE = 'http://localhost:5000';
 
 async function apiCall(method, endpoint, body = null) {
     const token = localStorage.getItem('token');
@@ -18,21 +16,16 @@ async function apiCall(method, endpoint, body = null) {
 
     const res = await fetch(`${API_BASE}${endpoint}`, options);
 
-    // Token hết hạn → redirect về login
     if (res.status === 401) {
         logout();
         return null;
     }
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    // Trả về null nếu response không có body (204 No Content)
     if (res.status === 204) return true;
 
     return await res.json();
 }
-
-// ── AUTH ──────────────────────────────────────────────────────────────────────
 
 async function login(email, password) {
     const data = await apiCall('POST', '/api/auth/login', { email, password });
@@ -53,8 +46,6 @@ function logout() {
 function isLoggedIn() {
     return !!localStorage.getItem('token');
 }
-
-// ── POI ───────────────────────────────────────────────────────────────────────
 
 async function getAllPois(includeInactive = true) {
     return await apiCall('GET', `/api/poi?includeInactive=${includeInactive}`);
@@ -79,8 +70,6 @@ async function upsertScript(poiId, data) {
 async function deleteScript(poiId, lang) {
     return await apiCall('DELETE', `/api/poi/${poiId}/scripts/${lang}`);
 }
-
-// ── ANALYTICS ─────────────────────────────────────────────────────────────────
 
 async function getSummary() {
     return await apiCall('GET', '/api/analytics/summary');

@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TasteVinhKhanh.MauiApp</name>
+    </assembly>
+    <members>
+        <member name="M:TasteVinhKhanh.MauiApp.Data.AppDatabase.WasRecentlyPlayedAsync(System.Int32,System.TimeSpan)">
+            <summary>Kiểm tra cooldown — tránh phát lại cùng POI quá nhanh</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Services.GeofenceEngine">
+            <summary>
+            Tính khoảng cách Haversine, phát hiện POI trong tầm,
+            kích hoạt NarrationEngine khi người dùng đến gần
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.GeofenceEngine.HaversineMeters(System.Double,System.Double,System.Double,System.Double)">
+            <summary>Công thức Haversine — tính khoảng cách giữa 2 toạ độ (mét)</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Services.LocationService">
+            <summary>Theo dõi GPS liên tục foreground + background</summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.SyncPoisAsync">
+            <summary>Đồng bộ POI từ server về SQLite — chỉ chạy khi có mạng</summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.UploadPendingLogsAsync">
+            <summary>Gửi log chưa sync lên server để analytics</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.Pois">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._pois"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.NearestPoi">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._nearestPoi"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.StatusMessage">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._statusMessage"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.IsLoading">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._isLoading"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.CurrentLanguage">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._currentLanguage"/>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.initCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.InitCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.InitCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.InitAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.changeLanguageCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.ChangeLanguageCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.ChangeLanguageCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.ChangeLanguage(System.String)"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.goToDetailCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToDetailCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToDetailCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToDetail(System.Int32)"/>.</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._poiId"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.Poi">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._poi"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.Scripts">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._scripts"/>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnPoiIdChanged(System.Int32)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId"/> is changed.</remarks>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.playNarrationCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PlayNarrationCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PlayNarrationCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PlayNarrationAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.openMapCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OpenMapCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OpenMapCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OpenMap"/>.</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp2.Resource">
+            <summary>
+            Android Resource Designer class.
+            Exposes the Android Resource designer assembly into the project Namespace.
+            </summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Pois">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Pois" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NearestPoi">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NearestPoi" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentLanguage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentLanguage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PoiId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PoiId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Poi">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Poi" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Scripts">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Scripts" generated properties.</summary>
+        </member>
+        <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
+            <summary>
+            A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
+            for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Pois">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Pois" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NearestPoi">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NearestPoi" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusMessage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentLanguage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentLanguage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PoiId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PoiId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Poi">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Poi" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Scripts">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Scripts" generated properties.</summary>
+        </member>
+    </members>
+</doc>
