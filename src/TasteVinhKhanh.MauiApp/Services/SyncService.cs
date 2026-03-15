@@ -15,11 +15,14 @@ public class SyncService
         _db = db;
     }
 
-    /// <summary>Đồng bộ POI từ server về SQLite — chỉ chạy khi có mạng</summary>
+    /// <summary>
+    /// Gọi GET /api/sync từ SQL Server về
+    /// Lưu vào SQLite local để app chạy offline
+    /// </summary>
     public async Task<SyncResult> SyncPoisAsync()
     {
         if (Connectivity.NetworkAccess != NetworkAccess.Internet)
-            return new SyncResult { Success = false, Message = "Không có mạng" };
+            return new SyncResult { Success = false, Message = "Không có mạng, dùng dữ liệu offline" };
 
         try
         {
@@ -30,29 +33,32 @@ public class SyncService
 
             var response = await _http.GetFromJsonAsync<SyncResponse>(url);
             if (response == null)
-                return new SyncResult { Success = false, Message = "Lỗi server" };
+                return new SyncResult { Success = false, Message = "Server không phản hồi" };
 
             if (response.HasChanges)
+            {
                 await _db.UpsertPoisFromServerAsync(response.Pois);
+                await _db.SaveLastSyncAtAsync(response.SyncedAt);
+                return new SyncResult
+                {
+                    Success = true,
+                    UpdatedCount = response.Pois.Count,
+                    Message = $"Đã cập nhật {response.Pois.Count} điểm thuyết minh"
+                };
+            }
 
             await _db.SaveLastSyncAtAsync(response.SyncedAt);
-
-            return new SyncResult
-            {
-                Success = true,
-                UpdatedCount = response.Pois.Count,
-                Message = response.HasChanges
-                    ? $"Cập nhật {response.Pois.Count} điểm"
-                    : "Dữ liệu đã mới nhất"
-            };
+            return new SyncResult { Success = true, Message = "Dữ liệu đã là mới nhất" };
         }
         catch (Exception ex)
         {
-            return new SyncResult { Success = false, Message = ex.Message };
+            return new SyncResult { Success = false, Message = $"Lỗi sync: {ex.Message}" };
         }
     }
 
-    /// <summary>Gửi log chưa sync lên server để analytics</summary>
+    /// <summary>
+    /// Gửi log chưa đồng bộ lên server khi có mạng
+    /// </summary>
     public async Task UploadPendingLogsAsync()
     {
         if (Connectivity.NetworkAccess != NetworkAccess.Internet) return;

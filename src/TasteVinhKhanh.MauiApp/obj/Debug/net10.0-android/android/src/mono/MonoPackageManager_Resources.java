@@ -17,7 +17,6 @@ public class MonoPackageManager_Resources {
 		"Microsoft.Extensions.Http.dll",
 		"Microsoft.Extensions.Logging.dll",
 		"Microsoft.Extensions.Logging.Abstractions.dll",
-		"Microsoft.Extensions.Logging.Debug.dll",
 		"Microsoft.Extensions.Options.dll",
 		"Microsoft.Extensions.Options.ConfigurationExtensions.dll",
 		"Microsoft.Extensions.Primitives.dll",

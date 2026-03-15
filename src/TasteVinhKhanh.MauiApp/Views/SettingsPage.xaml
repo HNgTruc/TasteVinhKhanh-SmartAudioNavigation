@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
+             xmlns:conv="clr-namespace:TasteVinhKhanh.MauiApp.Converters"
+             x:Class="TasteVinhKhanh.MauiApp.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#0D0D0D">
+
+    <ContentPage.Resources>
+        <conv:LangActiveConverter x:Key="LangActiveConverter"/>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <StackLayout Spacing="0">
+
+                <!-- Header -->
+                <Grid Padding="24,52,24,32">
+                    <StackLayout Spacing="6">
+                        <Label Text="Settings" FontSize="30"
+                               FontAttributes="Bold" TextColor="#FFFFFF"/>
+                        <Label Text="Customize your night market experience"
+                               FontSize="13" TextColor="#666666"/>
+                    </StackLayout>
+                </Grid>
+
+                <!-- ── LANGUAGE ── -->
+                <Label Padding="24,0,24,12" Text="🌐  Language"
+                       FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+
+                <StackLayout Padding="20,0,20,24" Spacing="10">
+
+                    <!-- Tiếng Việt -->
+                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
+                            Padding="16" BackgroundColor="#1A1A1A">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
+                                                  CommandParameter="vi"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="🇻🇳" FontSize="28"/>
+                            <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
+                                <Label Text="Tiếng Việt" FontSize="16"
+                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="Ngôn ngữ bản địa"
+                                       FontSize="12" TextColor="#666666"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
+                                    StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent"
+                                    WidthRequest="28" HeightRequest="28"
+                                    IsVisible="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangActiveConverter},
+                                        ConverterParameter=vi}">
+                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
+                                       TextColor="White" HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- English -->
+                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
+                            Padding="16" BackgroundColor="#1A1A1A">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
+                                                  CommandParameter="en"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="🇬🇧" FontSize="28"/>
+                            <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
+                                <Label Text="English" FontSize="16"
+                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="International Standard"
+                                       FontSize="12" TextColor="#666666"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
+                                    StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent"
+                                    WidthRequest="28" HeightRequest="28"
+                                    IsVisible="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangActiveConverter},
+                                        ConverterParameter=en}">
+                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
+                                       TextColor="White" HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Chinese -->
+                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
+                            Padding="16" BackgroundColor="#1A1A1A">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
+                                                  CommandParameter="zh"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="🇨🇳" FontSize="28"/>
+                            <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
+                                <Label Text="中文" FontSize="16"
+                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="Chinese Simplified"
+                                       FontSize="12" TextColor="#666666"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
+                                    StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent"
+                                    WidthRequest="28" HeightRequest="28"
+                                    IsVisible="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangActiveConverter},
+                                        ConverterParameter=zh}">
+                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
+                                       TextColor="White" HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Korean -->
+                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
+                            Padding="16" BackgroundColor="#1A1A1A">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
+                                                  CommandParameter="ko"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="🇰🇷" FontSize="28"/>
+                            <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
+                                <Label Text="한국어" FontSize="16"
+                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="Korean"
+                                       FontSize="12" TextColor="#666666"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
+                                    StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent"
+                                    WidthRequest="28" HeightRequest="28"
+                                    IsVisible="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangActiveConverter},
+                                        ConverterParameter=ko}">
+                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
+                                       TextColor="White" HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Japanese -->
+                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
+                            Padding="16" BackgroundColor="#1A1A1A">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
+                                                  CommandParameter="ja"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="🇯🇵" FontSize="28"/>
+                            <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
+                                <Label Text="日本語" FontSize="16"
+                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="Japanese"
+                                       FontSize="12" TextColor="#666666"/>
+                            </StackLayout>
+                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
+                                    StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent"
+                                    WidthRequest="28" HeightRequest="28"
+                                    IsVisible="{Binding SelectedLanguage,
+                                        Converter={StaticResource LangActiveConverter},
+                                        ConverterParameter=ja}">
+                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
+                                       TextColor="White" HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                </StackLayout>
+
+                <!-- ── AUDIO FEATURES ── -->
+                <Label Padding="24,0,24,12" Text="🔊  Audio Features"
+                       FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+
+                <Border Margin="20,0,20,24" BackgroundColor="#1A1A1A"
+                        StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="20">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="Auto-play Audio" FontSize="15"
+                                   FontAttributes="Bold" TextColor="#FFFFFF"/>
+                            <Label Text="Hear descriptions as you walk by food stalls"
+                                   FontSize="12" TextColor="#666666"
+                                   LineBreakMode="WordWrap"/>
+                        </StackLayout>
+                        <Switch Grid.Column="1" IsToggled="{Binding AutoPlayAudio}"
+                                OnColor="#FF6B35" VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- ── DISPLAY ── -->
+                <Label Padding="24,0,24,12" Text="🖥  Display"
+                       FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+
+                <Border Margin="20,0,20,12" BackgroundColor="#1A1A1A"
+                        StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="20">
+                    <StackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Label Grid.Column="0" Text="Small"
+                                   FontSize="12" TextColor="#666666"
+                                   VerticalOptions="Center"/>
+                            <Slider Grid.Column="1" Minimum="1" Maximum="3"
+                                    Value="{Binding TextSize}" Margin="10,0"
+                                    ThumbColor="#FF6B35"
+                                    MinimumTrackColor="#FF6B35"
+                                    MaximumTrackColor="#333333"/>
+                            <Label Grid.Column="2" Text="Large Text"
+                                   FontSize="14" FontAttributes="Bold"
+                                   TextColor="#FFFFFF" VerticalOptions="Center"/>
+                        </Grid>
+                    </StackLayout>
+                </Border>
+
+                <Border Margin="20,0,20,24" BackgroundColor="#1A1A1A"
+                        StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="20">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="High Contrast Mode"
+                               FontSize="15" FontAttributes="Bold" TextColor="#FFFFFF"
+                               VerticalOptions="Center"/>
+                        <Switch Grid.Column="1" IsToggled="{Binding HighContrast}"
+                                OnColor="#FF6B35" VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- ── NEED HELP ── -->
+                <Border Margin="20,0,20,40" StrokeShape="RoundRectangle 16"
+                        Stroke="#FF6B3540" Padding="20">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#FF6B3520" Offset="0"/>
+                            <GradientStop Color="#1A1A1A" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <Border Grid.Column="0" BackgroundColor="#FF6B35"
+                                StrokeShape="RoundRectangle 20"
+                                Stroke="Transparent"
+                                WidthRequest="40" HeightRequest="40">
+                            <Label Text="?" FontSize="18" FontAttributes="Bold"
+                                   TextColor="White" HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Border>
+                        <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
+                            <Label Text="Need Help?" FontSize="15"
+                                   FontAttributes="Bold" TextColor="#FFFFFF"/>
+                            <Label Text="Talk to our street guides available 24/7"
+                                   FontSize="12" TextColor="#888888"/>
+                        </StackLayout>
+                        <Label Grid.Column="2" Text="›" FontSize="22"
+                               TextColor="#FF6B35" VerticalOptions="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Version -->
+                <StackLayout Padding="0,0,0,20" Spacing="4"
+                             HorizontalOptions="Center">
+                    <Label Text="VINH KHANH STREET V1.0"
+                           FontSize="11" TextColor="#333333"
+                           FontAttributes="Bold" HorizontalOptions="Center"/>
+                    <Label Text="Crafted for the streets of Q4"
+                           FontSize="11" TextColor="#2A2A2A"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+
+            </StackLayout>
+        </ScrollView>
+
+        <!-- ══ BOTTOM NAV ══ -->
+        <Border Grid.Row="1" Stroke="#1E1E1E" StrokeShape="RoundRectangle 0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#111111" Offset="0"/>
+                    <GradientStop Color="#0D0D0D" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+
+                <!-- Home -->
+                <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="⊞" FontSize="24" TextColor="#444444"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Home" FontSize="10" TextColor="#444444"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <!-- Map -->
+                <StackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="🗺" FontSize="24" TextColor="#444444"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Map" FontSize="10" TextColor="#444444"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <!-- Audio -->
+                <Grid Grid.Column="2" HorizontalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToAudioCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <Border StrokeShape="RoundRectangle 30" Stroke="Transparent"
+                            WidthRequest="58" HeightRequest="58"
+                            HorizontalOptions="Center" Margin="0,-28,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#FF6B35" Offset="0"/>
+                                <GradientStop Color="#FF4500" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="🎵" FontSize="24"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- Settings — active -->
+                <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                    <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 10"
+                            Stroke="Transparent" Padding="10,6"
+                            HorizontalOptions="Center">
+                        <Label Text="⚙" FontSize="20" TextColor="#FF6B35"
+                               HorizontalOptions="Center"/>
+                    </Border>
+                    <Label Text="Settings" FontSize="10" TextColor="#FF6B35"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>

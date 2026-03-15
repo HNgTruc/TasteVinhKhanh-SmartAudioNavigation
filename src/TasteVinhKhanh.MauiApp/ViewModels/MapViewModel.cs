@@ -89,4 +89,16 @@ public partial class MapViewModel : ObservableObject
     {
         await Shell.Current.GoToAsync($"PoiDetailPage?poiId={poiId}");
     }
+
+    [RelayCommand]
+    public async Task GoToHome()
+    => await Shell.Current.GoToAsync("//HomePage");
+
+    [RelayCommand]
+    public async Task GoToAudio()
+        => await Shell.Current.GoToAsync("//AudioPage");
+
+    [RelayCommand]
+    public async Task GoToSettings()
+        => await Shell.Current.GoToAsync("//SettingsPage");
 }

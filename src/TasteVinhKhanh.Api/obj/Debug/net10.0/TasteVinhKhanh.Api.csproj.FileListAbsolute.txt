@@ -171,4 +171,3 @@ C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhan
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\TasteVinhKhanh.Api.pdb
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\TasteVinhKhanh.Api.genruntimeconfig.cache
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\ref\TasteVinhKhanh.Api.dll
-C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
+             x:Class="TasteVinhKhanh.MauiApp.Views.AudioPage"
+             x:DataType="vm:AudioViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#0D0D0D">
+
+    <Grid RowDefinitions="*,Auto">
+        <StackLayout Grid.Row="0" Spacing="0">
+
+            <!-- Header -->
+            <Grid Padding="24,52,24,20">
+                <Label Text="Audio Guide" FontSize="22"
+                       FontAttributes="Bold" TextColor="#FFFFFF"/>
+            </Grid>
+
+            <!-- Language tabs -->
+            <ScrollView Orientation="Horizontal"
+                        HorizontalScrollBarVisibility="Never"
+                        Margin="0,0,0,24">
+                <HorizontalStackLayout Padding="20,0" Spacing="8">
+                    <Border BackgroundColor="#FF6B35" StrokeShape="RoundRectangle 20"
+                            Stroke="Transparent" Padding="20,10">
+                        <Label Text="VIETNAMESE" FontSize="13"
+                               FontAttributes="Bold" TextColor="White"/>
+                    </Border>
+                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
+                            Stroke="#333333" Padding="20,10">
+                        <Label Text="ENGLISH" FontSize="13" TextColor="#666666"/>
+                    </Border>
+                </HorizontalStackLayout>
+            </ScrollView>
+
+            <!-- NOW PLAYING CARD -->
+            <Border Margin="20,0" StrokeShape="RoundRectangle 24"
+                    Stroke="Transparent" HeightRequest="280">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#2A1500" Offset="0"/>
+                        <GradientStop Color="#1A0A00" Offset="0.5"/>
+                        <GradientStop Color="#0D0D0D" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Grid RowDefinitions="*,Auto" Padding="24">
+                    <StackLayout Grid.Row="0" Spacing="10">
+                        <Border BackgroundColor="#FF6B3530"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="10,4" HorizontalOptions="Start">
+                            <Label Text="{Binding NowPlayingStallLabel}"
+                                   FontSize="12" FontAttributes="Bold" TextColor="#FF6B35"/>
+                        </Border>
+                        <Label Text="{Binding NowPlayingName}"
+                               FontSize="28" FontAttributes="Bold"
+                               TextColor="#FFFFFF" LineBreakMode="WordWrap"/>
+                        <Label Text="{Binding NowPlayingDescription}"
+                               FontSize="13" TextColor="#888888"
+                               MaxLines="3" LineBreakMode="WordWrap"/>
+                    </StackLayout>
+
+                    <!-- Progress -->
+                    <StackLayout Grid.Row="1" Spacing="8">
+                        <Slider Value="{Binding Progress}" Minimum="0" Maximum="1"
+                                ThumbColor="#FF6B35" MinimumTrackColor="#FF6B35"
+                                MaximumTrackColor="#333333"/>
+                        <Grid ColumnDefinitions="*,*">
+                            <Label Grid.Column="0" Text="{Binding CurrentTime}"
+                                   FontSize="12" TextColor="#666666"/>
+                            <Label Grid.Column="1" Text="{Binding TotalTime}"
+                                   FontSize="12" TextColor="#666666"
+                                   HorizontalOptions="End"/>
+                        </Grid>
+                    </StackLayout>
+                </Grid>
+            </Border>
+
+            <!-- CONTROLS -->
+            <Grid Padding="40,32,40,0" ColumnDefinitions="*,Auto,*">
+                <Border Grid.Column="0" BackgroundColor="#1E1E1E"
+                        StrokeShape="RoundRectangle 20" Stroke="#333333"
+                        Padding="16" WidthRequest="52" HeightRequest="52"
+                        HorizontalOptions="Center">
+                    <Label Text="⏮" FontSize="20" TextColor="#888888"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+
+                <!-- Play/Pause main button -->
+                <Border Grid.Column="1" StrokeShape="RoundRectangle 40"
+                        Stroke="Transparent" WidthRequest="72" HeightRequest="72">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#FF6B35" Offset="0"/>
+                            <GradientStop Color="#FF4500" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding PlayPauseCommand}"/>
+                    </Border.GestureRecognizers>
+                    <Label Text="{Binding PlayPauseIcon}" FontSize="28"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+
+                <Border Grid.Column="2" BackgroundColor="#1E1E1E"
+                        StrokeShape="RoundRectangle 20" Stroke="#333333"
+                        Padding="16" WidthRequest="52" HeightRequest="52"
+                        HorizontalOptions="Center">
+                    <Label Text="⏭" FontSize="20" TextColor="#888888"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+            </Grid>
+
+            <!-- Speed + Volume -->
+            <Grid Padding="40,24,40,0" ColumnDefinitions="*,*">
+                <Border Grid.Column="0" BackgroundColor="#1E1E1E"
+                        StrokeShape="RoundRectangle 12" Stroke="#333333"
+                        Padding="16,10" HorizontalOptions="Start">
+                    <Label FontSize="13" TextColor="#AAAAAA">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="🔄  "/>
+                                <Span Text="{Binding SpeedLabel}" TextColor="#FF6B35"
+                                      FontAttributes="Bold"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Border>
+                <Border Grid.Column="1" BackgroundColor="#1E1E1E"
+                        StrokeShape="RoundRectangle 12" Stroke="#333333"
+                        Padding="16,10" HorizontalOptions="End">
+                    <Label FontSize="13" TextColor="#AAAAAA">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="🔊  "/>
+                                <Span Text="{Binding VolumeLabel}" TextColor="#FF6B35"
+                                      FontAttributes="Bold"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                    </Label>
+                </Border>
+            </Grid>
+
+        </StackLayout>
+
+        <!-- BOTTOM NAV -->
+        <Border Grid.Row="1" Stroke="#1E1E1E" StrokeShape="RoundRectangle 0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#111111" Offset="0"/>
+                    <GradientStop Color="#0D0D0D" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+                <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
+                    <Label Text="⊞" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="Home" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                    <Label Text="🗺" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="Map" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                </StackLayout>
+                <Grid Grid.Column="2" HorizontalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 30" Stroke="Transparent"
+                            WidthRequest="58" HeightRequest="58"
+                            HorizontalOptions="Center" Margin="0,-28,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#FF6B35" Offset="0"/>
+                                <GradientStop Color="#FF4500" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="🎵" FontSize="24"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                </Grid>
+                <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                    <Label Text="⚙" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="Settings" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                </StackLayout>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

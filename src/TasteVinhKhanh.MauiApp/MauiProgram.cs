@@ -41,12 +41,18 @@ public static class MauiProgram
         builder.Services.AddSingleton<GeofenceEngine>();
         builder.Services.AddSingleton<NarrationEngine>();
 
-        // ── VIEWMODELS ────────────────────────────────────────
+        // ViewModels
+        builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<MapViewModel>();
+        builder.Services.AddTransient<AudioViewModel>();
+        builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddTransient<PoiDetailViewModel>();
 
-        // ── VIEWS ─────────────────────────────────────────────
+        // Views
+        builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<MapPage>();
+        builder.Services.AddTransient<AudioPage>();
+        builder.Services.AddSingleton<SettingsPage>();
         builder.Services.AddTransient<PoiDetailPage>();
 
         return builder.Build();

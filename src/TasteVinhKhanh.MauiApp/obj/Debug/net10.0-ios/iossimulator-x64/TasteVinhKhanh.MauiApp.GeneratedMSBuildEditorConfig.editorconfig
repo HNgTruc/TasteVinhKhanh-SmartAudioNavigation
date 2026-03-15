@@ -24,7 +24,7 @@ build_property.InvariantGlobalization = false
 build_property.PlatformNeutralAssembly = 
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
-build_property.RootNamespace = TasteVinhKhanh.MauiApp2
+build_property.RootNamespace = TasteVinhKhanh.MauiApp
 build_property.ProjectDir = C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
@@ -33,7 +33,7 @@ build_property.EnableCodeStyleSeverity =
 
 [C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/App.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp2.App.xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.App.xaml
 build_metadata.AdditionalFiles.TargetPath = App.xaml
 build_metadata.AdditionalFiles.RelativePath = App.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
@@ -43,7 +43,7 @@ build_metadata.AdditionalFiles.LineInfo =
 
 [C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/AppShell.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp2.AppShell.xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.AppShell.xaml
 build_metadata.AdditionalFiles.TargetPath = AppShell.xaml
 build_metadata.AdditionalFiles.RelativePath = AppShell.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
@@ -53,7 +53,7 @@ build_metadata.AdditionalFiles.LineInfo =
 
 [C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp2.Resources.Styles.Colors.xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Resources.Styles.Colors.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Colors.xaml
 build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Colors.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
@@ -63,7 +63,7 @@ build_metadata.AdditionalFiles.LineInfo =
 
 [C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Resources/Styles/Styles.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp2.Resources.Styles.Styles.xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Resources.Styles.Styles.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Styles.xaml
 build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Styles.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
@@ -71,9 +71,29 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
+[C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Views/AudioPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Views.AudioPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Views\AudioPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Views\AudioPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Views/HomePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Views.HomePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Views\HomePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Views\HomePage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
 [C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Views/MapPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp2.Views.MapPage.xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Views.MapPage.xaml
 build_metadata.AdditionalFiles.TargetPath = Views\MapPage.xaml
 build_metadata.AdditionalFiles.RelativePath = Views\MapPage.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
@@ -83,9 +103,19 @@ build_metadata.AdditionalFiles.LineInfo =
 
 [C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Views/PoiDetailPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
-build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp2.Views.PoiDetailPage.xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Views.PoiDetailPage.xaml
 build_metadata.AdditionalFiles.TargetPath = Views\PoiDetailPage.xaml
 build_metadata.AdditionalFiles.RelativePath = Views\PoiDetailPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Views/SettingsPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Views.SettingsPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Views\SettingsPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Views\SettingsPage.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
 build_metadata.AdditionalFiles.NoWarn = 
 build_metadata.AdditionalFiles.EnableDiagnostics = 

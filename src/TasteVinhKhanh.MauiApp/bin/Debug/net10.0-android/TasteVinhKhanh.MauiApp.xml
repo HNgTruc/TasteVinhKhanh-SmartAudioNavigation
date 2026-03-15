@@ -20,12 +20,139 @@
             <summary>Theo dõi GPS liên tục foreground + background</summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.SyncPoisAsync">
-            <summary>Đồng bộ POI từ server về SQLite — chỉ chạy khi có mạng</summary>
+            <summary>
+            Gọi GET /api/sync từ SQL Server về
+            Lưu vào SQLite local để app chạy offline
+            </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.UploadPendingLogsAsync">
-            <summary>Gửi log chưa sync lên server để analytics</summary>
+            <summary>
+            Gửi log chưa đồng bộ lên server khi có mạng
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.NowPlayingName">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._nowPlayingName"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.NowPlayingDescription">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._nowPlayingDescription"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.NowPlayingStallLabel">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._nowPlayingStallLabel"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPauseIcon">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._playPauseIcon"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.IsPlaying">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._isPlaying"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.Progress">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._progress"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.CurrentTime">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._currentTime"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.TotalTime">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._totalTime"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.SpeedLabel">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._speedLabel"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.VolumeLabel">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._volumeLabel"/>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.playPauseCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPauseCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPauseCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPause"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.goToHomeCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToHomeCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToHomeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToHome"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.goToMapCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToMapCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToMapCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToMap"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.goToAudioCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToAudioCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToAudioCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToAudio"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.goToSettingsCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToSettingsCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToSettingsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToSettings"/>.</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TopPois">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._topPois"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.CurrentLanguageLabel">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._currentLanguageLabel"/>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.initCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.InitCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.InitCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.InitAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToDetailCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetailCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetailCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetail(System.Int32)"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToHomeCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToHomeCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToHomeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToHome"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToMapCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToMapCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToMapCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToMap"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToAudioCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToAudioCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToAudioCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToAudio"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToSettingsCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToSettingsCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToSettingsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToSettings"/>.</summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
@@ -64,6 +191,24 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToDetailCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToDetail(System.Int32)"/>.</summary>
         </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.goToHomeCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToHomeCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToHomeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToHome"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.goToAudioCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToAudioCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToAudioCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToAudio"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.goToSettingsCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToSettingsCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToSettingsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToSettings"/>.</summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel">
             <inheritdoc/>
             <inheritdoc/>
@@ -95,7 +240,72 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OpenMapCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OpenMap"/>.</summary>
         </member>
-        <member name="T:TasteVinhKhanh.MauiApp2.Resource">
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.AutoPlayAudio">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel._autoPlayAudio"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.HighContrast">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel._highContrast"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.TextSize">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel._textSize"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.SelectedLanguage">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel._selectedLanguage"/>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.OnAutoPlayAudioChanged(System.Boolean)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.AutoPlayAudio"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.AutoPlayAudio"/> is changed.</remarks>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.OnHighContrastChanged(System.Boolean)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.HighContrast"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.HighContrast"/> is changed.</remarks>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.OnTextSizeChanged(System.Double)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.TextSize"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.TextSize"/> is changed.</remarks>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.selectLanguageCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.SelectLanguageCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.SelectLanguageCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.SelectLanguage(System.String)"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.goToHomeCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToHomeCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToHomeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToHome"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.goToMapCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToMapCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToMapCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToMap"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.goToAudioCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToAudioCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToAudioCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToAudio"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.goToSettingsCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToSettingsCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToSettingsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToSettings"/>.</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Resource">
             <summary>
             Android Resource Designer class.
             Exposes the Android Resource designer assembly into the project Namespace.
@@ -106,6 +316,42 @@
             A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instances
             for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
             </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NowPlayingName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NowPlayingName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NowPlayingDescription">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NowPlayingDescription" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NowPlayingStallLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NowPlayingStallLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PlayPauseIcon">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PlayPauseIcon" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsPlaying">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsPlaying" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Progress">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Progress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentTime">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentTime" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TotalTime">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TotalTime" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SpeedLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SpeedLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.VolumeLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "VolumeLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TopPois">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TopPois" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentLanguageLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentLanguageLabel" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Pois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Pois" generated properties.</summary>
@@ -131,11 +377,59 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Scripts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Scripts" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.AutoPlayAudio">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HighContrast">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HighContrast" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TextSize">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TextSize" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedLanguage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedLanguage" generated properties.</summary>
+        </member>
         <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
             <summary>
             A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
             for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
             </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NowPlayingName">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NowPlayingName" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NowPlayingDescription">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NowPlayingDescription" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NowPlayingStallLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NowPlayingStallLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PlayPauseIcon">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PlayPauseIcon" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsPlaying">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsPlaying" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Progress">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Progress" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentTime">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentTime" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TotalTime">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TotalTime" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SpeedLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SpeedLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.VolumeLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "VolumeLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TopPois">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TopPois" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentLanguageLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentLanguageLabel" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Pois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Pois" generated properties.</summary>
@@ -160,6 +454,18 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Scripts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Scripts" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.AutoPlayAudio">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HighContrast">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HighContrast" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TextSize">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TextSize" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedLanguage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedLanguage" generated properties.</summary>
         </member>
     </members>
 </doc>

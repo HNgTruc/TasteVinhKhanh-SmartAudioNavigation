@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
+             xmlns:data="clr-namespace:TasteVinhKhanh.MauiApp.Data"
+             xmlns:conv="clr-namespace:TasteVinhKhanh.MauiApp.Converters"
+             x:Class="TasteVinhKhanh.MauiApp.Views.HomePage"
+             x:DataType="vm:HomeViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#0D0D0D">
+
+    <ContentPage.Resources>
+        <conv:FavoriteIconConverter x:Key="FavIcon"/>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <ScrollView Grid.Row="0">
+            <StackLayout Spacing="0">
+
+                <!-- ══ HERO SECTION ══ -->
+                <Grid Padding="24,56,24,32">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#1A0A00" Offset="0"/>
+                            <GradientStop Color="#0D0D0D" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Text left -->
+                    <StackLayout Grid.Column="0" Spacing="8">
+                        <Label Text="Chào mừng bạn" FontSize="13"
+                               TextColor="#FF6B35" FontAttributes="Bold"/>
+                        <Label FontSize="32" FontAttributes="Bold"
+                               TextColor="#FFFFFF" LineBreakMode="WordWrap">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Welcome to&#10;"/>
+                                    <Span Text="Vinh Khanh" TextColor="#FF6B35" FontAttributes="Italic"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Text="Experience the authentic pulse of Vinh Khanh Street. From sizzling snails to smoky grills, your night market adventure starts here."
+                               FontSize="13" TextColor="#777777"
+                               LineBreakMode="WordWrap" Margin="0,4,0,0"/>
+
+                        <!-- Language badge -->
+                        <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
+                                Stroke="#333333" Padding="12,6" HorizontalOptions="Start"
+                                Margin="0,8,0,0">
+                            <Label FontSize="12" TextColor="#AAAAAA">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="🌐  "/>
+                                        <Span Text="{Binding CurrentLanguageLabel}"
+                                              TextColor="#FF6B35" FontAttributes="Bold"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Border>
+                    </StackLayout>
+
+                    <!-- Emoji decoration -->
+                    <Label Grid.Column="1" Text="🍜" FontSize="72"
+                           VerticalOptions="Center" Opacity="0.3"/>
+                </Grid>
+
+                <!-- ══ QUICK ACTIONS ══ -->
+                <Grid Padding="20,0,20,24" ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <!-- Map card -->
+                    <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
+                            Stroke="#252525" Padding="18,16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#1A1A1A" Offset="0"/>
+                                <GradientStop Color="#161616" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
+                        </Border.GestureRecognizers>
+                        <StackLayout Spacing="10">
+                            <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent" Padding="10" WidthRequest="44"
+                                    HeightRequest="44">
+                                <Label Text="📍" FontSize="22"
+                                       HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <Label Text="Map" FontSize="16" FontAttributes="Bold"
+                                   TextColor="#FFFFFF"/>
+                            <Label Text="Find stalls" FontSize="12" TextColor="#666666"/>
+                        </StackLayout>
+                    </Border>
+
+                    <!-- Audio card -->
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 16"
+                            Stroke="#252525" Padding="18,16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#FF6B3520" Offset="0"/>
+                                <GradientStop Color="#1A1A1A" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToAudioCommand}"/>
+                        </Border.GestureRecognizers>
+                        <StackLayout Spacing="10">
+                            <Border BackgroundColor="#FF6B3530" StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent" Padding="10" WidthRequest="44"
+                                    HeightRequest="44">
+                                <Label Text="🎵" FontSize="22"
+                                       HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <Label Text="Audio Guide" FontSize="16" FontAttributes="Bold"
+                                   TextColor="#FFFFFF"/>
+                            <Label Text="Street stories" FontSize="12" TextColor="#666666"/>
+                        </StackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ══ STREET EATS ══ -->
+                <Grid Padding="20,0,20,12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackLayout Grid.Column="0" Spacing="2">
+                        <Label Text="Vị Ngon" FontSize="13"
+                               TextColor="#FF6B35" FontAttributes="Bold"/>
+                        <Label Text="Street Eats" FontSize="22"
+                               FontAttributes="Bold" TextColor="#FFFFFF"/>
+                    </StackLayout>
+                    <Label Grid.Column="1" Text="VIEW ALL" FontSize="12"
+                           TextColor="#FF6B35" FontAttributes="Bold"
+                           VerticalOptions="End"/>
+                </Grid>
+
+                <!-- Horizontal POI cards -->
+                <ScrollView Orientation="Horizontal"
+                            HorizontalScrollBarVisibility="Never"
+                            Margin="0,0,0,28">
+                    <HorizontalStackLayout Padding="20,0" Spacing="14">
+                        <CollectionView ItemsSource="{Binding TopPois}"
+                                        ItemsLayout="HorizontalList"
+                                        HeightRequest="220">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="data:LocalPoi">
+                                    <Border WidthRequest="170" HeightRequest="210"
+                                            StrokeShape="RoundRectangle 16"
+                                            Stroke="#252525" BackgroundColor="#161616"
+                                            Margin="0,0,12,0">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=GoToDetailCommand}"
+                                                CommandParameter="{Binding Id}"/>
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="Auto,*" Padding="0">
+
+                                            <!-- Image area -->
+                                            <Border Grid.Row="0" HeightRequest="110"
+                                                    StrokeShape="RoundRectangle 16,16,0,0"
+                                                    Stroke="Transparent">
+                                                <Border.Background>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                        <GradientStop Color="#2A1500" Offset="0"/>
+                                                        <GradientStop Color="#1A0D00" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Border.Background>
+                                                <Label Text="🍜" FontSize="48"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" Opacity="0.8"/>
+                                            </Border>
+
+                                            <!-- HOT SELLER badge -->
+                                            <Border Grid.Row="0"
+                                                    BackgroundColor="#FF6B35"
+                                                    StrokeShape="RoundRectangle 6"
+                                                    Stroke="Transparent"
+                                                    Padding="7,3"
+                                                    HorizontalOptions="Start"
+                                                    VerticalOptions="Start"
+                                                    Margin="10,10,0,0">
+                                                <Label Text="HOT 🔥" FontSize="9"
+                                                       FontAttributes="Bold" TextColor="White"/>
+                                            </Border>
+
+                                            <!-- Info -->
+                                            <StackLayout Grid.Row="1" Spacing="4" Padding="12,10">
+                                                <Label Text="{Binding Name}" FontSize="14"
+                                                       FontAttributes="Bold" TextColor="#FFFFFF"
+                                                       MaxLines="1" LineBreakMode="TailTruncation"/>
+                                                <Label Text="{Binding ShortDescription}"
+                                                       FontSize="11" TextColor="#666666"
+                                                       MaxLines="2" LineBreakMode="TailTruncation"/>
+                                            </StackLayout>
+
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- ══ EXPLORE BUTTON ══ -->
+                <Grid Padding="20,0,20,40">
+                    <Border StrokeShape="RoundRectangle 16" Stroke="Transparent">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#FF6B35" Offset="0"/>
+                                <GradientStop Color="#FF4500" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
+                        </Border.GestureRecognizers>
+                        <Label Text="EXPLORE THE NIGHT  →"
+                               FontSize="15" FontAttributes="Bold"
+                               TextColor="White" HorizontalOptions="Center"
+                               Padding="0,18"/>
+                    </Border>
+                </Grid>
+
+            </StackLayout>
+        </ScrollView>
+
+        <!-- ══ BOTTOM NAV ══ -->
+        <Border Grid.Row="1" Stroke="#1E1E1E" StrokeShape="RoundRectangle 0">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#111111" Offset="0"/>
+                    <GradientStop Color="#0D0D0D" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+                <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
+                    <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 10"
+                            Stroke="Transparent" Padding="10,6" HorizontalOptions="Center">
+                        <Label Text="⊞" FontSize="20" TextColor="#FF6B35" HorizontalOptions="Center"/>
+                    </Border>
+                    <Label Text="Home" FontSize="10" TextColor="#FF6B35" HorizontalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                    <Label Text="🗺" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="Map" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                </StackLayout>
+                <Grid Grid.Column="2" HorizontalOptions="Center">
+                    <Border StrokeShape="RoundRectangle 30" Stroke="Transparent"
+                            WidthRequest="58" HeightRequest="58"
+                            HorizontalOptions="Center" Margin="0,-28,0,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#FF6B35" Offset="0"/>
+                                <GradientStop Color="#FF4500" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Label Text="🎵" FontSize="24"
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                    </Border>
+                </Grid>
+                <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                    <Label Text="⚙" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="Settings" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                </StackLayout>
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>
