@@ -46,6 +46,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<AudioPlayerService>();
         builder.Services.AddSingleton<NarrationEngine>();
         builder.Services.AddSingleton<GeofenceEngine>();
+        builder.Services.AddSingleton<LocalizationService>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();

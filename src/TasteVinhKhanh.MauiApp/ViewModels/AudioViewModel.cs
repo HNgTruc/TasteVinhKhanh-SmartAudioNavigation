@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Storage;
 using TasteVinhKhanh.MauiApp.Data;
 using TasteVinhKhanh.MauiApp.Services;
 
@@ -9,10 +10,11 @@ public partial class AudioViewModel : ObservableObject
 {
     private readonly AppDatabase _db;
     private readonly NarrationEngine _narration;
+    private readonly LocalizationService _i18n;
 
-    [ObservableProperty] private string _nowPlayingName = "Chọn một điểm thuyết minh";
-    [ObservableProperty] private string _nowPlayingDescription = "Đi đến bản đồ và chọn một quán để bắt đầu nghe thuyết minh";
-    [ObservableProperty] private string _nowPlayingStallLabel = "STALL #--";
+    [ObservableProperty] private string _nowPlayingName = "";
+    [ObservableProperty] private string _nowPlayingDescription = "";
+    [ObservableProperty] private string _nowPlayingStallLabel = "";
     [ObservableProperty] private string _playPauseIcon = "▶";
     [ObservableProperty] private bool _isPlaying = false;
     [ObservableProperty] private double _progress = 0;
@@ -21,14 +23,40 @@ public partial class AudioViewModel : ObservableObject
     [ObservableProperty] private string _speedLabel = "1.0x";
     [ObservableProperty] private string _volumeLabel = "80%";
 
+    // ── Bindable translated strings ──
+    [ObservableProperty] private string _tNowPlaying = "";
+    [ObservableProperty] private string _tSelect = "";
+    [ObservableProperty] private string _tSelectHint = "";
+    [ObservableProperty] private string _tStall = "";
+    [ObservableProperty] private string _tNavHome = "";
+    [ObservableProperty] private string _tNavMap = "";
+    [ObservableProperty] private string _tNavAudio = "";
+    [ObservableProperty] private string _tNavSettings = "";
+
     private LocalPoi? _currentPoi;
 
-    public AudioViewModel(AppDatabase db, NarrationEngine narration)
+    public AudioViewModel(AppDatabase db, NarrationEngine narration, LocalizationService i18n)
     {
         _db = db;
         _narration = narration;
+        _i18n = i18n;
+        RefreshTexts();
+
+        _i18n.LanguageChanged += RefreshTexts;
 
         _narration.NarrationStarted += OnNarrationStarted;
+    }
+
+    private void RefreshTexts()
+    {
+        TNowPlaying = _i18n.T("Audio_NowPlaying");
+        TSelect = _i18n.T("Audio_Select");
+        TSelectHint = _i18n.T("Audio_SelectHint");
+        TStall = _i18n.T("Audio_Stall");
+        TNavHome = _i18n.T("Nav_Home");
+        TNavMap = _i18n.T("Nav_Map");
+        TNavAudio = _i18n.T("Nav_Audio");
+        TNavSettings = _i18n.T("Nav_Settings");
     }
 
     private async void OnNarrationStarted(string poiName)
@@ -39,7 +67,7 @@ public partial class AudioViewModel : ObservableObject
 
         NowPlayingName = _currentPoi.Name;
         NowPlayingDescription = _currentPoi.ShortDescription;
-        NowPlayingStallLabel = $"STALL #{_currentPoi.Id:D2}";
+        NowPlayingStallLabel = $"{TStall}{_currentPoi.Id:D2}";
         PlayPauseIcon = "⏸";
         IsPlaying = true;
     }
@@ -60,9 +88,10 @@ public partial class AudioViewModel : ObservableObject
             IsPlaying = true;
         }
     }
+
     [RelayCommand]
     public async Task GoToHome()
-    => await Shell.Current.GoToAsync("//HomePage");
+        => await Shell.Current.GoToAsync("//HomePage");
 
     [RelayCommand]
     public async Task GoToMap()

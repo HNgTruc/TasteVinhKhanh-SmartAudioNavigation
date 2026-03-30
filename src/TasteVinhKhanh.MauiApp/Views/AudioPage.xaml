@@ -12,41 +12,12 @@
 
             <!-- Header -->
             <Grid Padding="24,52,24,20">
-                <Label Text="Audio Guide" FontSize="22"
+                <Label Text="{Binding TNowPlaying}" FontSize="22"
                        FontAttributes="Bold" TextColor="#FFFFFF"/>
             </Grid>
 
-            <!-- Language tabs -->
-            <ScrollView Orientation="Horizontal"
-                        HorizontalScrollBarVisibility="Never"
-                        Margin="0,0,0,24">
-                <HorizontalStackLayout Padding="20,0" Spacing="8">
-                    <Border BackgroundColor="#FF6B35" StrokeShape="RoundRectangle 20"
-                            Stroke="Transparent" Padding="16,10">
-                        <Label Text="VI 🇻🇳" FontSize="13"
-                               FontAttributes="Bold" TextColor="White"/>
-                    </Border>
-                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
-                            Stroke="#333333" Padding="16,10">
-                        <Label Text="EN 🇬🇧" FontSize="13" TextColor="#AAAAAA"/>
-                    </Border>
-                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
-                            Stroke="#333333" Padding="16,10">
-                        <Label Text="ZH 🇨🇳" FontSize="13" TextColor="#AAAAAA"/>
-                    </Border>
-                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
-                            Stroke="#333333" Padding="16,10">
-                        <Label Text="KO 🇰🇷" FontSize="13" TextColor="#AAAAAA"/>
-                    </Border>
-                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
-                            Stroke="#333333" Padding="16,10">
-                        <Label Text="JA 🇯🇵" FontSize="13" TextColor="#AAAAAA"/>
-                    </Border>
-                </HorizontalStackLayout>
-            </ScrollView>
-
             <!-- NOW PLAYING CARD -->
-            <Border Margin="20,0" StrokeShape="RoundRectangle 24"
+            <Border Margin="20,0,20,24" StrokeShape="RoundRectangle 24"
                     Stroke="Transparent" HeightRequest="280">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -170,14 +141,14 @@
                         <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
                     </StackLayout.GestureRecognizers>
                     <Label Text="⊞" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
-                    <Label Text="Home" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="{Binding TNavHome}" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
                 <StackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
                     </StackLayout.GestureRecognizers>
                     <Label Text="🗺" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
-                    <Label Text="Map" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="{Binding TNavMap}" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
                 <Grid Grid.Column="2" HorizontalOptions="Center">
                     <Border StrokeShape="RoundRectangle 30" Stroke="Transparent"
@@ -198,7 +169,7 @@
                         <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
                     </StackLayout.GestureRecognizers>
                     <Label Text="⚙" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
-                    <Label Text="Settings" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="{Binding TNavSettings}" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
             </Grid>
         </Border>
