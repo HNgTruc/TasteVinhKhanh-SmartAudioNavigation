@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh Admin — Quản lý Tours</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🍜 TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="poi.html">
+                    <span class="icon">📍</span> Điểm thuyết minh
+                </a>
+                <a href="tour.html" class="active">
+                    <span class="icon">🗺️</span> Quản lý Tours
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Quản trị viên</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center"
+                        onclick="logout()">
+                    🚪 Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="topbar">
+                <h2>🗺️ Quản lý Tours</h2>
+            </div>
+
+            <div class="content">
+                <div class="card">
+                    <div class="table-header">
+                        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                            <div class="search-box">
+                                <span class="search-icon">🔍</span>
+                                <input type="text" id="searchInput" class="form-control"
+                                       placeholder="Tìm kiếm tour..."
+                                       oninput="debounceSearch()" style="min-width:200px;">
+                            </div>
+                            <select id="statusFilter" class="form-control" onchange="loadTours(1)"
+                                    style="width:auto; min-width:150px;">
+                                <option value="active">Hoạt động</option>
+                                <option value="all">Tất cả</option>
+                                <option value="inactive">Đã xóa</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="openCreateModal()">
+                            ➕ Tạo Tour mới
+                        </button>
+                    </div>
+
+                    <!-- Pagination info -->
+                    <div id="paginationInfo" class="pagination-info" style="display:none; padding:8px 16px; font-size:13px; color:var(--gray-500);">
+                        Hiển thị <span id="paginationText"></span>
+                    </div>
+
+                    <div id="tableLoading" class="loading"><div class="spinner"></div></div>
+
+                    <table id="tourTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên tour</th>
+                                <th>Mô tả</th>
+                                <th>Số POI</th>
+                                <th>Ngày tạo</th>
+                                <th>Trạng thái</th>
+                                <th style="width:140px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tourBody"></tbody>
+                    </table>
+
+                    <!-- Pagination controls -->
+                    <div id="paginationControls" class="pagination" style="display:none; justify-content:center; gap:4px;"></div>
+
+                    <div id="tourEmpty" class="empty-state" style="display:none">
+                        <div class="empty-icon">🗺️</div>
+                        <p>Chưa có tour nào.</p>
+                        <p style="font-size:13px; color:var(--gray-500)">Nhấn "Tạo Tour mới" để bắt đầu.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: TẠO / SỬA TOUR -->
+    <div class="modal-overlay" id="tourModal">
+        <div class="modal" style="max-width:640px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">Tạo Tour mới</h3>
+                <button class="btn-icon" onclick="closeModal('tourModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAlert" class="alert alert-error" style="display:none"></div>
+                <input type="hidden" id="tourId">
+
+                <!-- Thông tin tour -->
+                <div class="form-group">
+                    <label>Tên tour *</label>
+                    <input type="text" id="tourName" class="form-control"
+                           placeholder="VD: Tour Miền Tây 1 Ngày" maxlength="200">
+                    <div id="nameCharCount" style="text-align:right; font-size:11px; color:var(--gray-400); margin-top:2px;"></div>
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <textarea id="tourDesc" class="form-control" rows="2"
+                             placeholder="Mô tả ngắn về tour..." maxlength="1000"></textarea>
+                </div>
+
+                <!-- Chọn POIs -->
+                <div class="form-group">
+                    <label>Điểm tham quan (POIs) *</label>
+                    <p style="font-size:12px; color:var(--gray-500); margin:4px 0 10px;">
+                        Kéo thả hoặc dùng nút ⬆️⬇️ để sắp xếp thứ tự lộ trình.
+                    </p>
+
+                    <!-- Danh sách POI đã chọn -->
+                    <div id="selectedPois" style="min-height:48px; border:1px solid var(--gray-200);
+                         border-radius:8px; padding:8px; background:var(--gray-50);">
+                        <div id="selectedPoisEmpty" style="text-align:center; color:var(--gray-400);
+                             font-size:13px; padding:8px;">
+                            Chưa chọn điểm nào. Nhấn "Thêm điểm" bên dưới.
+                        </div>
+                        <div id="selectedPoisList"></div>
+                    </div>
+
+                    <!-- Nút thêm POI -->
+                    <button class="btn btn-outline btn-sm" style="margin-top:8px;"
+                            onclick="openPoiPicker()">
+                        ➕ Thêm điểm tham quan
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('tourModal')">Huỷ</button>
+                <button class="btn btn-primary" onclick="saveTour()" id="saveBtn">💾 Lưu Tour</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHỌN POI -->
+    <div class="modal-overlay" id="poiPickerModal">
+        <div class="modal" style="max-width:500px;">
+            <div class="modal-header">
+                <h3>Chọn điểm tham quan</h3>
+                <button class="btn-icon" onclick="closeModal('poiPickerModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-box" style="margin-bottom:12px;">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="poiPickerSearch" class="form-control"
+                           placeholder="Tìm kiếm điểm..."
+                           oninput="renderPoiPicker()">
+                </div>
+                <div id="poiPickerList" style="max-height:350px; overflow-y:auto;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('poiPickerModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHI TIẾT TOUR -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal" style="max-width:560px;">
+            <div class="modal-header">
+                <h3 id="detailTitle">Chi tiết Tour</h3>
+                <button class="btn-icon" onclick="closeModal('detailModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="detailBody"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('detailModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    if (!requireAuth()) throw new Error('Not authenticated');
+
+    // ── State ──────────────────────────────────────────────────────────────────
+    let allPois = [];
+    let selectedPoiIds = [];       // đang chọn trong modal create/edit
+    let currentPage = 1;
+    let currentSearch = '';
+    let currentIncludeInactive = false;
+    let searchTimeout = null;
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+    async function init() {
+        await Promise.all([loadTours(1), loadAllPois()]);
+    }
+
+    async function loadAllPois() {
+        try {
+            allPois = await getAllPois(true) || [];
+        } catch (e) {
+            allPois = [];
+        }
+    }
+
+    // ── Load Tours ─────────────────────────────────────────────────────────────
+    async function loadTours(page) {
+        currentPage = page;
+        currentIncludeInactive = document.getElementById('statusFilter').value === 'all'
+            ? true : (document.getElementById('statusFilter').value === 'inactive' ? 'only' : false);
+
+        document.getElementById('tableLoading').style.display = 'block';
+        document.getElementById('tourTable').style.display = 'none';
+        document.getElementById('tourEmpty').style.display = 'none';
+        document.getElementById('paginationControls').style.display = 'none';
+        document.getElementById('paginationInfo').style.display = 'none';
+
+        try {
+            // Truyền includeInactive dạng bool hoặc 'only'
+            const includeInactive = currentIncludeInactive === 'only' ? true : currentIncludeInactive;
+            const data = await getTours(currentPage, 10, currentSearch, includeInactive);
+            renderTours(data);
+        } catch (e) {
+            showToast('Không thể tải danh sách tours', 'error');
+            document.getElementById('tableLoading').style.display = 'none';
+        }
+    }
+
+    function renderTours(data) {
+        document.getElementById('tableLoading').style.display = 'none';
+
+        if (!data || !data.items || data.items.length === 0) {
+            document.getElementById('tourEmpty').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('tourTable').style.display = 'table';
+        document.getElementById('paginationInfo').style.display = 'flex';
+
+        const start = (data.page - 1) * data.pageSize + 1;
+        const end = Math.min(data.page * data.pageSize, data.totalCount);
+        document.getElementById('paginationText').textContent =
+            `${start}–${end} của ${data.totalCount} tour`;
+
+        document.getElementById('tourBody').innerHTML = data.items.map((t, i) => `
+            <tr>
+                <td>${start + i}</td>
+                <td>
+                    <div style="font-weight:600; cursor:pointer; color:var(--primary);"
+                         onclick="openDetailModal(${t.id})">${t.name}</div>
+                </td>
+                <td style="font-size:12px; color:var(--gray-500); max-width:200px;">
+                    ${t.description ? (t.description.length > 80 ? t.description.substring(0,80) + '…' : t.description) : '—'}
+                </td>
+                <td><span class="badge badge-info">${t.poiCount} điểm</span></td>
+                <td style="font-size:12px; color:var(--gray-500);">${formatDate(t.createdAt)}</td>
+                <td>
+                    <span class="badge ${t.isActive ? 'badge-success' : 'badge-danger'}">
+                        ${t.isActive ? 'Hoạt động' : 'Đã xóa'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn-icon edit" onclick="openEditModal(${t.id})" title="Sửa">✏️</button>
+                    <button class="btn-icon delete" onclick="confirmDelete(${t.id}, '${t.name.replace(/'/g, "\\'")}')"
+                            title="Xóa">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+
+        // Pagination controls
+        if (data.totalPages > 1) {
+            document.getElementById('paginationControls').style.display = 'flex';
+            renderPagination(data.page, data.totalPages);
+        } else {
+            document.getElementById('paginationControls').style.display = 'none';
+        }
+    }
+
+    function renderPagination(page, totalPages) {
+        const container = document.getElementById('paginationControls');
+        let html = '';
+
+        // Prev
+        html += `<button class="btn btn-outline btn-sm" ${page <= 1 ? 'disabled' : ''}
+                          onclick="loadTours(${page - 1})">‹</button>`;
+
+        // Pages
+        const range = [];
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || Math.abs(i - page) <= 2)
+                range.push(i);
+            else if (range[range.length - 1] !== '…')
+                range.push('…');
+        }
+        range.forEach(p => {
+            if (p === '…') html += `<span style="padding:0 4px; color:var(--gray-400)">…</span>`;
+            else html += `<button class="btn ${p === page ? 'btn-primary' : 'btn-outline'} btn-sm"
+                                  onclick="loadTours(${p})">${p}</button>`;
+        });
+
+        // Next
+        html += `<button class="btn btn-outline btn-sm" ${page >= totalPages ? 'disabled' : ''}
+                          onclick="loadTours(${page + 1})">›</button>`;
+
+        container.innerHTML = html;
+    }
+
+    // ── Search ─────────────────────────────────────────────────────────────────
+    function debounceSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentSearch = document.getElementById('searchInput').value;
+            loadTours(1);
+        }, 350);
+    }
+
+    // ── Create / Edit ──────────────────────────────────────────────────────────
+    function openCreateModal() {
+        document.getElementById('modalTitle').textContent = 'Tạo Tour mới';
+        document.getElementById('tourId').value = '';
+        document.getElementById('tourName').value = '';
+        document.getElementById('tourDesc').value = '';
+        document.getElementById('nameCharCount').textContent = '';
+        selectedPoiIds = [];
+        renderSelectedPois();
+        document.getElementById('modalAlert').style.display = 'none';
+        openModal('tourModal');
+    }
+
+    async function openEditModal(id) {
+        document.getElementById('modalTitle').textContent = 'Chỉnh sửa Tour';
+        document.getElementById('modalAlert').style.display = 'none';
+
+        try {
+            const tour = await getTour(id);
+            if (!tour) { showToast('Không tìm thấy tour', 'error'); return; }
+
+            document.getElementById('tourId').value = tour.id;
+            document.getElementById('tourName').value = tour.name;
+            document.getElementById('tourDesc').value = tour.description || '';
+            document.getElementById('nameCharCount').textContent =
+                `${tour.name.length}/200`;
+
+            selectedPoiIds = tour.pois.map(p => p.poiId);
+            renderSelectedPois();
+            openModal('tourModal');
+        } catch (e) {
+            showToast('Không tải được thông tin tour', 'error');
+        }
+    }
+
+    // Theo dõi số ký tự tên tour
+    document.getElementById('tourName')?.addEventListener('input', function () {
+        const count = document.getElementById('nameCharCount');
+        if (count) count.textContent = `${this.value.length}/200`;
+    });
+
+    // ── POI Picker ─────────────────────────────────────────────────────────────
+    function openPoiPicker() {
+        document.getElementById('poiPickerSearch').value = '';
+        renderPoiPicker();
+        openModal('poiPickerModal');
+    }
+
+    function renderPoiPicker() {
+        const q = document.getElementById('poiPickerSearch').value.toLowerCase();
+        const activePois = allPois.filter(p => p.isActive);
+
+        const filtered = q
+            ? activePois.filter(p => p.name.toLowerCase().includes(q))
+            : activePois;
+
+        if (filtered.length === 0) {
+            document.getElementById('poiPickerList').innerHTML =
+                '<div style="text-align:center; color:var(--gray-400); padding:24px;">Không tìm thấy điểm nào.</div>';
+            return;
+        }
+
+        document.getElementById('poiPickerList').innerHTML = filtered.map(p => `
+            <div style="display:flex; align-items:center; gap:10px; padding:10px;
+                        border-bottom:1px solid var(--gray-100);">
+                <div style="flex:1;">
+                    <div style="font-weight:500;">${p.name}</div>
+                    <div style="font-size:12px; color:var(--gray-500);">
+                        ${p.shortDescription || ''}
+                    </div>
+                </div>
+                ${selectedPoiIds.includes(p.id)
+                    ? `<span class="badge badge-success" style="white-space:nowrap;">✓ Đã chọn</span>`
+                    : `<button class="btn btn-outline btn-sm" onclick="addPoiToTour(${p.id})">Thêm</button>`
+                }
+            </div>
+        `).join('');
+    }
+
+    function addPoiToTour(poiId) {
+        if (selectedPoiIds.includes(poiId)) return;
+        selectedPoiIds.push(poiId);
+        renderSelectedPois();
+        renderPoiPicker(); // cập nhật lại trạng thái "Đã chọn"
+        showToast('Đã thêm điểm vào tour');
+    }
+
+    function removePoiFromTour(poiId) {
+        if (selectedPoiIds.length <= 1) {
+            showToast('Tour phải có ít nhất 1 điểm', 'error');
+            return;
+        }
+        selectedPoiIds = selectedPoiIds.filter(id => id !== poiId);
+        renderSelectedPois();
+    }
+
+    function movePoiInTour(poiId, direction) {
+        const idx = selectedPoiIds.indexOf(poiId);
+        const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+        if (newIdx < 0 || newIdx >= selectedPoiIds.length) return;
+        [selectedPoiIds[idx], selectedPoiIds[newIdx]] = [selectedPoiIds[newIdx], selectedPoiIds[idx]];
+        renderSelectedPois();
+    }
+
+    function renderSelectedPois() {
+        const emptyEl = document.getElementById('selectedPoisEmpty');
+        const listEl = document.getElementById('selectedPoisList');
+
+        if (selectedPoiIds.length === 0) {
+            emptyEl.style.display = 'block';
+            listEl.innerHTML = '';
+            return;
+        }
+        emptyEl.style.display = 'none';
+
+        listEl.innerHTML = selectedPoiIds.map((poiId, idx) => {
+            const poi = allPois.find(p => p.id === poiId);
+            if (!poi) return '';
+            return `
+            <div style="display:flex; align-items:center; gap:8px;
+                        padding:6px 8px; background:white; border-radius:6px;
+                        border:1px solid var(--gray-200); margin-bottom:4px;"
+                        draggable="true"
+                        ondragstart="onDragStart(event, ${idx})"
+                        ondragover="onDragOver(event)"
+                        ondrop="onDrop(event, ${idx})">
+                <span style="color:var(--gray-400); font-size:16px; cursor:grab;">⋮⋮</span>
+                <span class="badge badge-info" style="min-width:24px; text-align:center; font-size:11px;">${idx + 1}</span>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:500; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                        ${poi.name}
+                    </div>
+                </div>
+                <button class="btn-icon" style="font-size:14px;"
+                        onclick="movePoiInTour(${poiId}, 'up')" ${idx === 0 ? 'disabled' : ''}
+                        title="Lên">⬆️</button>
+                <button class="btn-icon" style="font-size:14px;"
+                        onclick="movePoiInTour(${poiId}, 'down')" ${idx === selectedPoiIds.length - 1 ? 'disabled' : ''}
+                        title="Xuống">⬇️</button>
+                <button class="btn-icon delete" onclick="removePoiFromTour(${poiId})"
+                        title="Xóa khỏi tour">✕</button>
+            </div>`;
+        }).join('');
+    }
+
+    // ── Drag & Drop reorder ────────────────────────────────────────────────────
+    let dragIdx = -1;
+
+    function onDragStart(e, idx) {
+        dragIdx = idx;
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function onDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+
+    function onDrop(e, targetIdx) {
+        e.preventDefault();
+        if (dragIdx === -1 || dragIdx === targetIdx) return;
+        const moved = selectedPoiIds.splice(dragIdx, 1)[0];
+        selectedPoiIds.splice(targetIdx, 0, moved);
+        renderSelectedPois();
+        dragIdx = -1;
+    }
+
+    // ── Save Tour ───────────────────────────────────────────────────────────────
+    async function saveTour() {
+        const id = document.getElementById('tourId').value;
+        const name = document.getElementById('tourName').value.trim();
+        const desc = document.getElementById('tourDesc').value.trim();
+        const alertBox = document.getElementById('modalAlert');
+
+        if (!name) {
+            alertBox.textContent = 'Tên tour không được để trống.';
+            alertBox.style.display = 'block';
+            return;
+        }
+        if (name.length > 200) {
+            alertBox.textContent = 'Tên tour không được vượt quá 200 ký tự.';
+            alertBox.style.display = 'block';
+            return;
+        }
+        if (desc.length > 1000) {
+            alertBox.textContent = 'Mô tả không được vượt quá 1000 ký tự.';
+            alertBox.style.display = 'block';
+            return;
+        }
+        if (selectedPoiIds.length === 0) {
+            alertBox.textContent = 'Tour phải có ít nhất 1 điểm tham quan.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        alertBox.style.display = 'none';
+        const btn = document.getElementById('saveBtn');
+        btn.textContent = 'Đang lưu…';
+        btn.disabled = true;
+
+        const data = { name, description: desc || null, poiIds: [...selectedPoiIds] };
+
+        try {
+            if (id) {
+                await updateTour(parseInt(id), data);
+                showToast('Cập nhật tour thành công!');
+            } else {
+                await createTour(data);
+                showToast('Tạo tour mới thành công!');
+            }
+            closeModal('tourModal');
+            await loadTours(currentPage);
+        } catch (e) {
+            alertBox.textContent = 'Lưu thất bại. Vui lòng thử lại.';
+            alertBox.style.display = 'block';
+        }
+
+        btn.textContent = '💾 Lưu Tour';
+        btn.disabled = false;
+    }
+
+    // ── Delete ─────────────────────────────────────────────────────────────────
+    async function confirmDelete(id, name) {
+        if (!confirm(`Xóa tour "${name}"?\nTour sẽ bị ẩn khỏi danh sách.`)) return;
+        try {
+            await deleteTour(id);
+            showToast('Đã xóa tour');
+            await loadTours(currentPage);
+        } catch (e) {
+            showToast('Xóa thất bại!', 'error');
+        }
+    }
+
+    // ── Detail Modal ───────────────────────────────────────────────────────────
+    async function openDetailModal(id) {
+        try {
+            const tour = await getTour(id);
+            if (!tour) { showToast('Không tìm thấy tour', 'error'); return; }
+
+            document.getElementById('detailTitle').textContent = tour.name;
+            document.getElementById('detailBody').innerHTML = `
+                <div style="margin-bottom:16px;">
+                    <div style="font-size:13px; color:var(--gray-500); margin-bottom:8px;">
+                        Mô tả
+                    </div>
+                    <div>${tour.description || '<em style="color:var(--gray-400)">Không có mô tả</em>'}</div>
+                </div>
+                <div style="font-size:13px; color:var(--gray-500); margin-bottom:8px;">
+                    Lộ trình — ${tour.pois.length} điểm
+                </div>
+                <div style="border:1px solid var(--gray-200); border-radius:8px; overflow:hidden;">
+                    ${tour.pois.length === 0
+                        ? '<div style="padding:16px; color:var(--gray-400); text-align:center;">Tour không có điểm nào.</div>'
+                        : tour.pois.map((p, i) => `
+                            <div style="display:flex; align-items:center; gap:10px;
+                                        padding:10px 12px; border-bottom:1px solid var(--gray-100);
+                                        ${i === tour.pois.length - 1 ? 'border-bottom:none;' : ''}">
+                                <span class="badge badge-info" style="min-width:24px; text-align:center;">${p.stopOrder}</span>
+                                <div style="flex:1;">
+                                    <div style="font-weight:500; font-size:13px;">${p.poiName}</div>
+                                </div>
+                                ${!p.poiIsActive
+                                    ? '<span class="badge badge-danger" style="font-size:10px;">Đã ẩn</span>'
+                                    : ''}
+                            </div>
+                        `).join('')
+                    }
+                </div>
+                <div style="margin-top:12px; font-size:12px; color:var(--gray-400);">
+                    Tạo: ${formatDate(tour.createdAt)}
+                    ${tour.updatedAt ? `<br>Cập nhật: ${formatDate(tour.updatedAt)}` : ''}
+                </div>
+            `;
+            openModal('detailModal');
+        } catch (e) {
+            showToast('Không tải được chi tiết tour', 'error');
+        }
+    }
+
+    // ── Start ──────────────────────────────────────────────────────────────────
+    init();
+    </script>
+
+</body>
+</html>

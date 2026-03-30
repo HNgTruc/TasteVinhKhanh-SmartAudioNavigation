@@ -7,28 +7,71 @@
         <member name="M:TasteVinhKhanh.MauiApp.Data.AppDatabase.WasRecentlyPlayedAsync(System.Int32,System.TimeSpan)">
             <summary>Kiểm tra cooldown — tránh phát lại cùng POI quá nhanh</summary>
         </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Services.AudioPlayerService">
+            <summary>
+            Tải audio file từ server, lưu local, và phát audio.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.PlayAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript)">
+            <summary>
+            Đảm bảo audio đã được tải về, rồi phát nó.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.DownloadAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript)">
+            <summary>
+            Tải audio từ URL về thư mục app và đánh dấu đã tải.
+            </summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.GeofenceEngine">
             <summary>
             Tính khoảng cách Haversine, phát hiện POI trong tầm,
-            kích hoạt NarrationEngine khi người dùng đến gần
+            kích hoạt NarrationEngine khi người dùng đến gần.
             </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.GeofenceEngine.HaversineMeters(System.Double,System.Double,System.Double,System.Double)">
             <summary>Công thức Haversine — tính khoảng cách giữa 2 toạ độ (mét)</summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.LocationService">
-            <summary>Theo dõi GPS liên tục foreground + background</summary>
+            <summary>
+            Theo dõi GPS liên tục — foreground.
+            Background location (khi app không mở) cần cấu hình thêm Android Service
+            trong AndroidManifest.xml và MainActivity.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Services.NotificationService">
+            <summary>
+            Gửi local notification khi người dùng đến gần 1 POI.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Services.SyncService">
+            <inheritdoc/>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.SyncPoisAsync">
             <summary>
-            Gọi GET /api/sync từ SQL Server về
-            Lưu vào SQLite local để app chạy offline
+            Gọi GET /api/sync từ server về.
+            Lưu vào SQLite local để app chạy offline.
+            Nếu API lỗi → dùng dữ liệu offline có sẵn.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.BuildOfflineResult(System.String)">
+            <summary>
+            Fallback: trả về dữ liệu offline từ SQLite.
             </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.UploadPendingLogsAsync">
             <summary>
-            Gửi log chưa đồng bộ lên server khi có mạng
+            Gửi log chưa đồng bộ lên server khi có mạng.
+            Chạy nền, không ảnh hưởng UX.
             </summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.Services.SyncService.SyncStatus">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.Services.SyncService._syncStatus"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.Services.SyncService.IsSyncing">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.Services.SyncService._isSyncing"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.Services.SyncService.LastSyncAt">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.Services.SyncService._lastSyncAt"/>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel">
             <inheritdoc/>
@@ -106,6 +149,7 @@
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
+            <inheritdoc/>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TopPois">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._topPois"/>
@@ -118,6 +162,12 @@
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.InitCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.InitAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.openLanguagePickerCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.OpenLanguagePickerCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.OpenLanguagePickerCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.OpenLanguagePicker"/>.</summary>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToDetailCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetailCommand"/>.</summary>
@@ -157,6 +207,22 @@
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="E:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.LocationChanged">
+            <summary>
+            Sự kiện bắn khi vị trí người dùng thay đổi — dùng bởi MapPage.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.UpdateNearbyHighlight(Microsoft.Maui.Devices.Sensors.Location)">
+            <summary>
+            Highlight POI gần nhất (gọi từ MapPage khi có location update).
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.CalculateDistance(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Khoảng cách Haversine (mét).
+            </summary>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.Pois">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._pois"/>
@@ -164,14 +230,35 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.NearestPoi">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._nearestPoi"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.SelectedPoi">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._selectedPoi"/>
+        </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.StatusMessage">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._statusMessage"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.SyncDetail">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._syncDetail"/>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.IsLoading">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._isLoading"/>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.CurrentLanguage">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._currentLanguage"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.PoiCountLabel">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._poiCountLabel"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.CurrentUserLocation">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._currentUserLocation"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.NearestPoiId">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._nearestPoiId"/>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.toggleFavoriteCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.ToggleFavoriteCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.ToggleFavoriteCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.ToggleFavorite(System.Int32)"/>.</summary>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.initCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.InitCommand"/>.</summary>
@@ -311,11 +398,130 @@
             Exposes the Android Resource designer assembly into the project Namespace.
             </summary>
         </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Button.TextColorTo(Microsoft.Maui.Controls.Button,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_DatePicker.TextColorTo(Microsoft.Maui.Controls.DatePicker,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Editor.TextColorTo(Microsoft.Maui.Controls.Editor,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Entry.TextColorTo(Microsoft.Maui.Controls.Entry,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_InputView.TextColorTo(Microsoft.Maui.Controls.InputView,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Label.TextColorTo(Microsoft.Maui.Controls.Label,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Picker.TextColorTo(Microsoft.Maui.Controls.Picker,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_RadioButton.TextColorTo(Microsoft.Maui.Controls.RadioButton,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_SearchBar.TextColorTo(Microsoft.Maui.Controls.SearchBar,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
+        <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_TimePicker.TextColorTo(Microsoft.Maui.Controls.TimePicker,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing)">
+            <summary>
+            Animates the TextColor of an <see cref = "T:Microsoft.Maui.ITextStyle"/> to the given color
+            </summary>
+            <param name = "element"></param>
+            <param name = "color">The target color to animate the <see cref = "P:Microsoft.Maui.ITextStyle.TextColor"/> to</param>
+            <param name = "rate">The time, in milliseconds, between the frames of the animation</param>
+            <param name = "length">The duration, in milliseconds, of the animation</param>
+            <param name = "easing">The easing function to be used in the animation</param>
+            <returns>Value indicating if the animation completed successfully or not</returns>
+        </member>
         <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs">
             <summary>
             A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instances
             for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
             </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SyncStatus">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SyncStatus" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsSyncing">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsSyncing" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.LastSyncAt">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "LastSyncAt" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NowPlayingName">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NowPlayingName" generated properties.</summary>
@@ -359,14 +565,29 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NearestPoi">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NearestPoi" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedPoi">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedPoi" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.StatusMessage">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SyncDetail">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SyncDetail" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsLoading">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsLoading" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentLanguage">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentLanguage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PoiCountLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PoiCountLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentUserLocation">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentUserLocation" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NearestPoiId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NearestPoiId" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PoiId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PoiId" generated properties.</summary>
@@ -394,6 +615,15 @@
             A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
             for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
             </summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SyncStatus">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SyncStatus" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsSyncing">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsSyncing" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.LastSyncAt">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "LastSyncAt" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NowPlayingName">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NowPlayingName" generated properties.</summary>
@@ -437,14 +667,29 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NearestPoi">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NearestPoi" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedPoi">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedPoi" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.StatusMessage">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "StatusMessage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SyncDetail">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SyncDetail" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsLoading">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsLoading" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentLanguage">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentLanguage" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PoiCountLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PoiCountLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentUserLocation">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentUserLocation" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NearestPoiId">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NearestPoiId" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PoiId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PoiId" generated properties.</summary>

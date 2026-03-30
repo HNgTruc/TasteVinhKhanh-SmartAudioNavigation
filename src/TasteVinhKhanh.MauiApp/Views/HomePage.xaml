@@ -48,19 +48,14 @@
                                FontSize="13" TextColor="#777777"
                                LineBreakMode="WordWrap" Margin="0,4,0,0"/>
 
-                        <!-- Language badge -->
+                        <!-- Language globe button -->
                         <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
-                                Stroke="#333333" Padding="12,6" HorizontalOptions="Start"
+                                Stroke="#FF6B3560" Padding="12,6" HorizontalOptions="Start"
                                 Margin="0,8,0,0">
-                            <Label FontSize="12" TextColor="#AAAAAA">
-                                <Label.FormattedText>
-                                    <FormattedString>
-                                        <Span Text="🌐  "/>
-                                        <Span Text="{Binding CurrentLanguageLabel}"
-                                              TextColor="#FF6B35" FontAttributes="Bold"/>
-                                    </FormattedString>
-                                </Label.FormattedText>
-                            </Label>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding OpenLanguagePickerCommand}"/>
+                            </Border.GestureRecognizers>
+                            <Label Text="🌐" FontSize="14" TextColor="#FF6B35"/>
                         </Border>
                     </StackLayout>
 
@@ -245,10 +240,16 @@
                     <Label Text="Home" FontSize="10" TextColor="#FF6B35" HorizontalOptions="Center"/>
                 </StackLayout>
                 <StackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
+                    </StackLayout.GestureRecognizers>
                     <Label Text="🗺" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Map" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
                 <Grid Grid.Column="2" HorizontalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToAudioCommand}"/>
+                    </Grid.GestureRecognizers>
                     <Border StrokeShape="RoundRectangle 30" Stroke="Transparent"
                             WidthRequest="58" HeightRequest="58"
                             HorizontalOptions="Center" Margin="0,-28,0,0">
@@ -263,6 +264,9 @@
                     </Border>
                 </Grid>
                 <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
+                    </StackLayout.GestureRecognizers>
                     <Label Text="⚙" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Settings" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>

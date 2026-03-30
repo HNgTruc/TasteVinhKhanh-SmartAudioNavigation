@@ -4,19 +4,21 @@ namespace TasteVinhKhanh.MauiApp.Services;
 
 /// <summary>
 /// Tính khoảng cách Haversine, phát hiện POI trong tầm,
-/// kích hoạt NarrationEngine khi người dùng đến gần
+/// kích hoạt NarrationEngine khi người dùng đến gần.
 /// </summary>
 public class GeofenceEngine
 {
     private readonly AppDatabase _db;
     private readonly NarrationEngine _narration;
+    private readonly NotificationService _notif;
 
     public event Action<LocalPoi, double>? PoiTriggered;
 
-    public GeofenceEngine(AppDatabase db, NarrationEngine narration)
+    public GeofenceEngine(AppDatabase db, NarrationEngine narration, NotificationService notif)
     {
         _db = db;
         _narration = narration;
+        _notif = notif;
     }
 
     public async Task CheckLocationAsync(Location location)
@@ -43,6 +45,10 @@ public class GeofenceEngine
         if (await _db.WasRecentlyPlayedAsync(inRange.Poi.Id, TimeSpan.FromMinutes(5)))
             return;
 
+        // Gửi notification để người dùng biết (dù điện thoại đang khóa)
+        await _notif.ShowPoiNotificationAsync(inRange.Poi.Name, inRange.Distance);
+
+        // Kích hoạt thuyết minh
         PoiTriggered?.Invoke(inRange.Poi, inRange.Distance);
         await _narration.PlayAsync(inRange.Poi, inRange.Distance, location);
     }

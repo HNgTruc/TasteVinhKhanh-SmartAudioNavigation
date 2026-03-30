@@ -78,3 +78,36 @@ async function getSummary() {
 async function getTopPois(top = 10) {
     return await apiCall('GET', `/api/analytics/top-pois?top=${top}`);
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOUR APIs
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function getTours(page = 1, pageSize = 10, search = '', includeInactive = false) {
+    const params = new URLSearchParams({
+        page, pageSize,
+        search: search || '',
+        includeInactive
+    });
+    return await apiCall('GET', `/api/tour?${params}`);
+}
+
+async function getTour(id) {
+    return await apiCall('GET', `/api/tour/${id}`);
+}
+
+async function createTour(data) {
+    return await apiCall('POST', '/api/tour', data);
+}
+
+async function updateTour(id, data) {
+    return await apiCall('PUT', `/api/tour/${id}`, data);
+}
+
+async function reorderTour(id, poiIds) {
+    return await apiCall('PUT', `/api/tour/${id}/reorder`, { poiIds });
+}
+
+async function deleteTour(id) {
+    return await apiCall('DELETE', `/api/tour/${id}`);
+}

@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TasteVinhKhanh.MauiApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+b32cd906dcb53263b6ae7dba951d7eaee179a466")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+27723999510ea2ed990e41cd711f69cbb608b8f2")]
 [assembly: System.Reflection.AssemblyProductAttribute("TasteVinhKhanh.MauiApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TasteVinhKhanh.MauiApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

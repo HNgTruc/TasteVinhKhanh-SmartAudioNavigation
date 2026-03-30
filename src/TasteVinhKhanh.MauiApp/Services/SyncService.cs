@@ -1,13 +1,26 @@
 using System.Net.Http.Json;
+using CommunityToolkit.Mvvm.ComponentModel;
 using TasteVinhKhanh.MauiApp.Data;
 using TasteVinhKhanh.Shared.DTOs;
 
 namespace TasteVinhKhanh.MauiApp.Services;
 
-public class SyncService
+public class SyncResult
+{
+    public bool Success { get; set; }
+    public string Message { get; set; } = "";
+    public int UpdatedCount { get; set; }
+    public bool FromCache { get; set; }
+}
+
+public partial class SyncService : ObservableObject
 {
     private readonly HttpClient _http;
     private readonly AppDatabase _db;
+
+    [ObservableProperty] private string _syncStatus = "Chưa đồng bộ";
+    [ObservableProperty] private bool _isSyncing = false;
+    [ObservableProperty] private DateTime? _lastSyncAt;
 
     public SyncService(HttpClient http, AppDatabase db)
     {
@@ -16,48 +29,128 @@ public class SyncService
     }
 
     /// <summary>
-    /// Gọi GET /api/sync từ SQL Server về
-    /// Lưu vào SQLite local để app chạy offline
+    /// Gọi GET /api/sync từ server về.
+    /// Lưu vào SQLite local để app chạy offline.
+    /// Nếu API lỗi → dùng dữ liệu offline có sẵn.
     /// </summary>
     public async Task<SyncResult> SyncPoisAsync()
     {
-        if (Connectivity.NetworkAccess != NetworkAccess.Internet)
-            return new SyncResult { Success = false, Message = "Không có mạng, dùng dữ liệu offline" };
+        // ── 1. Kiểm tra mạng ──────────────────────────────────────
+        var network = Connectivity.NetworkAccess;
+        if (network != NetworkAccess.Internet)
+        {
+            var cached = await _db.GetAllPoisAsync();
+            SyncStatus = $"Offline — có {cached.Count} điểm trong bộ nhớ";
+            return new SyncResult
+            {
+                Success = true,
+                Message = $"Offline — có {cached.Count} điểm trong bộ nhớ",
+                UpdatedCount = cached.Count,
+                FromCache = true
+            };
+        }
+
+        IsSyncing = true;
+        SyncStatus = "Đang đồng bộ với server...";
 
         try
         {
+            // ── 2. Gọi API ───────────────────────────────────────────
             var lastSync = await _db.GetLastSyncAtAsync();
             var url = lastSync.HasValue
                 ? $"api/sync?lastSyncAt={lastSync.Value:O}"
                 : "api/sync";
 
-            var response = await _http.GetFromJsonAsync<SyncResponse>(url);
-            if (response == null)
-                return new SyncResult { Success = false, Message = "Server không phản hồi" };
+            SyncStatus = $"Đang gọi: {url}";
 
+            // Timeout 10 giây để không treo app
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var response = await _http.GetFromJsonAsync<SyncResponse>(url, cts.Token);
+
+            if (response == null)
+                throw new InvalidOperationException("Server trả về dữ liệu rỗng");
+
+            // ── 3. Lưu vào SQLite ─────────────────────────────────────
             if (response.HasChanges)
             {
                 await _db.UpsertPoisFromServerAsync(response.Pois);
                 await _db.SaveLastSyncAtAsync(response.SyncedAt);
+                LastSyncAt = response.SyncedAt;
+                SyncStatus = $"Đã cập nhật {response.Pois.Count} điểm từ server";
+
                 return new SyncResult
                 {
                     Success = true,
                     UpdatedCount = response.Pois.Count,
-                    Message = $"Đã cập nhật {response.Pois.Count} điểm thuyết minh"
+                    Message = $"Đã cập nhật {response.Pois.Count} điểm từ server"
                 };
             }
 
             await _db.SaveLastSyncAtAsync(response.SyncedAt);
-            return new SyncResult { Success = true, Message = "Dữ liệu đã là mới nhất" };
+            LastSyncAt = response.SyncedAt;
+            SyncStatus = "";
+
+            return new SyncResult
+            {
+                Success = true,
+                Message = "",
+                UpdatedCount = 0
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            // Timeout — API không phản hồi
+            SyncStatus = "⚠️ Server không phản hồi (timeout)";
+            return await BuildOfflineResult("Server không phản hồi sau 10 giây");
+        }
+        catch (HttpRequestException ex)
+        {
+            // Không kết nối được — có thể API chưa chạy
+            SyncStatus = $"⚠️ Không kết nối được server: {ex.Message}";
+            return await BuildOfflineResult($"Không kết nối server: {ex.Message}");
         }
         catch (Exception ex)
         {
-            return new SyncResult { Success = false, Message = $"Lỗi sync: {ex.Message}" };
+            SyncStatus = $"⚠️ Lỗi sync: {ex.Message}";
+            return await BuildOfflineResult($"Lỗi: {ex.Message}");
+        }
+        finally
+        {
+            IsSyncing = false;
         }
     }
 
     /// <summary>
-    /// Gửi log chưa đồng bộ lên server khi có mạng
+    /// Fallback: trả về dữ liệu offline từ SQLite.
+    /// </summary>
+    private async Task<SyncResult> BuildOfflineResult(string reason)
+    {
+        var cached = await _db.GetAllPoisAsync();
+        if (cached.Count > 0)
+        {
+            SyncStatus = $"📴 Offline — {cached.Count} điểm (đã lưu trước đó)";
+            return new SyncResult
+            {
+                Success = true,
+                Message = $"{reason}. Dùng {cached.Count} điểm offline.",
+                UpdatedCount = cached.Count,
+                FromCache = true
+            };
+        }
+
+        SyncStatus = "❌ Không có dữ liệu offline";
+        return new SyncResult
+        {
+            Success = false,
+            Message = $"{reason}. Không có dữ liệu offline.",
+            UpdatedCount = 0,
+            FromCache = true
+        };
+    }
+
+    /// <summary>
+    /// Gửi log chưa đồng bộ lên server khi có mạng.
+    /// Chạy nền, không ảnh hưởng UX.
     /// </summary>
     public async Task UploadPendingLogsAsync()
     {
@@ -82,17 +175,14 @@ public class SyncService
                 }).ToList()
             };
 
-            var resp = await _http.PostAsJsonAsync("api/analytics/logs", req);
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var resp = await _http.PostAsJsonAsync("api/analytics/logs", req, cts.Token);
             if (resp.IsSuccessStatusCode)
                 await _db.MarkLogsSyncedAsync(logs.Select(l => l.Id));
         }
-        catch { }
+        catch
+        {
+            // Chạy nền — bỏ qua lỗi
+        }
     }
-}
-
-public class SyncResult
-{
-    public bool Success { get; set; }
-    public string Message { get; set; } = "";
-    public int UpdatedCount { get; set; }
 }

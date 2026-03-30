@@ -25,6 +25,8 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<PoiPoint> PoiPoints => Set<PoiPoint>();
     public DbSet<AudioScript> AudioScripts => Set<AudioScript>();
     public DbSet<PlaybackLog> PlaybackLogs => Set<PlaybackLog>();
+    public DbSet<Tour> Tours => Set<Tour>();
+    public DbSet<TourStop> TourStops => Set<TourStop>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -67,6 +69,33 @@ public class AppDbContext : IdentityDbContext<AppUser>
             e.HasOne(l => l.PoiPoint)
              .WithMany()
              .HasForeignKey(l => l.PoiPointId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ── Tour ──────────────────────────────────────────────────────────────
+        builder.Entity<Tour>(e =>
+        {
+            e.HasKey(t => t.Id);
+            e.Property(t => t.Name).IsRequired().HasMaxLength(200);
+            e.Property(t => t.Description).HasMaxLength(1000);
+            e.Property(t => t.CreatedBy).IsRequired().HasMaxLength(256);
+
+            e.HasMany(t => t.TourStops)
+             .WithOne(s => s.Tour)
+             .HasForeignKey(s => s.TourId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── TourStop ──────────────────────────────────────────────────────────
+        builder.Entity<TourStop>(e =>
+        {
+            e.HasKey(s => s.Id);
+            e.HasIndex(s => new { s.TourId, s.PoiPointId }).IsUnique();
+            e.HasIndex(s => new { s.TourId, s.StopOrder });
+
+            e.HasOne(s => s.PoiPoint)
+             .WithMany()
+             .HasForeignKey(s => s.PoiPointId)
              .OnDelete(DeleteBehavior.Restrict);
         });
     }

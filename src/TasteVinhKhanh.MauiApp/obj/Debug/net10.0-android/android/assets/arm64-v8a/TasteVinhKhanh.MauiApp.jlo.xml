@@ -1,0 +1,15 @@
+<api>
+  <jcw-types>
+    <type name="MainActivity" package="crc64e53e43c6011b6ba6" application_java_class="android.app.Application" mono_runtime_initialization="mono.MonoPackageManager.LoadApplication (context);" extends_type="crc6488302ad6e9e4df1a.MauiAppCompatActivity" partial_assembly_qualified_name="TasteVinhKhanh.MauiApp.MainActivity, TasteVinhKhanh.MauiApp">
+      <constructors>
+        <constructor name="MainActivity" method="n_.ctor:()V:" jni_signature="()V" managed_parameters="" retval="void" is_dynamically_registered="True" />
+        <constructor name="MainActivity" method="n_.ctor:(I)V:" jni_signature="(I)V" managed_parameters="System.Int32, System.Private.CoreLib" params="int p0" retval="void" is_dynamically_registered="True" super_call="p0" activate_call="p0" />
+      </constructors>
+    </type>
+    <type name="MainApplication" package="crc64e53e43c6011b6ba6" application_java_class="android.app.Application" mono_runtime_initialization="mono.MonoPackageManager.LoadApplication (context);" extends_type="crc6488302ad6e9e4df1a.MauiApplication" is_application="True" partial_assembly_qualified_name="TasteVinhKhanh.MauiApp.MainApplication, TasteVinhKhanh.MauiApp" application_constructor="MainApplication" />
+  </jcw-types>
+  <acw-types partial-assembly-name="TasteVinhKhanh.MauiApp" module-name="TasteVinhKhanh.MauiApp.dll">
+    <type assembly-qualified-name="TasteVinhKhanh.MauiApp.MainActivity, TasteVinhKhanh.MauiApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" compat-jni-name="tastevinhkhanh.mauiapp.MainActivity" java-key="crc64e53e43c6011b6ba6.MainActivity" managed-key="TasteVinhKhanh.MauiApp.MainActivity" partial-assembly-qualified-name="TasteVinhKhanh.MauiApp.MainActivity, TasteVinhKhanh.MauiApp" />
+    <type assembly-qualified-name="TasteVinhKhanh.MauiApp.MainApplication, TasteVinhKhanh.MauiApp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" compat-jni-name="tastevinhkhanh.mauiapp.MainApplication" java-key="crc64e53e43c6011b6ba6.MainApplication" managed-key="TasteVinhKhanh.MauiApp.MainApplication" partial-assembly-qualified-name="TasteVinhKhanh.MauiApp.MainApplication, TasteVinhKhanh.MauiApp" />
+  </acw-types>
+</api>

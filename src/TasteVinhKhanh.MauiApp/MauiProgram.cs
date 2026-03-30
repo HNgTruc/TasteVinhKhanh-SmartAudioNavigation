@@ -1,3 +1,5 @@
+using CommunityToolkit.Maui;
+using Plugin.LocalNotification;
 using TasteVinhKhanh.MauiApp.Data;
 using TasteVinhKhanh.MauiApp.Services;
 using TasteVinhKhanh.MauiApp.ViewModels;
@@ -14,6 +16,8 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiMaps()
+            .UseMauiCommunityToolkit()
+            .UseLocalNotification()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -29,17 +33,19 @@ public static class MauiProgram
             ? "http://10.0.2.2:5000/"
             : "http://localhost:5000/";
 
+        // AddHttpClient injects HttpClient vào SyncService constructor
         builder.Services.AddHttpClient<SyncService>(client =>
         {
             client.BaseAddress = new Uri(apiBaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromSeconds(10);
         });
 
         // ── SERVICES ──────────────────────────────────────────
-        builder.Services.AddSingleton<SyncService>();
+        builder.Services.AddSingleton<NotificationService>();
         builder.Services.AddSingleton<LocationService>();
-        builder.Services.AddSingleton<GeofenceEngine>();
+        builder.Services.AddSingleton<AudioPlayerService>();
         builder.Services.AddSingleton<NarrationEngine>();
+        builder.Services.AddSingleton<GeofenceEngine>();
 
         // ViewModels
         builder.Services.AddTransient<HomeViewModel>();

@@ -274,6 +274,72 @@ android.gms.extensions.AwaitableTaskCompleteListener_1;crc6495d4f5d63cc5c882.Awa
 Android.Gms.Internal.Constants.IListAppsActivityContract, Xamarin.GooglePlayServices.Basement;com.google.android.gms.common.internal.constants.ListAppsActivityContract
 Android.Gms.Internal.Constants.IListAppsActivityContract;com.google.android.gms.common.internal.constants.ListAppsActivityContract
 com.google.android.gms.common.internal.constants.ListAppsActivityContract;com.google.android.gms.common.internal.constants.ListAppsActivityContract
+Android.Gms.Location.ActivityTransition+ISupportedActivityTransition, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.ActivityTransition$SupportedActivityTransition
+Android.Gms.Location.ActivityTransition.ISupportedActivityTransition;com.google.android.gms.location.ActivityTransition$SupportedActivityTransition
+com.google.android.gms.location.ActivityTransition$SupportedActivityTransition;com.google.android.gms.location.ActivityTransition$SupportedActivityTransition
+Android.Gms.Location.GeofencingRequest+IInitialTrigger, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.GeofencingRequest$InitialTrigger
+Android.Gms.Location.GeofencingRequest.IInitialTrigger;com.google.android.gms.location.GeofencingRequest$InitialTrigger
+com.google.android.gms.location.GeofencingRequest$InitialTrigger;com.google.android.gms.location.GeofencingRequest$InitialTrigger
+Android.Gms.Location.IActivityRecognitionApi, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.ActivityRecognitionApi
+Android.Gms.Location.IActivityRecognitionApi;com.google.android.gms.location.ActivityRecognitionApi
+com.google.android.gms.location.ActivityRecognitionApi;com.google.android.gms.location.ActivityRecognitionApi
+Android.Gms.Location.IActivityRecognitionClient, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.ActivityRecognitionClient
+Android.Gms.Location.IActivityRecognitionClient;com.google.android.gms.location.ActivityRecognitionClient
+com.google.android.gms.location.ActivityRecognitionClient;com.google.android.gms.location.ActivityRecognitionClient
+Android.Gms.Location.IDeviceOrientationListener, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.DeviceOrientationListener
+Android.Gms.Location.IDeviceOrientationListener;com.google.android.gms.location.DeviceOrientationListener
+com.google.android.gms.location.DeviceOrientationListener;com.google.android.gms.location.DeviceOrientationListener
+Android.Gms.Location.IDeviceOrientationListenerImplementor, Xamarin.GooglePlayServices.Location;mono.com.google.android.gms.location.DeviceOrientationListenerImplementor
+Android.Gms.Location.IDeviceOrientationListenerImplementor;mono.com.google.android.gms.location.DeviceOrientationListenerImplementor
+mono.com.google.android.gms.location.DeviceOrientationListenerImplementor;mono.com.google.android.gms.location.DeviceOrientationListenerImplementor
+Android.Gms.Location.IFusedLocationProviderApi, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.FusedLocationProviderApi
+Android.Gms.Location.IFusedLocationProviderApi;com.google.android.gms.location.FusedLocationProviderApi
+com.google.android.gms.location.FusedLocationProviderApi;com.google.android.gms.location.FusedLocationProviderApi
+Android.Gms.Location.IFusedLocationProviderClient, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.FusedLocationProviderClient
+Android.Gms.Location.IFusedLocationProviderClient;com.google.android.gms.location.FusedLocationProviderClient
+com.google.android.gms.location.FusedLocationProviderClient;com.google.android.gms.location.FusedLocationProviderClient
+Android.Gms.Location.IFusedOrientationProviderClient, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.FusedOrientationProviderClient
+Android.Gms.Location.IFusedOrientationProviderClient;com.google.android.gms.location.FusedOrientationProviderClient
+com.google.android.gms.location.FusedOrientationProviderClient;com.google.android.gms.location.FusedOrientationProviderClient
+Android.Gms.Location.IGeofence, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.Geofence
+Android.Gms.Location.IGeofence;com.google.android.gms.location.Geofence
+com.google.android.gms.location.Geofence;com.google.android.gms.location.Geofence
+Android.Gms.Location.IGeofenceGeofenceTransition, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.Geofence$GeofenceTransition
+Android.Gms.Location.IGeofenceGeofenceTransition;com.google.android.gms.location.Geofence$GeofenceTransition
+com.google.android.gms.location.Geofence$GeofenceTransition;com.google.android.gms.location.Geofence$GeofenceTransition
+Android.Gms.Location.IGeofenceTransitionTypes, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.Geofence$TransitionTypes
+Android.Gms.Location.IGeofenceTransitionTypes;com.google.android.gms.location.Geofence$TransitionTypes
+com.google.android.gms.location.Geofence$TransitionTypes;com.google.android.gms.location.Geofence$TransitionTypes
+Android.Gms.Location.IGeofencingApi, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.GeofencingApi
+Android.Gms.Location.IGeofencingApi;com.google.android.gms.location.GeofencingApi
+com.google.android.gms.location.GeofencingApi;com.google.android.gms.location.GeofencingApi
+Android.Gms.Location.IGeofencingClient, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.GeofencingClient
+Android.Gms.Location.IGeofencingClient;com.google.android.gms.location.GeofencingClient
+com.google.android.gms.location.GeofencingClient;com.google.android.gms.location.GeofencingClient
+Android.Gms.Location.IGranularity, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.Granularity
+Android.Gms.Location.IGranularity;com.google.android.gms.location.Granularity
+com.google.android.gms.location.Granularity;com.google.android.gms.location.Granularity
+Android.Gms.Location.ILocationListener, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.LocationListener
+Android.Gms.Location.ILocationListener;com.google.android.gms.location.LocationListener
+com.google.android.gms.location.LocationListener;com.google.android.gms.location.LocationListener
+Android.Gms.Location.ILocationListenerImplementor, Xamarin.GooglePlayServices.Location;mono.com.google.android.gms.location.LocationListenerImplementor
+Android.Gms.Location.ILocationListenerImplementor;mono.com.google.android.gms.location.LocationListenerImplementor
+mono.com.google.android.gms.location.LocationListenerImplementor;mono.com.google.android.gms.location.LocationListenerImplementor
+Android.Gms.Location.IPriority, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.Priority
+Android.Gms.Location.IPriority;com.google.android.gms.location.Priority
+com.google.android.gms.location.Priority;com.google.android.gms.location.Priority
+Android.Gms.Location.ISettingsApi, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.SettingsApi
+Android.Gms.Location.ISettingsApi;com.google.android.gms.location.SettingsApi
+com.google.android.gms.location.SettingsApi;com.google.android.gms.location.SettingsApi
+Android.Gms.Location.ISettingsClient, Xamarin.GooglePlayServices.Location;com.google.android.gms.location.SettingsClient
+Android.Gms.Location.ISettingsClient;com.google.android.gms.location.SettingsClient
+com.google.android.gms.location.SettingsClient;com.google.android.gms.location.SettingsClient
+Android.Gms.Location.LocationCallback, Xamarin.GooglePlayServices.Location;crc64e95e69e34d869711.LocationCallback
+Android.Gms.Location.LocationCallback;crc64e95e69e34d869711.LocationCallback
+android.gms.location.LocationCallback;crc64e95e69e34d869711.LocationCallback
+Android.Gms.Location.LocationListener, Xamarin.GooglePlayServices.Location;crc64e95e69e34d869711.LocationListener
+Android.Gms.Location.LocationListener;crc64e95e69e34d869711.LocationListener
+android.gms.location.LocationListener;crc64e95e69e34d869711.LocationListener
 Android.Gms.Maps.GoogleMap+ICancelableCallback, Xamarin.GooglePlayServices.Maps;com.google.android.gms.maps.GoogleMap$CancelableCallback
 Android.Gms.Maps.GoogleMap.ICancelableCallback;com.google.android.gms.maps.GoogleMap$CancelableCallback
 com.google.android.gms.maps.GoogleMap$CancelableCallback;com.google.android.gms.maps.GoogleMap$CancelableCallback
@@ -2293,6 +2359,15 @@ com.bumptech.glide.util.pool.FactoryPools$Poolable;com.bumptech.glide.util.pool.
 Bumptech.Glide.Util.Pool.FactoryPools+IResetter, Xamarin.Android.Glide;com.bumptech.glide.util.pool.FactoryPools$Resetter
 Bumptech.Glide.Util.Pool.FactoryPools.IResetter;com.bumptech.glide.util.pool.FactoryPools$Resetter
 com.bumptech.glide.util.pool.FactoryPools$Resetter;com.bumptech.glide.util.pool.FactoryPools$Resetter
+CommunityToolkit.Maui.Alerts.Snackbar+SnackbarCallback, CommunityToolkit.Maui;crc648fc34c62be8fbbff.Snackbar_SnackbarCallback
+CommunityToolkit.Maui.Alerts.Snackbar.SnackbarCallback;crc648fc34c62be8fbbff.Snackbar_SnackbarCallback
+communitytoolkit.maui.alerts.Snackbar_SnackbarCallback;crc648fc34c62be8fbbff.Snackbar_SnackbarCallback
+CommunityToolkit.Maui.Core.Views.MauiDrawingView, CommunityToolkit.Maui.Core;crc64159f3caeb1269279.MauiDrawingView
+CommunityToolkit.Maui.Core.Views.MauiDrawingView;crc64159f3caeb1269279.MauiDrawingView
+communitytoolkit.maui.core.views.MauiDrawingView;crc64159f3caeb1269279.MauiDrawingView
+CommunityToolkit.Maui.Core.Views.MauiPopup, CommunityToolkit.Maui.Core;crc64159f3caeb1269279.MauiPopup
+CommunityToolkit.Maui.Core.Views.MauiPopup;crc64159f3caeb1269279.MauiPopup
+communitytoolkit.maui.core.views.MauiPopup;crc64159f3caeb1269279.MauiPopup
 Google.Android.Gms.Common.SignatureVerification.ISignatureVerificationConfiguration, Xamarin.GooglePlayServices.Basement;com.google.android.gms.common.signatureverification.SignatureVerificationConfiguration
 Google.Android.Gms.Common.SignatureVerification.ISignatureVerificationConfiguration;com.google.android.gms.common.signatureverification.SignatureVerificationConfiguration
 com.google.android.gms.common.signatureverification.SignatureVerificationConfiguration;com.google.android.gms.common.signatureverification.SignatureVerificationConfiguration
@@ -4234,6 +4309,18 @@ microsoft.maui.platform.WrapperView;crc6452ffdc5b34af3a0f.WrapperView
 Microsoft.Maui.Storage.FileProvider, Microsoft.Maui.Essentials;microsoft.maui.essentials.fileProvider
 Microsoft.Maui.Storage.FileProvider;microsoft.maui.essentials.fileProvider
 microsoft.maui.essentials.fileProvider;microsoft.maui.essentials.fileProvider
+Plugin.LocalNotification.Platforms.GeofenceTransitionsIntentReceiver, Plugin.LocalNotification;plugin.LocalNotification.GeofenceTransitionsIntentReceiver
+Plugin.LocalNotification.Platforms.GeofenceTransitionsIntentReceiver;plugin.LocalNotification.GeofenceTransitionsIntentReceiver
+plugin.LocalNotification.GeofenceTransitionsIntentReceiver;plugin.LocalNotification.GeofenceTransitionsIntentReceiver
+Plugin.LocalNotification.Platforms.NotificationActionReceiver, Plugin.LocalNotification;plugin.LocalNotification.NotificationActionReceiver
+Plugin.LocalNotification.Platforms.NotificationActionReceiver;plugin.LocalNotification.NotificationActionReceiver
+plugin.LocalNotification.NotificationActionReceiver;plugin.LocalNotification.NotificationActionReceiver
+Plugin.LocalNotification.Platforms.ScheduledAlarmReceiver, Plugin.LocalNotification;plugin.LocalNotification.ScheduledAlarmReceiver
+Plugin.LocalNotification.Platforms.ScheduledAlarmReceiver;plugin.LocalNotification.ScheduledAlarmReceiver
+plugin.LocalNotification.ScheduledAlarmReceiver;plugin.LocalNotification.ScheduledAlarmReceiver
+Plugin.Maui.Audio.StreamMediaDataSource, Plugin.Maui.Audio;crc64467b05f37239e7a6.StreamMediaDataSource
+Plugin.Maui.Audio.StreamMediaDataSource;crc64467b05f37239e7a6.StreamMediaDataSource
+plugin.maui.audio.StreamMediaDataSource;crc64467b05f37239e7a6.StreamMediaDataSource
 TasteVinhKhanh.MauiApp.MainActivity, TasteVinhKhanh.MauiApp;crc64e53e43c6011b6ba6.MainActivity
 TasteVinhKhanh.MauiApp.MainActivity;crc64e53e43c6011b6ba6.MainActivity
 tastevinhkhanh.mauiapp.MainActivity;crc64e53e43c6011b6ba6.MainActivity

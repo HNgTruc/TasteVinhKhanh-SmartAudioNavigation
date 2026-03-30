@@ -22,13 +22,25 @@
                         Margin="0,0,0,24">
                 <HorizontalStackLayout Padding="20,0" Spacing="8">
                     <Border BackgroundColor="#FF6B35" StrokeShape="RoundRectangle 20"
-                            Stroke="Transparent" Padding="20,10">
-                        <Label Text="VIETNAMESE" FontSize="13"
+                            Stroke="Transparent" Padding="16,10">
+                        <Label Text="VI 🇻🇳" FontSize="13"
                                FontAttributes="Bold" TextColor="White"/>
                     </Border>
                     <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
-                            Stroke="#333333" Padding="20,10">
-                        <Label Text="ENGLISH" FontSize="13" TextColor="#666666"/>
+                            Stroke="#333333" Padding="16,10">
+                        <Label Text="EN 🇬🇧" FontSize="13" TextColor="#AAAAAA"/>
+                    </Border>
+                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
+                            Stroke="#333333" Padding="16,10">
+                        <Label Text="ZH 🇨🇳" FontSize="13" TextColor="#AAAAAA"/>
+                    </Border>
+                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
+                            Stroke="#333333" Padding="16,10">
+                        <Label Text="KO 🇰🇷" FontSize="13" TextColor="#AAAAAA"/>
+                    </Border>
+                    <Border BackgroundColor="#1E1E1E" StrokeShape="RoundRectangle 20"
+                            Stroke="#333333" Padding="16,10">
+                        <Label Text="JA 🇯🇵" FontSize="13" TextColor="#AAAAAA"/>
                     </Border>
                 </HorizontalStackLayout>
             </ScrollView>
@@ -154,10 +166,16 @@
             </Border.Background>
             <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
                 <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
+                    </StackLayout.GestureRecognizers>
                     <Label Text="⊞" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Home" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
                 <StackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
+                    </StackLayout.GestureRecognizers>
                     <Label Text="🗺" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Map" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
@@ -176,6 +194,9 @@
                     </Border>
                 </Grid>
                 <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
+                    </StackLayout.GestureRecognizers>
                     <Label Text="⚙" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Settings" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>

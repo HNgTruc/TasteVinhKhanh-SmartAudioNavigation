@@ -1,17 +1,29 @@
 namespace TasteVinhKhanh.MauiApp.Services;
 
-/// <summary>Theo dõi GPS liên tục foreground + background</summary>
+/// <summary>
+/// Theo dõi GPS liên tục — foreground.
+/// Background location (khi app không mở) cần cấu hình thêm Android Service
+/// trong AndroidManifest.xml và MainActivity.
+/// </summary>
 public class LocationService
 {
     private CancellationTokenSource? _cts;
+    private readonly NotificationService _notif;
 
     public event Action<Location>? LocationUpdated;
     public Location? LastLocation { get; private set; }
 
+    public LocationService(NotificationService notif)
+    {
+        _notif = notif;
+    }
+
     public async Task StartAsync()
     {
+        // Yêu cầu quyền location
         var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-        if (status != PermissionStatus.Granted) return;
+        if (status != PermissionStatus.Granted)
+            return;
 
         _cts = new CancellationTokenSource();
 
@@ -22,7 +34,7 @@ public class LocationService
                 try
                 {
                     var request = new GeolocationRequest(
-                        GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+                        GeolocationAccuracy.High, TimeSpan.FromSeconds(10));
                     var location = await Geolocation.GetLocationAsync(request, _cts.Token);
 
                     if (location != null)
@@ -33,9 +45,13 @@ public class LocationService
                 }
                 catch (FeatureNotSupportedException) { break; }
                 catch (PermissionException) { break; }
-                catch { }
+                catch { /* GPS không khả dụng */ }
 
-                await Task.Delay(TimeSpan.FromSeconds(5), _cts.Token);
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(5), _cts.Token);
+                }
+                catch (OperationCanceledException) { break; }
             }
         }, _cts.Token);
     }
