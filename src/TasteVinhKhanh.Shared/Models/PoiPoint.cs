@@ -36,4 +36,7 @@ public class PoiPoint
 
     /// <summary>Danh sách script thuyết minh theo từng ngôn ngữ</summary>
     public List<AudioScript> AudioScripts { get; set; } = new();
+
+    /// <summary>Danh sách ảnh của điểm thuyết minh</summary>
+    public List<RestaurantImage> Images { get; set; } = new();
 }

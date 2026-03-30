@@ -51,6 +51,26 @@ ELSE
     PRINT 'ℹ️  Bảng AudioScripts đã tồn tại';
 GO
 
+-- ── 2b. Tạo bảng RestaurantImages nếu chưa có ───────────────
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'RestaurantImages')
+BEGIN
+    CREATE TABLE RestaurantImages (
+        Id INT IDENTITY(1,1) PRIMARY KEY,
+        PoiPointId INT NOT NULL,
+        ImageUrl NVARCHAR(500) NOT NULL,
+        IsPrimary BIT DEFAULT 0,
+        SortOrder INT DEFAULT 0,
+        CreatedAt DATETIME2 DEFAULT GETUTCDATE(),
+        UpdatedAt DATETIME2 DEFAULT GETUTCDATE(),
+        CONSTRAINT FK_RestaurantImages_PoiPoints FOREIGN KEY (PoiPointId)
+            REFERENCES PoiPoints(Id) ON DELETE CASCADE
+    );
+    PRINT '✅ Bảng RestaurantImages đã được tạo';
+END
+ELSE
+    PRINT 'ℹ️  Bảng RestaurantImages đã tồn tại';
+GO
+
 -- ── 3. Xóa dữ liệu cũ (nếu muốn seed lại) ──────────────────
 -- Bỏ comment nếu muốn xóa và seed lại:
 -- DELETE FROM AudioScripts;
@@ -164,3 +184,55 @@ SELECT
 
 PRINT '✅ Seed hoàn tất! Chạy API và mở MauiApp để xem bản đồ.';
 GO
+
+-- ── 7. Seed RestaurantImages (12 quán) ─────────────────────────
+-- Mỗi quán để NULL/placeholder — bạn copy ảnh vào wwwroot/images/
+-- rồi UPDATE ImageUrl cho đúng tên file
+SET IDENTITY_INSERT RestaurantImages ON;
+
+MERGE INTO RestaurantImages AS target
+USING (VALUES
+    -- 1. Alo Quán
+    (1,  1, N'/images/alo_quan_1.jpg',  1, 1, GETUTCDATE(), GETUTCDATE()),
+    (2,  1, N'/images/alo_quan_2.jpg',  0, 2, GETUTCDATE(), GETUTCDATE()),
+    (3,  1, N'/images/alo_quan_3.jpg',  0, 3, GETUTCDATE(), GETUTCDATE()),
+    -- 2. THÈM NƯỚNG YAKINIKU
+    (4,  2, N'/images/yakiniku_1.jpg',   1, 1, GETUTCDATE(), GETUTCDATE()),
+    (5,  2, N'/images/yakiniku_2.jpg',  0, 2, GETUTCDATE(), GETUTCDATE()),
+    -- 3. Chilli Lẩu Nướng Quán
+    (6,  3, N'/images/chilli_1.jpg',     1, 1, GETUTCDATE(), GETUTCDATE()),
+    (7,  3, N'/images/chilli_2.jpg',    0, 2, GETUTCDATE(), GETUTCDATE()),
+    -- 4. A FAT HOT POT
+    (8,  4, N'/images/afat_1.jpg',       1, 1, GETUTCDATE(), GETUTCDATE()),
+    (9,  4, N'/images/afat_2.jpg',      0, 2, GETUTCDATE(), GETUTCDATE()),
+    -- 5. Lãng Quán
+    (10, 5, N'/images/lang_quan_1.jpg',  1, 1, GETUTCDATE(), GETUTCDATE()),
+    -- 6. Lẩu Nướng Thuận Việt
+    (11, 6, N'/images/thuan_viet_1.jpg', 1, 1, GETUTCDATE(), GETUTCDATE()),
+    -- 7. Ốc Hoa Kiều
+    (12, 7, N'/images/oc_hoa_kieu_1.jpg', 1, 1, GETUTCDATE(), GETUTCDATE()),
+    (13, 7, N'/images/oc_hoa_kieu_2.jpg', 0, 2, GETUTCDATE(), GETUTCDATE()),
+    -- 8. RONGbuffet
+    (14, 8, N'/images/rongbuffet_1.jpg', 1, 1, GETUTCDATE(), GETUTCDATE()),
+    (15, 8, N'/images/rongbuffet_2.jpg', 0, 2, GETUTCDATE(), GETUTCDATE()),
+    -- 9. 中越友谊烧烤 SHAOKAO
+    (16, 9, N'/images/shaokao_1.jpg',    1, 1, GETUTCDATE(), GETUTCDATE()),
+    -- 10. Lẩu Gà Lá É Con Gà Trống
+    (17, 10, N'/images/lau_ga_1.jpg',    1, 1, GETUTCDATE(), GETUTCDATE()),
+    -- 11. BONA Food and Beer
+    (18, 11, N'/images/bona_1.jpg',      1, 1, GETUTCDATE(), GETUTCDATE()),
+    -- 12. Quán Nước SINZIEN
+    (19, 12, N'/images/sinzien_1.jpg',   1, 1, GETUTCDATE(), GETUTCDATE())
+) AS source (Id, PoiPointId, ImageUrl, IsPrimary, SortOrder, CreatedAt, UpdatedAt)
+ON target.Id = source.Id
+WHEN NOT MATCHED BY TARGET THEN
+    INSERT (Id, PoiPointId, ImageUrl, IsPrimary, SortOrder, CreatedAt, UpdatedAt)
+    VALUES (source.Id, source.PoiPointId, source.ImageUrl,
+            source.IsPrimary, source.SortOrder, source.CreatedAt, source.UpdatedAt);
+
+SET IDENTITY_INSERT RestaurantImages OFF;
+GO
+
+PRINT '✅ RestaurantImages seed xong! Copy ảnh vào wwwroot/images/ rồi chạy lại.';
+GO
+

@@ -27,6 +27,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<PlaybackLog> PlaybackLogs => Set<PlaybackLog>();
     public DbSet<Tour> Tours => Set<Tour>();
     public DbSet<TourStop> TourStops => Set<TourStop>();
+    public DbSet<RestaurantImage> RestaurantImages => Set<RestaurantImage>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -97,6 +98,25 @@ public class AppDbContext : IdentityDbContext<AppUser>
              .WithMany()
              .HasForeignKey(s => s.PoiPointId)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ── RestaurantImage ───────────────────────────────────────────────────
+        builder.Entity<RestaurantImage>(e =>
+        {
+            e.HasKey(i => i.Id);
+            e.Property(i => i.ImageUrl).IsRequired().HasMaxLength(500);
+            e.Property(i => i.IsPrimary).HasDefaultValue(false);
+            e.Property(i => i.SortOrder).HasDefaultValue(0);
+
+            // Mỗi quán chỉ có 1 ảnh chính
+            e.HasIndex(i => new { i.PoiPointId, i.IsPrimary })
+             .HasFilter("[IsPrimary] = 1")
+             .IsUnique();
+
+            e.HasOne(i => i.PoiPoint)
+             .WithMany()
+             .HasForeignKey(i => i.PoiPointId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
