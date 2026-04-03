@@ -45,8 +45,10 @@ public class AnalyticsService : IAnalyticsService
     public async Task<AnalyticsSummary> GetSummaryAsync()
     {
         var total = await _db.PlaybackLogs.CountAsync();
+        var todayStart = DateTime.UtcNow.Date;
+        var todayEnd = todayStart.AddDays(1);
         var today = await _db.PlaybackLogs
-            .Where(l => l.PlayedAt.Date == DateTime.UtcNow.Date)
+            .Where(l => l.PlayedAt >= todayStart && l.PlayedAt < todayEnd)
             .CountAsync();
         var uniqueDevices = await _db.PlaybackLogs
             .Select(l => l.AnonymousDeviceId)
@@ -59,16 +61,24 @@ public class AnalyticsService : IAnalyticsService
     /// <summary>Top POI được nghe nhiều nhất</summary>
     public async Task<List<TopPoiResult>> GetTopPoisAsync(int top = 10)
     {
-        return await _db.PlaybackLogs
-            .GroupBy(l => new { l.PoiPointId, l.PoiPoint!.Name })
-            .Select(g => new TopPoiResult(
-                g.Key.PoiPointId,
-                g.Key.Name,
-                g.Count(),
-                g.Max(l => l.PlayedAt)
-            ))
-            .OrderByDescending(x => x.PlayCount)
+        // GroupBy chỉ chứa cột primitive (PoiPointId) — navigation property không translate được sang SQL
+        var raw = await _db.PlaybackLogs
+            .GroupBy(l => l.PoiPointId)
+            .Select(g => new { PoiPointId = g.Key, Count = g.Count(), MaxPlayedAt = g.Max(l => l.PlayedAt) })
+            .OrderByDescending(x => x.Count)
             .Take(top)
             .ToListAsync();
+
+        var poiIds = raw.Select(r => r.PoiPointId).ToList();
+        var poiNames = await _db.PoiPoints
+            .Where(p => poiIds.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id, p => p.Name);
+
+        return raw.Select(r => new TopPoiResult(
+            r.PoiPointId,
+            poiNames.GetValueOrDefault(r.PoiPointId, "?"),
+            r.Count,
+            r.MaxPlayedAt
+        )).ToList();
     }
 }

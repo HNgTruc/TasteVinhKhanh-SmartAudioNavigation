@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh — Tài khoản của tôi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🍜 TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="edit-poi.html">
+                    <span class="icon">📍</span> Điểm thuyết minh
+                </a>
+                <a href="upload-images.html">
+                    <span class="icon">🖼️</span> Upload ảnh
+                </a>
+                <a href="profile.html" class="active">
+                    <span class="icon">👤</span> Tài khoản
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">V</div>
+                    <div>
+                        <div class="user-name" id="userName">Vendor</div>
+                        <div class="user-role">Nhà cung cấp</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center"
+                        onclick="vendorLogout()">
+                    🚪 Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="topbar">
+                <h2>👤 Tài khoản của tôi</h2>
+                <a href="dashboard.html" class="btn btn-outline btn-sm">← Quay lại</a>
+            </div>
+
+            <div class="content">
+
+                <!-- Thông tin tài khoản -->
+                <div class="card">
+                    <h3 style="font-size:15px; margin-bottom:16px">📝 Thông tin tài khoản</h3>
+
+                    <div id="profileLoading" class="loading"><div class="spinner"></div></div>
+                    <div id="profileContent" style="display:none">
+
+                        <!-- Trạng thái tài khoản -->
+                        <div id="statusBanner" class="alert" style="margin-bottom:16px; display:none"></div>
+
+                        <div id="profileAlert" class="alert alert-error" style="display:none; margin-bottom:12px"></div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tên chủ sở hữu *</label>
+                                <input type="text" id="fOwnerName" class="form-control"
+                                       placeholder="Họ và tên">
+                            </div>
+                            <div class="form-group">
+                                <label>Tên doanh nghiệp / Cửa hàng</label>
+                                <input type="text" id="fBusinessName" class="form-control"
+                                       readonly style="background:var(--gray-100); cursor:not-allowed">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" id="fEmail" class="form-control"
+                                       placeholder="email@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label>Số điện thoại *</label>
+                                <input type="tel" id="fPhone" class="form-control"
+                                       placeholder="VD: 0901234567">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Địa chỉ</label>
+                            <input type="text" id="fAddress" class="form-control"
+                                   placeholder="Địa chỉ cửa hàng">
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; gap:8px">
+                            <button class="btn btn-outline" onclick="loadProfile()">↺ Khôi phục</button>
+                            <button class="btn btn-primary" onclick="saveProfile()" id="saveBtn">💾 Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông báo thành công -->
+                <div class="card" style="border-left:4px solid var(--primary)">
+                    <h4 style="font-size:14px; margin-bottom:8px">💡 Lưu ý</h4>
+                    <ul style="font-size:13px; color:var(--gray-500); padding-left:16px; line-height:1.8">
+                        <li>Tên doanh nghiệp chỉ có <strong>quản trị viên</strong> mới có thể thay đổi.</li>
+                        <li>Thông tin thay đổi ở trên sẽ được <strong>cập nhật ngay lập tức</strong>, không cần chờ duyệt.</li>
+                        <li>Nếu thay đổi email, bạn cần đăng nhập lại với email mới.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+    if (!requireVendorAuth()) throw new Error('Not authenticated');
+
+    async function loadProfile() {
+        document.getElementById('profileLoading').style.display = 'block';
+        document.getElementById('profileContent').style.display = 'none';
+
+        try {
+            const profile = await apiCall('GET', '/api/vendor/profile');
+            if (!profile) return;
+
+            document.getElementById('fOwnerName').value = profile.ownerName || '';
+            document.getElementById('fBusinessName').value = profile.businessName || '';
+            document.getElementById('fEmail').value = profile.email || '';
+            document.getElementById('fPhone').value = profile.phone || '';
+            document.getElementById('fAddress').value = profile.address || '';
+
+            // Trạng thái tài khoản
+            const banner = document.getElementById('statusBanner');
+            if (profile.status === 'Pending') {
+                banner.className = 'alert alert-warning';
+                banner.textContent = '⏳ Tài khoản của bạn đang chờ quản trị viên duyệt. Một số chức năng bị giới hạn.';
+                banner.style.display = 'block';
+            } else if (profile.status === 'Rejected') {
+                banner.className = 'alert alert-error';
+                banner.textContent = `❌ Tài khoản bị từ chối. Lý do: ${profile.rejectedReason || 'Không có'}`;
+                banner.style.display = 'block';
+            } else {
+                banner.style.display = 'none';
+            }
+        } catch (e) {
+            showToast('Không thể tải thông tin tài khoản', 'error');
+        }
+
+        document.getElementById('profileLoading').style.display = 'none';
+        document.getElementById('profileContent').style.display = 'block';
+    }
+
+    async function saveProfile() {
+        const ownerName = document.getElementById('fOwnerName').value.trim();
+        const email = document.getElementById('fEmail').value.trim();
+        const phone = document.getElementById('fPhone').value.trim();
+        const address = document.getElementById('fAddress').value.trim();
+        const alertBox = document.getElementById('profileAlert');
+        const btn = document.getElementById('saveBtn');
+
+        if (!ownerName || !email || !phone) {
+            alertBox.textContent = 'Vui lòng điền đầy đủ thông tin bắt buộc (*).';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        if (!email.includes('@')) {
+            alertBox.textContent = 'Email không hợp lệ.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        btn.textContent = 'Đang lưu...';
+        btn.disabled = true;
+        alertBox.style.display = 'none';
+
+        try {
+            await apiCall('PUT', '/api/vendor/profile', {
+                ownerName,
+                email,
+                phone,
+                address
+            });
+
+            showToast('Lưu thông tin thành công!');
+
+            // Nếu email đổi thì reload để cập nhật
+            if (email !== localStorage.getItem('vendorEmail')) {
+                localStorage.setItem('vendorEmail', email);
+                localStorage.setItem('vendorName', ownerName);
+                document.getElementById('userName').textContent = ownerName;
+                document.getElementById('userAvatar').textContent = ownerName.charAt(0).toUpperCase();
+            }
+        } catch (e) {
+            alertBox.textContent = e.message || 'Lưu thất bại. Vui lòng thử lại.';
+            alertBox.style.display = 'block';
+        }
+
+        btn.textContent = '💾 Lưu thay đổi';
+        btn.disabled = false;
+    }
+
+    loadProfile();
+    </script>
+
+</body>
+</html>

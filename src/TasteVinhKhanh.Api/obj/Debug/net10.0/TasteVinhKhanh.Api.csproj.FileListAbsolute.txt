@@ -1,4 +1,5 @@
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\bin\Debug\net10.0\appsettings.json
+C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\bin\Debug\net10.0\TasteVinhKhanh.Api.staticwebassets.runtime.json
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\bin\Debug\net10.0\TasteVinhKhanh.Api.staticwebassets.endpoints.json
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\bin\Debug\net10.0\TasteVinhKhanh.Api.exe
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\bin\Debug\net10.0\TasteVinhKhanh.Api.deps.json
@@ -160,6 +161,7 @@ C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhan
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\scopedcss\bundle\TasteVinhKhanh.Api.styles.css
+C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\compressed\yaznkdc5w2-{0}-zfjffteuy9-zfjffteuy9.gz
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\staticwebassets.build.json
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\staticwebassets.build.json.cache
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\staticwebassets.development.json
@@ -171,4 +173,3 @@ C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhan
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\TasteVinhKhanh.Api.pdb
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\TasteVinhKhanh.Api.genruntimeconfig.cache
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\obj\Debug\net10.0\ref\TasteVinhKhanh.Api.dll
-C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Api\bin\Debug\net10.0\TasteVinhKhanh.Api.staticwebassets.runtime.json

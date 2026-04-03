@@ -24,7 +24,10 @@ public class PoiService : IPoiService
 
     public async Task<List<PoiDto>> GetAllAsync(bool includeInactive = false)
     {
-        var query = _db.PoiPoints.Include(p => p.AudioScripts).AsQueryable();
+        var query = _db.PoiPoints
+            .Include(p => p.AudioScripts)
+            .Include(p => p.Images)
+            .AsQueryable();
 
         if (!includeInactive)
             query = query.Where(p => p.IsActive);
@@ -37,6 +40,7 @@ public class PoiService : IPoiService
     {
         var poi = await _db.PoiPoints
             .Include(p => p.AudioScripts)
+            .Include(p => p.Images)
             .FirstOrDefaultAsync(p => p.Id == id);
 
         return poi == null ? null : ToDto(poi);
@@ -53,6 +57,7 @@ public class PoiService : IPoiService
             TriggerRadiusMeters = r.TriggerRadiusMeters,
             Priority = r.Priority,
             ImageUrl = r.ImageUrl,
+            IconUrl = r.IconUrl,
             MapUrl = r.MapUrl,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -75,6 +80,7 @@ public class PoiService : IPoiService
         poi.TriggerRadiusMeters = r.TriggerRadiusMeters;
         poi.Priority = r.Priority;
         poi.ImageUrl = r.ImageUrl;
+        poi.IconUrl = r.IconUrl;
         poi.MapUrl = r.MapUrl;
         poi.IsActive = r.IsActive;
         poi.UpdatedAt = DateTime.UtcNow;
@@ -138,9 +144,15 @@ public class PoiService : IPoiService
         Priority = p.Priority,
         IsActive = p.IsActive,
         ImageUrl = p.ImageUrl,
+        IconUrl = p.IconUrl,
         MapUrl = p.MapUrl,
         UpdatedAt = p.UpdatedAt,
-        AudioScripts = p.AudioScripts.Select(ToScriptDto).ToList()
+        AudioScripts = p.AudioScripts.Select(ToScriptDto).ToList(),
+        Images = p.Images.Select(i => new RestaurantImageDto
+        {
+            Id = i.Id, PoiPointId = i.PoiPointId, ImageUrl = i.ImageUrl,
+            IsPrimary = i.IsPrimary, SortOrder = i.SortOrder
+        }).ToList()
     };
 
     private static AudioScriptDto ToScriptDto(AudioScript s) => new()

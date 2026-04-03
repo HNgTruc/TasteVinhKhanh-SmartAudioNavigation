@@ -1,0 +1,153 @@
+// Auth utilities — Vendor Portal
+
+const API_BASE = 'http://localhost:5000';
+
+// ── HTTP helper ────────────────────────────────────────────────────────────
+
+async function apiCall(method, endpoint, body = null) {
+    const token = localStorage.getItem('vendorToken');
+    const options = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+    };
+    if (body) options.body = JSON.stringify(body);
+
+    const res = await fetch(`${API_BASE}${endpoint}`, options);
+    if (res.status === 401) { vendorLogout(); return null; }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (res.status === 204) return true;
+    return await res.json();
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────
+
+async function vendorRegister(businessName, ownerName, email, password, phone, address) {
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/vendor-register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ businessName, ownerName, email, password, phone, address: address || '' })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+        return { success: true, message: data.message };
+    } catch (err) {
+        return { success: false, message: err.message };
+    }
+}
+
+async function vendorLogin(email, password) {
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/vendor-login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (res.status === 403) {
+            const data = await res.json();
+            throw new Error(data.message || 'Tài khoản đang chờ được duyệt.');
+        }
+
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.message || 'Đăng nhập thất bại.');
+        }
+
+        const data = await res.json();
+        localStorage.setItem('vendorToken', data.accessToken);
+        localStorage.setItem('vendorName', data.userName || email);
+        localStorage.setItem('vendorEmail', data.email || email);
+        return true;
+    } catch (err) {
+        throw err;
+    }
+}
+
+function vendorLogout() {
+    localStorage.removeItem('vendorToken');
+    localStorage.removeItem('vendorName');
+    localStorage.removeItem('vendorEmail');
+    window.location.href = 'index.html';
+}
+
+function isVendorLoggedIn() {
+    return !!localStorage.getItem('vendorToken');
+}
+
+function requireVendorAuth() {
+    if (!isVendorLoggedIn()) {
+        window.location.href = 'index.html';
+        return false;
+    }
+    const nameEl = document.getElementById('userName');
+    if (nameEl) nameEl.textContent = localStorage.getItem('vendorName') || 'Vendor';
+    const avatarEl = document.getElementById('userAvatar');
+    if (avatarEl) {
+        const name = localStorage.getItem('vendorName') || 'V';
+        avatarEl.textContent = name.charAt(0).toUpperCase();
+    }
+    return true;
+}
+
+// ── VENDOR PROFILE ────────────────────────────────────────────────────────
+
+async function getVendorProfile() {
+    return await apiCall('GET', '/api/vendor/profile');
+}
+
+// ── POI ───────────────────────────────────────────────────────────────────
+
+async function getMyPois() {
+    return await apiCall('GET', '/api/vendor/pois');
+}
+
+async function getMyPoi(id) {
+    return await apiCall('GET', `/api/vendor/pois/${id}`);
+}
+
+async function updateMyPoi(id, data) {
+    return await apiCall('PUT', `/api/vendor/pois/${id}`, data);
+}
+
+// ── AUDIO SCRIPTS ──────────────────────────────────────────────────────────
+
+async function getMyScripts(poiId) {
+    return await apiCall('GET', `/api/vendor/pois/${poiId}/scripts`);
+}
+
+async function upsertMyScript(poiId, data) {
+    return await apiCall('PUT', `/api/vendor/pois/${poiId}/scripts`, data);
+}
+
+// ── IMAGE UPLOAD ───────────────────────────────────────────────────────────
+
+async function uploadImage(file, poiId) {
+    const token = localStorage.getItem('vendorToken');
+    const formData = new FormData();
+    formData.append('files', file);
+    if (poiId) formData.append('poiId', poiId);
+
+    const res = await fetch(`${API_BASE}/api/vendor/images/upload`, {
+        method: 'POST',
+        headers: {
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: formData
+    });
+
+    if (res.status === 401) { vendorLogout(); return null; }
+    if (!res.ok) throw new Error(`Upload failed: HTTP ${res.status}`);
+
+    const data = await res.json();
+    return { imageUrl: data.urls?.[0] };
+}
+
+// ── ANALYTICS ──────────────────────────────────────────────────────────────
+
+async function getVendorSummary() {
+    return await apiCall('GET', '/api/vendor/analytics/summary');
+}

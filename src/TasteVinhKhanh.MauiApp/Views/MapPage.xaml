@@ -18,18 +18,18 @@
     <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- ══ HEADER ══ -->
-        <StackLayout Grid.Row="0" Padding="20,52,20,16" BackgroundColor="#0D0D0D" Spacing="2">
+        <Grid Grid.Row="0" Padding="20,52,20,0" BackgroundColor="#0D0D0D">
             <Label Text="{Binding THeader}"
                    FontSize="22" FontAttributes="Bold" TextColor="#FF6B35"/>
-        </StackLayout>
+        </Grid>
 
         <!-- ══ GOOGLE MAP (fixed, not inside ScrollView) ══ -->
-        <Grid Grid.Row="1" HeightRequest="260">
+        <Grid Grid.Row="1" HeightRequest="250" BackgroundColor="#1A1A1A">
             <maps:Map x:Name="googleMap"
                       IsShowingUser="True"
                       MapType="Street"/>
             <!-- Gradient overlay bottom -->
-            <Rectangle VerticalOptions="End" HeightRequest="60"
+            <Rectangle VerticalOptions="End" HeightRequest="30"
                         InputTransparent="True">
                 <Rectangle.Fill>
                     <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -74,7 +74,7 @@
             <StackLayout Spacing="0">
 
                 <!-- SECTION TITLE -->
-                <Grid Padding="20,12,20,12">
+                <Grid Padding="16,12,16,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -99,7 +99,7 @@
                                 SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="data:LocalPoi">
-                            <Grid Padding="16,6">
+                            <Grid Padding="12,5">
                                 <Border BackgroundColor="#161616"
                                         StrokeShape="RoundRectangle 18"
                                         Stroke="#252525">
@@ -108,7 +108,7 @@
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=GoToDetailCommand}"
                                             CommandParameter="{Binding Id}"/>
                                     </Border.GestureRecognizers>
-                                    <Grid RowDefinitions="Auto,Auto" Padding="14">
+                                    <Grid RowDefinitions="Auto,Auto" Padding="12,10">
 
                                         <!-- Row 1: Icon + Info + Like -->
                                         <Grid Grid.Row="0"

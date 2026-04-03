@@ -84,11 +84,7 @@ async function getTopPois(top = 10) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 async function getTours(page = 1, pageSize = 10, search = '', includeInactive = false) {
-    const params = new URLSearchParams({
-        page, pageSize,
-        search: search || '',
-        includeInactive
-    });
+    const params = new URLSearchParams({ page, pageSize, search: search || '', includeInactive });
     return await apiCall('GET', `/api/tour?${params}`);
 }
 
@@ -110,4 +106,108 @@ async function reorderTour(id, poiIds) {
 
 async function deleteTour(id) {
     return await apiCall('DELETE', `/api/tour/${id}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VENDOR MANAGEMENT APIs  (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/admin/vendors — danh sách vendor (filter ?status=Pending|Approved|Rejected) */
+async function getVendors(status = '') {
+    const params = status ? `?status=${encodeURIComponent(status)}` : '';
+    return await apiCall('GET', `/api/admin/vendors${params}`);
+}
+
+/** GET /api/admin/vendors/:id — chi tiết 1 vendor */
+async function getVendor(id) {
+    return await apiCall('GET', `/api/admin/vendors/${id}`);
+}
+
+/** PUT /api/admin/vendors/:id — cập nhật trạng thái vendor */
+async function updateVendor(id, data) {
+    return await apiCall('PUT', `/api/admin/vendors/${id}`, data);
+}
+
+/** POST /api/admin/vendors — tạo vendor mới */
+async function createVendor(data) {
+    return await apiCall('POST', '/api/admin/vendors', data);
+}
+
+/** DELETE /api/admin/vendors/:id — xoá vendor */
+async function deleteVendor(id) {
+    const res = await fetch(`${API_BASE}/api/admin/vendors/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+    if (res.status === 401) { logout(); return null; }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || `Xoá thất bại (HTTP ${res.status})`);
+    return data;
+}
+
+/** PUT /api/admin/vendors/:vendorId/approve — duyệt vendor + gán POI */
+async function approveVendor(vendorId, poiPointId = 0) {
+    return await apiCall('PUT', `/api/admin/vendors/${vendorId}/approve`, { poiPointId });
+}
+
+/** PUT /api/admin/vendors/:vendorId/reject — từ chối vendor */
+async function rejectVendor(vendorId, reason = '') {
+    return await apiCall('PUT', `/api/admin/vendors/${vendorId}/reject`, { reason });
+}
+
+/** GET /api/admin/vendors/:id/pois — danh sách POI của vendor */
+async function getVendorPois(vendorId) {
+    return await apiCall('GET', `/api/admin/vendors/${vendorId}/pois`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PENDING UPDATES APIs  (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/admin/pending-updates — danh sách thay đổi chờ duyệt */
+async function getPendingUpdates(page = 1, pageSize = 20) {
+    const params = new URLSearchParams({ page, pageSize });
+    return await apiCall('GET', `/api/admin/pending-updates?${params}`);
+}
+
+/** GET /api/admin/pending-updates/:id — chi tiết 1 pending update */
+async function getPendingUpdate(id) {
+    return await apiCall('GET', `/api/admin/pending-updates/${id}`);
+}
+
+/** POST /api/admin/pending-updates/:id/approve — duyệt */
+async function approvePendingUpdate(id) {
+    return await apiCall('POST', `/api/admin/pending-updates/${id}/approve`);
+}
+
+/** POST /api/admin/pending-updates/:id/reject — từ chối */
+async function rejectPendingUpdate(id, reason = '') {
+    return await apiCall('POST', `/api/admin/pending-updates/${id}/reject`, { reason });
+}
+
+/** GET /api/admin/pending-updates/stats — badge counts */
+async function getPendingStats() {
+    return await apiCall('GET', '/api/admin/pending-updates/stats');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STAGING IMAGE APIs
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/admin/staging-images — danh sách ảnh chờ duyệt */
+async function getStagingImages(status = 'Pending') {
+    return await apiCall('GET', `/api/admin/staging-images?status=${encodeURIComponent(status)}`);
+}
+
+/** POST /api/admin/staging-images/:id/approve — duyệt ảnh */
+async function approveStagingImage(id, poiPointId = 0) {
+    return await apiCall('POST', `/api/admin/staging-images/${id}/approve`, { PoiPointId: poiPointId });
+}
+
+/** POST /api/admin/staging-images/:id/reject — từ chối ảnh */
+async function rejectStagingImage(id, reason = '') {
+    return await apiCall('POST', `/api/admin/staging-images/${id}/reject`, { reason });
 }

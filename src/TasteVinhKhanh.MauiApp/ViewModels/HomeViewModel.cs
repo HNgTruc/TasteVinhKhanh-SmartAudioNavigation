@@ -48,8 +48,8 @@ public partial class HomeViewModel : ObservableObject
     private void RefreshTexts()
     {
         TWelcome = _i18n.T("Home_Welcome");
-        TTitleLine1 = _i18n.T("Home_Title_Line1");
-        TTitleLine2 = _i18n.T("Home_Title_Line2");
+        TTitleLine1 = _i18n.T("Home_TitleLine1");
+        TTitleLine2 = _i18n.T("Home_TitleLine2");
         TSubtitle = _i18n.T("Home_Subtitle");
         TStreetEats = _i18n.T("Home_StreetEats");
         TStreetEatsSub = _i18n.T("Home_StreetEatsSub");

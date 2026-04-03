@@ -22,7 +22,10 @@ public class SyncService : ISyncService
     /// </summary>
     public async Task<SyncResponse> GetChangesAsync(DateTime? lastSyncAt)
     {
-        var query = _db.PoiPoints.Include(p => p.AudioScripts).AsQueryable();
+        var query = _db.PoiPoints
+            .Include(p => p.AudioScripts)
+            .Include(p => p.Images)
+            .AsQueryable();
 
         if (lastSyncAt.HasValue)
             query = query.Where(p => p.UpdatedAt > lastSyncAt.Value);

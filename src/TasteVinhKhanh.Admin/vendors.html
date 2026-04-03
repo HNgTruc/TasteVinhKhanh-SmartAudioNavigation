@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh Admin — Quản lý Vendors</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🍜 TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="poi.html">
+                    <span class="icon">📍</span> Điểm thuyết minh
+                </a>
+                <a href="tour.html">
+                    <span class="icon">🗺️</span> Quản lý Tours
+                </a>
+                <a href="vendors.html" class="active">
+                    <span class="icon">🏪</span> Vendors
+                    <span class="nav-badge" id="vendorBadge" style="display:none">0</span>
+                </a>
+                <a href="pending-updates.html">
+                    <span class="icon">⏳</span> Duyệt cập nhật
+                    <span class="nav-badge nav-badge-warning" id="pendingBadge" style="display:none">0</span>
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Quản trị viên</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center"
+                        onclick="logout()">
+                    🚪 Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="topbar">
+                <h2>🏪 Quản lý Vendors</h2>
+                <button class="btn btn-primary btn-sm" onclick="openCreateModal()">
+                    ➕ Thêm Vendor
+                </button>
+            </div>
+
+            <div class="content">
+
+                <!-- STATS -->
+                <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr)">
+                    <div class="stat-card">
+                        <div class="stat-icon green">🏪</div>
+                        <div>
+                            <div class="stat-value" id="totalVendors">—</div>
+                            <div class="stat-label">Tổng Vendor</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">📍</div>
+                        <div>
+                            <div class="stat-value" id="totalPoiCount">—</div>
+                            <div class="stat-label">Điểm thuyết minh</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">✅</div>
+                        <div>
+                            <div class="stat-value" id="activeVendors">—</div>
+                            <div class="stat-label">Đang hoạt động</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABS -->
+                <div class="tabs">
+                    <div class="tab active" onclick="setStatusFilter('')" id="tabAll">Tất cả</div>
+                    <div class="tab" onclick="setStatusFilter('Pending')" id="tabPending">
+                        ⏳ Chờ duyệt
+                        <span class="badge badge-warning" id="pendingCount" style="display:none; margin-left:4px">0</span>
+                    </div>
+                    <div class="tab" onclick="setStatusFilter('Approved')" id="tabApproved">✅ Đã duyệt</div>
+                    <div class="tab" onclick="setStatusFilter('Rejected')" id="tabRejected">❌ Từ chối</div>
+                </div>
+
+                <!-- TABLE -->
+                <div class="card">
+                    <div id="tableLoading" class="loading"><div class="spinner"></div></div>
+
+                    <table id="vendorTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>Tên Vendor</th>
+                                <th>Email</th>
+                                <th style="width:100px">Số POI</th>
+                                <th style="width:150px">Ngày đăng kí</th>
+                                <th style="width:110px">Trạng thái</th>
+                                <th style="width:160px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vendorBody"></tbody>
+                    </table>
+
+                    <div id="vendorEmpty" class="empty-state" style="display:none">
+                        <div class="empty-icon">🏪</div>
+                        <p>Không có vendor nào.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: TẠO / SỬA VENDOR -->
+    <div class="modal-overlay" id="vendorModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="vendorModalTitle">Thêm Vendor</h3>
+                <button class="btn-icon" onclick="closeModal('vendorModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalAlert" class="alert alert-error" style="display:none"></div>
+                <input type="hidden" id="vendorId">
+
+                <div class="form-group">
+                    <label>Tên Vendor *</label>
+                    <input type="text" id="vendorName" class="form-control"
+                           placeholder="VD: Cửa hàng Cô Ba">
+                </div>
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="vendorEmail" class="form-control"
+                           placeholder="vendor@example.com">
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label>Mật khẩu <span id="pwLabel">(bỏ trống nếu không đổi)</span></label>
+                    <input type="password" id="vendorPassword" class="form-control"
+                           placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="vendorActive" checked> Đang hoạt động
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('vendorModal')">Huỷ</button>
+                <button class="btn btn-primary" onclick="saveVendor()" id="saveBtn">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DETAIL VENDOR (xem POI) -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal" style="max-width:640px">
+            <div class="modal-header">
+                <h3 id="detailModalTitle">Chi tiết Vendor</h3>
+                <button class="btn-icon" onclick="closeModal('detailModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="detailLoading" class="loading"><div class="spinner"></div></div>
+                <div id="detailContent" style="display:none">
+                    <div id="detailStats" class="stat-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:16px"></div>
+                    <h4 style="font-size:14px; margin-bottom:10px">📍 Điểm thuyết minh</h4>
+                    <table style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Tên điểm</th>
+                                <th style="width:80px">Ưu tiên</th>
+                                <th style="width:100px">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailPoiBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('detailModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: DUYỆT VENDOR -->
+    <div class="modal-overlay" id="approveModal">
+        <div class="modal" style="max-width:480px">
+            <div class="modal-header">
+                <h3>✅ Duyệt Vendor</h3>
+                <button class="btn-icon" onclick="closeModal('approveModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="approveAlert" class="alert alert-error" style="display:none"></div>
+                <input type="hidden" id="approveVendorId">
+                <p id="approveVendorName" style="margin-bottom:16px; font-weight:600"></p>
+                <div class="form-group">
+                    <label>POI để gán (tuỳ chọn)</label>
+                    <select id="approvePoiSelect" class="form-control">
+                        <option value="0">— Đang tải —</option>
+                    </select>
+                    <div class="form-hint">Vendor cần được gán ít nhất 1 POI để quản lý điểm thuyết minh.</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('approveModal')">Huỷ</button>
+                <button class="btn btn-primary" onclick="doApproveVendor()" id="approveBtn">✅ Duyệt &amp; Gán</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: TỪ CHỐI VENDOR -->
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal" style="max-width:480px">
+            <div class="modal-header">
+                <h3>❌ Từ chối Vendor</h3>
+                <button class="btn-icon" onclick="closeModal('rejectModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="rejectVendorId">
+                <p id="rejectVendorName" style="margin-bottom:16px; font-weight:600"></p>
+                <div class="form-group">
+                    <label>Lý do từ chối (tuỳ chọn)</label>
+                    <textarea id="rejectReason" class="form-control" rows="3"
+                              placeholder="VD: Thông tin không hợp lệ, trùng lặp với vendor khác..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('rejectModal')">Huỷ</button>
+                <button class="btn btn-danger" onclick="doRejectVendor()" id="rejectBtn">❌ Từ chối</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: XÁC NHẬN XOÁ -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal" style="max-width:400px">
+            <div class="modal-header">
+                <h3>🗑️ Xác nhận xoá</h3>
+                <button class="btn-icon" onclick="closeModal('deleteModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="deleteVendorId">
+                <div style="text-align:center; padding:8px 0 16px">
+                    <div style="font-size:48px; line-height:1; margin-bottom:12px">⚠️</div>
+                    <p style="font-size:15px; color:var(--gray-700); margin:0">
+                        Bạn có chắc muốn xoá vendor<br>
+                        <strong id="deleteVendorName" style="color:var(--danger)"></strong>?
+                    </p>
+                    <p style="font-size:12px; color:var(--gray-500); margin-top:8px">
+                        Hành động này sẽ xoá cả tài khoản đăng nhập và <strong>không thể hoàn tác</strong>.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('deleteModal')">Huỷ</button>
+                <button class="btn btn-danger" onclick="doDeleteVendor()" id="deleteBtn">🗑️ Xoá</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    if (!requireAuth()) throw new Error('Not authenticated');
+
+    let allVendors = [];
+    let currentStatus = '';
+    let pendingCount = 0;
+
+    // ── LOAD ─────────────────────────────────────────────────────────────────
+
+    async function loadVendors() {
+        document.getElementById('tableLoading').style.display = 'block';
+        document.getElementById('vendorTable').style.display = 'none';
+        document.getElementById('vendorEmpty').style.display = 'none';
+
+        try {
+            const data = await getVendors(currentStatus);
+            allVendors = data?.items || data || [];
+            renderStats(data);
+            renderTable(allVendors);
+
+            // Load pending count for badge
+            const allData = await getVendors('Pending');
+            const pending = allData?.items || allData || [];
+            pendingCount = pending.length;
+            const badge = document.getElementById('pendingCount');
+            if (pendingCount > 0) {
+                badge.textContent = pendingCount;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        } catch (e) {
+            showToast('Không thể tải danh sách vendor', 'error');
+        }
+
+        document.getElementById('tableLoading').style.display = 'none';
+    }
+
+    function renderStats(data) {
+        document.getElementById('totalVendors').textContent = data?.totalCount ?? allVendors.length;
+        document.getElementById('totalPoiCount').textContent = data?.totalPoiCount ?? '—';
+        document.getElementById('activeVendors').textContent =
+            allVendors.filter(v => v.isActive).length;
+    }
+
+    function renderTable(vendors) {
+        if (vendors.length === 0) {
+            document.getElementById('vendorEmpty').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('vendorTable').style.display = 'table';
+        document.getElementById('vendorBody').innerHTML = vendors.map(v => {
+            const statusBadge = getStatusBadge(v);
+            const actions = getActionButtons(v);
+            return `
+            <tr>
+                <td>
+                    <div style="font-weight:600">${escapeHtml(v.name || v.userName || '')}</div>
+                    ${v.businessName ? `<div style="font-size:12px; color:var(--gray-500)">${escapeHtml(v.businessName)}</div>` : ''}
+                </td>
+                <td style="font-size:13px">${escapeHtml(v.email || '')}</td>
+                <td><span class="badge badge-gray">${v.poiCount ?? 0}</span></td>
+                <td style="font-size:12px; color:var(--gray-500)">${formatDate(v.createdAt)}</td>
+                <td>${statusBadge}</td>
+                <td>${actions}</td>
+            </tr>
+        `}).join('');
+    }
+
+    function getStatusBadge(vendor) {
+        // vendor is a VendorListDto — isActive means Approved
+        if (vendor.isActive) {
+            return '<span class="badge badge-success">✅ Hoạt động</span>';
+        }
+        if (vendor.status === 'Pending') {
+            return '<span class="badge badge-warning">⏳ Chờ duyệt</span>';
+        }
+        if (vendor.status === 'Rejected') {
+            return '<span class="badge badge-danger">❌ Từ chối</span>';
+        }
+        return '<span class="badge badge-danger">❌ Tạm khoá</span>';
+    }
+
+    function getActionButtons(v) {
+        if (v.status === 'Pending') {
+            return `
+                <button class="btn btn-sm btn-primary" onclick="openApproveModal(${v.id}, '${escapeAttr(v.name || v.email || '')}')" title="Duyệt">✅ Duyệt</button>
+                <button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger)" onclick="openRejectModal(${v.id}, '${escapeAttr(v.name || v.email || '')}')" title="Từ chối">❌</button>
+                <button class="btn-icon edit" onclick="openDetailModal(${v.id})" title="Xem">👁️</button>
+            `;
+        }
+        return `
+            <button class="btn-icon edit" onclick="openDetailModal(${v.id})" title="Xem chi tiết">👁️</button>
+            <button class="btn-icon delete" onclick="confirmDeleteVendor(${v.id}, '${escapeAttr(v.name || v.email || '')}')" title="Xoá">🗑️</button>
+        `;
+    }
+
+    function setStatusFilter(status) {
+        currentStatus = status;
+        // Update active tab
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        const tabId = status === 'Pending' ? 'tabPending'
+            : status === 'Approved' ? 'tabApproved'
+            : status === 'Rejected' ? 'tabRejected'
+            : 'tabAll';
+        document.getElementById(tabId).classList.add('active');
+        loadVendors();
+    }
+
+    // ── APPROVE MODAL ─────────────────────────────────────────────────────────
+
+    async function openApproveModal(id, name) {
+        document.getElementById('approveVendorId').value = id;
+        document.getElementById('approveVendorName').textContent = `Vendor: ${name}`;
+        document.getElementById('approveAlert').style.display = 'none';
+        document.getElementById('approvePoiSelect').innerHTML = '<option value="0">— Đang tải POI —</option>';
+
+        openModal('approveModal');
+
+        // Load unassigned POIs
+        try {
+            const pois = await apiCall('GET', '/api/admin/pois/unassigned');
+            const select = document.getElementById('approvePoiSelect');
+            select.innerHTML = '<option value="0">— Không gán POI —</option>';
+            if (pois && pois.length > 0) {
+                pois.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            } else {
+                const opt = document.createElement('option');
+                opt.value = '0';
+                opt.textContent = '— Không có POI trống —';
+                select.appendChild(opt);
+            }
+        } catch (e) {
+            document.getElementById('approvePoiSelect').innerHTML = '<option value="0">Lỗi tải POI</option>';
+        }
+    }
+
+    async function doApproveVendor() {
+        const vendorId = parseInt(document.getElementById('approveVendorId').value);
+        const poiId = parseInt(document.getElementById('approvePoiSelect').value);
+        const alertBox = document.getElementById('approveAlert');
+        const btn = document.getElementById('approveBtn');
+
+        btn.textContent = 'Đang xử lý...';
+        btn.disabled = true;
+        alertBox.style.display = 'none';
+
+        try {
+            await approveVendor(vendorId, poiId);
+            closeModal('approveModal');
+            showToast('Đã duyệt vendor thành công!');
+            await loadVendors();
+        } catch (e) {
+            alertBox.textContent = 'Duyệt thất bại. Vui lòng thử lại.';
+            alertBox.style.display = 'block';
+        }
+
+        btn.textContent = '✅ Duyệt & Gán';
+        btn.disabled = false;
+    }
+
+    async function openRejectModal(id, name) {
+        document.getElementById('rejectVendorId').value = id;
+        document.getElementById('rejectVendorName').textContent = `Vendor: ${name}`;
+        document.getElementById('rejectReason').value = '';
+        openModal('rejectModal');
+    }
+
+    async function doRejectVendor() {
+        const vendorId = parseInt(document.getElementById('rejectVendorId').value);
+        const reason = document.getElementById('rejectReason').value.trim();
+        const btn = document.getElementById('rejectBtn');
+
+        btn.textContent = 'Đang xử lý...';
+        btn.disabled = true;
+
+        try {
+            await rejectVendor(vendorId, reason);
+            closeModal('rejectModal');
+            showToast('Đã từ chối vendor.');
+            await loadVendors();
+        } catch (e) {
+            showToast('Thao tác thất bại!', 'error');
+        }
+
+        btn.textContent = '❌ Từ chối';
+        btn.disabled = false;
+    }
+
+    // ── MODAL: CREATE / EDIT ────────────────────────────────────────────────
+
+    function openCreateModal() {
+        document.getElementById('vendorModalTitle').textContent = 'Thêm Vendor';
+        document.getElementById('vendorId').value = '';
+        document.getElementById('vendorName').value = '';
+        document.getElementById('vendorEmail').value = '';
+        document.getElementById('vendorPassword').value = '';
+        document.getElementById('vendorPassword').placeholder = 'Nhập mật khẩu cho vendor mới';
+        document.getElementById('pwLabel').textContent = '';
+        document.getElementById('passwordGroup').style.display = 'block';
+        document.getElementById('vendorActive').checked = true;
+        document.getElementById('modalAlert').style.display = 'none';
+        openModal('vendorModal');
+    }
+
+    function openEditModal(id) {
+        const v = allVendors.find(x => x.id === id);
+        if (!v) return;
+
+        document.getElementById('vendorModalTitle').textContent = 'Sửa Vendor';
+        document.getElementById('vendorId').value = v.id;
+        document.getElementById('vendorName').value = v.name || '';
+        document.getElementById('vendorEmail').value = v.email || '';
+        document.getElementById('vendorPassword').value = '';
+        document.getElementById('vendorPassword').placeholder = '•••••••• (bỏ trống nếu không đổi)';
+        document.getElementById('pwLabel').textContent = '(bỏ trống nếu không đổi)';
+        document.getElementById('passwordGroup').style.display = 'block';
+        document.getElementById('vendorActive').checked = v.isActive !== false;
+        document.getElementById('modalAlert').style.display = 'none';
+        openModal('vendorModal');
+    }
+
+    async function saveVendor() {
+        const id = document.getElementById('vendorId').value;
+        const name = document.getElementById('vendorName').value.trim();
+        const email = document.getElementById('vendorEmail').value.trim();
+        const password = document.getElementById('vendorPassword').value;
+        const alertBox = document.getElementById('modalAlert');
+
+        if (!name) { alertBox.textContent = 'Tên vendor không được để trống.'; alertBox.style.display = 'block'; return; }
+        if (!email) { alertBox.textContent = 'Email không được để trống.'; alertBox.style.display = 'block'; return; }
+        if (!id && !password) { alertBox.textContent = 'Mật khẩu không được để trống khi tạo mới.'; alertBox.style.display = 'block'; return; }
+
+        alertBox.style.display = 'none';
+        const btn = document.getElementById('saveBtn');
+        btn.textContent = 'Đang lưu...';
+        btn.disabled = true;
+
+        const data = {
+            name,
+            email,
+            ...(password && { password }),
+            isActive: document.getElementById('vendorActive').checked
+        };
+
+        try {
+            if (id) {
+                await updateVendor(id, data);
+                showToast('Cập nhật thành công!');
+            } else {
+                await createVendor(data);
+                showToast('Thêm vendor thành công!');
+            }
+            closeModal('vendorModal');
+            await loadVendors();
+        } catch (e) {
+            alertBox.textContent = 'Lưu thất bại. Kiểm tra lại thông tin.';
+            alertBox.style.display = 'block';
+        }
+
+        btn.textContent = 'Lưu';
+        btn.disabled = false;
+    }
+
+    // ── DELETE ───────────────────────────────────────────────────────────────
+
+    async function confirmDeleteVendor(id, name) {
+        document.getElementById('deleteVendorId').value = id;
+        document.getElementById('deleteVendorName').textContent = name;
+        openModal('deleteModal');
+    }
+
+    async function doDeleteVendor() {
+        const id = parseInt(document.getElementById('deleteVendorId').value);
+        const btn = document.getElementById('deleteBtn');
+        btn.textContent = 'Đang xoá...';
+        btn.disabled = true;
+
+        try {
+            await deleteVendor(id);
+            closeModal('deleteModal');
+            showToast('Đã xoá vendor thành công!');
+            await loadVendors();
+        } catch (e) {
+            showToast('Xoá thất bại!', 'error');
+        }
+
+        btn.textContent = '🗑️ Xoá';
+        btn.disabled = false;
+    }
+
+    // ── DETAIL MODAL ────────────────────────────────────────────────────────
+
+    async function openDetailModal(id) {
+        const v = allVendors.find(x => x.id === id);
+        if (!v) return;
+
+        document.getElementById('detailModalTitle').textContent = v.name || v.email || 'Vendor';
+        document.getElementById('detailLoading').style.display = 'block';
+        document.getElementById('detailContent').style.display = 'none';
+        openModal('detailModal');
+
+        try {
+            const [detail, pois] = await Promise.all([
+                getVendor(id).catch(() => v),
+                getVendorPois(id).catch(() => [])
+            ]);
+
+            const poiCount = pois.length;
+            const activePois = pois.filter(p => p.isActive).length;
+
+            document.getElementById('detailStats').innerHTML = `
+                <div class="stat-card" style="padding:12px">
+                    <div class="stat-value" style="font-size:20px">${poiCount}</div>
+                    <div class="stat-label">Điểm POI</div>
+                </div>
+                <div class="stat-card" style="padding:12px">
+                    <div class="stat-value" style="font-size:20px">${activePois}</div>
+                    <div class="stat-label">Đang hoạt động</div>
+                </div>
+                <div class="stat-card" style="padding:12px">
+                    <div class="stat-value" style="font-size:20px">${detail.totalPlays || 0}</div>
+                    <div class="stat-label">Lượt nghe</div>
+                </div>
+            `;
+
+            document.getElementById('detailPoiBody').innerHTML = pois.length === 0
+                ? '<tr><td colspan="3" style="text-align:center; color:var(--gray-500); padding:20px">Chưa có POI nào</td></tr>'
+                : pois.map(p => `
+                    <tr>
+                        <td>${escapeHtml(p.name)}</td>
+                        <td><span class="badge badge-gray">${p.priority}</span></td>
+                        <td>
+                            <span class="badge ${p.isActive ? 'badge-success' : 'badge-danger'}">
+                                ${p.isActive ? 'Hoạt động' : 'Ẩn'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+            document.getElementById('detailLoading').style.display = 'none';
+            document.getElementById('detailContent').style.display = 'block';
+
+        } catch (e) {
+            document.getElementById('detailLoading').innerHTML = '<p style="color:var(--danger)">Không thể tải chi tiết</p>';
+        }
+    }
+
+    // ── HELPERS ─────────────────────────────────────────────────────────────
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function escapeAttr(str) {
+        if (!str) return '';
+        return str.replace(/"/g, '%22').replace(/'/g, '%27');
+    }
+
+    loadVendors();
+    </script>
+
+</body>
+</html>

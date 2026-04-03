@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh — Upload Ảnh</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">🍜 TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="edit-poi.html">
+                    <span class="icon">📍</span> Điểm thuyết minh
+                </a>
+                <a href="upload-images.html" class="active">
+                    <span class="icon">🖼️</span> Upload ảnh
+                </a>
+                <a href="profile.html">
+                    <span class="icon">👤</span> Tài khoản
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">V</div>
+                    <div>
+                        <div class="user-name" id="userName">Vendor</div>
+                        <div class="user-role">Nhà cung cấp</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center"
+                        onclick="vendorLogout()">
+                    🚪 Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+            <div class="topbar">
+                <h2>🖼️ Upload Ảnh</h2>
+                <a href="dashboard.html" class="btn btn-outline btn-sm">← Quay lại</a>
+            </div>
+
+            <div class="content">
+
+                <!-- Chọn POI -->
+                <div class="card">
+                    <h3 style="font-size:15px; margin-bottom:12px">📍 Chọn điểm thuyết minh</h3>
+                    <div class="form-group" style="margin-bottom:0">
+                        <select id="poiSelect" class="form-control" style="max-width:400px"
+                                onchange="onPoiChange()">
+                            <option value="">— Chọn điểm thuyết minh —</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- DROP ZONE -->
+                <div class="card" id="uploadCard">
+                    <h3 style="font-size:15px; margin-bottom:12px">📤 Tải lên ảnh mới</h3>
+
+                    <div class="upload-drop-zone" id="dropZone">
+                        <input type="file" id="fileInput" accept="image/*" multiple onchange="onFilesSelected()">
+                        <div style="font-size:28px; margin-bottom:8px">📁</div>
+                        <div style="font-weight:600">Kéo thả ảnh vào đây</div>
+                        <div style="font-size:12px; margin-top:4px">hoặc nhấn để chọn file</div>
+                        <div style="font-size:11px; color:var(--gray-500); margin-top:6px">
+                            PNG, JPG, WEBP • Tối đa 5MB mỗi ảnh
+                        </div>
+                    </div>
+
+                    <!-- Preview ảnh chờ gửi duyệt -->
+                    <div id="pendingSection" style="display:none; margin-top:20px">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px">
+                            <h4 style="font-size:14px; font-weight:600; color:var(--gray-700)">
+                                📋 Ảnh chờ gửi duyệt
+                            </h4>
+                            <div style="display:flex; gap:8px">
+                                <button class="btn btn-outline btn-sm" onclick="clearPending()">Xoá tất cả</button>
+                                <button class="btn btn-primary" onclick="sendForApproval()" id="sendBtn">
+                                    📨 Gửi duyệt
+                                </button>
+                            </div>
+                        </div>
+                        <p style="font-size:12px; color:var(--gray-500); margin-bottom:12px">
+                            Ảnh sẽ được gửi cho quản trị viên duyệt trước khi hiển thị.
+                        </p>
+                        <div id="pendingGrid" class="image-preview-grid"></div>
+                    </div>
+
+                    <div id="uploadProgress" class="loading" style="display:none; padding:20px">
+                        <div class="spinner"></div>
+                        <div style="margin-top:8px; font-size:13px">Đang tải ảnh...</div>
+                    </div>
+                </div>
+
+                <!-- PREVIEW GRID -->
+                <div class="card">
+                    <div class="table-header">
+                        <h3 style="font-size:15px">✅ Ảnh đã duyệt</h3>
+                        <div id="poiNameLabel" style="font-size:13px; color:var(--gray-500)">—</div>
+                    </div>
+
+                    <div id="imgLoading" class="loading"><div class="spinner"></div></div>
+                    <div id="imageGrid" class="image-preview-grid" style="display:none"></div>
+                    <div id="imgEmpty" class="empty-state" style="display:none">
+                        <div class="empty-icon">🖼️</div>
+                        <p>Chưa có ảnh nào cho điểm này.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: XEM ẢNH LỚN -->
+    <div class="modal-overlay" id="imageModal">
+        <div class="modal" style="max-width:720px">
+            <div class="modal-header">
+                <h3 id="imageModalTitle">Ảnh</h3>
+                <button class="btn-icon" onclick="closeModal('imageModal')">✕</button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:10px">
+                <img id="imageModalImg" src="" alt="" style="max-width:100%; border-radius:8px">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('imageModal')">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    if (!requireVendorAuth()) throw new Error('Not authenticated');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const preSelectedPoiId = parseInt(urlParams.get('poiId')) || null;
+
+    let allPois = [];
+    let selectedPoiId = null;
+    let currentImages = [];        // ảnh đã duyệt (hiện có)
+    let pendingImages = [];         // ảnh chờ gửi duyệt (blob/url tạm)
+    let pendingBlobUrls = [];      // blob URLs để revoke later
+
+    // ── INIT ─────────────────────────────────────────────────────────────────
+
+    async function init() {
+        try {
+            allPois = await getMyPois() || [];
+            const select = document.getElementById('poiSelect');
+            allPois.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name;
+                select.appendChild(opt);
+            });
+
+            if (preSelectedPoiId) {
+                select.value = preSelectedPoiId;
+                await onPoiChange();
+            }
+        } catch (e) {
+            showToast('Không thể tải danh sách điểm', 'error');
+        }
+    }
+
+    // ── POI CHANGE ─────────────────────────────────────────────────────────────
+
+    async function onPoiChange() {
+        selectedPoiId = parseInt(document.getElementById('poiSelect').value) || null;
+
+        // Clear pending
+        clearPending();
+
+        document.getElementById('imgLoading').style.display = 'none';
+        document.getElementById('imageGrid').style.display = 'none';
+        document.getElementById('imgEmpty').style.display = 'none';
+        document.getElementById('pendingSection').style.display = 'none';
+
+        if (!selectedPoiId) {
+            document.getElementById('poiNameLabel').textContent = '—';
+            return;
+        }
+
+        const poi = allPois.find(p => p.id === selectedPoiId);
+        document.getElementById('poiNameLabel').textContent = poi ? poi.name : '—';
+        await loadImages();
+    }
+
+    // ── LOAD APPROVED IMAGES ───────────────────────────────────────────────────
+
+    async function loadImages() {
+        if (!selectedPoiId) return;
+
+        document.getElementById('imgLoading').style.display = 'block';
+        document.getElementById('imageGrid').style.display = 'none';
+        document.getElementById('imgEmpty').style.display = 'none';
+
+        try {
+            currentImages = [];
+
+            // 1) Lấy tất cả ảnh từ bảng RestaurantImages (ảnh đã duyệt)
+            try {
+                const gallery = await apiCall('GET', `/api/vendor/pois/${selectedPoiId}/images`);
+                if (gallery && Array.isArray(gallery)) {
+                    gallery.forEach(img => {
+                        currentImages.push({ url: img.imageUrl, id: img.id, isPrimary: img.isPrimary });
+                    });
+                }
+            } catch (_) { }
+
+            // 2) Nếu không có ảnh nào trong RestaurantImages, lấy từ PoiPoint.ImageUrl
+            if (currentImages.length === 0) {
+                const poi = await getMyPoi(selectedPoiId);
+                if (poi.imageUrl) {
+                    currentImages.push({ url: poi.imageUrl, isPrimary: true });
+                }
+            }
+
+            renderApprovedImages();
+        } catch (e) {
+            showToast('Không thể tải danh sách ảnh', 'error');
+        }
+
+        document.getElementById('imgLoading').style.display = 'none';
+    }
+
+    function renderApprovedImages() {
+        if (currentImages.length === 0) {
+            document.getElementById('imgEmpty').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('imageGrid').style.display = 'grid';
+        document.getElementById('imageGrid').innerHTML = currentImages.map((img, i) => `
+            <div class="image-preview-item">
+                <img src="${API_BASE}${img.url}" alt="Image ${i+1}"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 60%22><rect fill=%22%23f3f4f6%22 width=%22100%22 height=%2260%22/><text x=%2250%22 y=%2235%22 text-anchor=%22middle%22 fill=%22%239ca3af%22 font-size=%2212%22>No Image</text></svg>'">
+                ${img.isPrimary ? '<span style="position:absolute;top:6px;left:6px;font-size:10px;background:var(--primary);color:white;padding:2px 6px;border-radius:4px">Chính</span>' : ''}
+                <button style="position:absolute;bottom:6px;right:6px;width:24px;height:24px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center"
+                        onclick="openImageModal('${API_BASE}${img.url}', '${i}')">🔍</button>
+            </div>
+        `).join('');
+    }
+
+    // ── FILE UPLOAD ───────────────────────────────────────────────────────────
+
+    function onFilesSelected() {
+        const files = Array.from(document.getElementById('fileInput').files);
+        if (files.length > 0) processFiles(files);
+    }
+
+    // Drag & drop
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+        if (files.length > 0) processFiles(files);
+    });
+
+    function processFiles(files) {
+        if (!selectedPoiId) {
+            showToast('Vui lòng chọn điểm thuyết minh trước khi tải ảnh.', 'error');
+            return;
+        }
+
+        const MAX_SIZE = 5 * 1024 * 1024;
+        const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+
+        for (const f of files) {
+            if (f.size > MAX_SIZE) {
+                showToast(`"${f.name}" vượt quá 5MB!`, 'error');
+                return;
+            }
+            if (!allowed.includes(f.type)) {
+                showToast(`"${f.name}" không đúng định dạng (chỉ JPG, PNG, WEBP).`, 'error');
+                return;
+            }
+        }
+
+        // Tạo preview blob URLs
+        files.forEach((file, i) => {
+            const blobUrl = URL.createObjectURL(file);
+            pendingBlobUrls.push(blobUrl);
+            pendingImages.push({
+                file,
+                blobUrl,
+                name: file.name,
+                size: file.size,
+                tempId: `${Date.now()}_${i}`
+            });
+        });
+
+        renderPendingImages();
+        document.getElementById('fileInput').value = '';
+    }
+
+    function renderPendingImages() {
+        if (pendingImages.length === 0) {
+            document.getElementById('pendingSection').style.display = 'none';
+            return;
+        }
+
+        document.getElementById('pendingSection').style.display = 'block';
+        document.getElementById('pendingGrid').innerHTML = pendingImages.map((img, i) => `
+            <div class="image-preview-item">
+                <img src="${img.blobUrl}" alt="${img.name}" style="width:100%;height:100%;object-fit:cover">
+                <span style="position:absolute;top:6px;left:6px;font-size:10px;background:var(--warning);color:white;padding:2px 6px;border-radius:4px">Chờ duyệt</span>
+                <button class="remove-btn" onclick="removePending(${i})">✕</button>
+            </div>
+        `).join('');
+    }
+
+    function removePending(idx) {
+        URL.revokeObjectURL(pendingImages[idx].blobUrl);
+        pendingImages.splice(idx, 1);
+        renderPendingImages();
+    }
+
+    function clearPending() {
+        pendingBlobUrls.forEach(url => URL.revokeObjectURL(url));
+        pendingBlobUrls = [];
+        pendingImages = [];
+        renderPendingImages();
+    }
+
+    // ── GỬI DUYỆT ──────────────────────────────────────────────────────────────
+
+    async function sendForApproval() {
+        if (pendingImages.length === 0) {
+            showToast('Chưa có ảnh nào để gửi.', 'error');
+            return;
+        }
+
+        const btn = document.getElementById('sendBtn');
+        btn.textContent = 'Đang gửi...';
+        btn.disabled = true;
+
+        let successCount = 0;
+        let failCount = 0;
+
+        for (const img of pendingImages) {
+            try {
+                const result = await uploadImageForApproval(img.file, selectedPoiId);
+                if (result && result.success) successCount++;
+                else failCount++;
+            } catch {
+                failCount++;
+            }
+        }
+
+        clearPending();
+
+        if (successCount > 0) {
+            showToast(`Đã gửi ${successCount} ảnh cho quản trị viên duyệt!`, 'success');
+        }
+        if (failCount > 0) {
+            showToast(`${failCount} ảnh gửi thất bại.`, 'error');
+        }
+
+        btn.textContent = '📨 Gửi duyệt';
+        btn.disabled = false;
+    }
+
+    // ── IMAGE MODAL ────────────────────────────────────────────────────────────
+
+    function openImageModal(url) {
+        document.getElementById('imageModalTitle').textContent = 'Ảnh đã duyệt';
+        document.getElementById('imageModalImg').src = url;
+        openModal('imageModal');
+    }
+
+    function escapeAttr(str) {
+        if (!str) return '';
+        return str.replace(/'/g, '%27').replace(/"/g, '%22');
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return (str + '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    init();
+    </script>
+
+</body>
+</html>

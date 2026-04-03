@@ -28,6 +28,9 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<Tour> Tours => Set<Tour>();
     public DbSet<TourStop> TourStops => Set<TourStop>();
     public DbSet<RestaurantImage> RestaurantImages => Set<RestaurantImage>();
+    public DbSet<Vendor> Vendors => Set<Vendor>();
+    public DbSet<PendingPOIUpdate> PendingPOIUpdates => Set<PendingPOIUpdate>();
+    public DbSet<StagingImage> StagingImages => Set<StagingImage>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -40,6 +43,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
             e.Property(p => p.Name).IsRequired().HasMaxLength(200);
             e.Property(p => p.ShortDescription).HasMaxLength(500);
             e.Property(p => p.ImageUrl).HasMaxLength(500);
+            e.Property(p => p.IconUrl).HasMaxLength(500);
             e.Property(p => p.MapUrl).HasMaxLength(500);
 
             e.HasMany(p => p.AudioScripts)
@@ -114,8 +118,75 @@ public class AppDbContext : IdentityDbContext<AppUser>
              .IsUnique();
 
             e.HasOne(i => i.PoiPoint)
-             .WithMany()
+             .WithMany(p => p.Images)
              .HasForeignKey(i => i.PoiPointId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── Vendor ────────────────────────────────────────────────────────────
+        builder.Entity<Vendor>(e =>
+        {
+            e.HasKey(v => v.Id);
+            e.Property(v => v.BusinessName).IsRequired().HasMaxLength(200);
+            e.Property(v => v.OwnerName).IsRequired().HasMaxLength(100);
+            e.Property(v => v.Phone).IsRequired().HasMaxLength(20);
+            e.Property(v => v.Address).HasMaxLength(500);
+            e.Property(v => v.Status).IsRequired().HasMaxLength(20);
+            e.Property(v => v.RejectedReason).HasMaxLength(500);
+
+            // 1 UserId chỉ có 1 Vendor
+            e.HasIndex(v => v.UserId).IsUnique();
+
+            // 1 PoiPoint chỉ có 1 Vendor (null nếu chưa gán)
+            e.HasIndex(v => v.PoiPointId);
+
+            e.HasOne(v => v.PoiPoint)
+             .WithMany()
+             .HasForeignKey(v => v.PoiPointId)
+             .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ── PendingPOIUpdate ─────────────────────────────────────────────────
+        builder.Entity<PendingPOIUpdate>(e =>
+        {
+            e.HasKey(u => u.Id);
+            e.Property(u => u.Status).IsRequired().HasMaxLength(20);
+            e.Property(u => u.AdminNote).HasMaxLength(500);
+            e.Property(u => u.ReviewedBy).HasMaxLength(256);
+
+            e.HasIndex(u => u.Status);
+            e.HasIndex(u => u.VendorId);
+            e.HasIndex(u => u.PoiPointId);
+
+            e.HasOne(u => u.Vendor)
+             .WithMany()
+             .HasForeignKey(u => u.VendorId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ── StagingImage ───────────────────────────────────────────────────
+        builder.Entity<StagingImage>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.FileName).IsRequired().HasMaxLength(255);
+            e.Property(x => x.TempUrl).IsRequired().HasMaxLength(500);
+            e.Property(x => x.ApprovedUrl).HasMaxLength(500);
+            e.Property(x => x.Status).IsRequired().HasMaxLength(20);
+            e.Property(x => x.AdminNote).HasMaxLength(500);
+            e.Property(x => x.ReviewedBy).HasMaxLength(256);
+
+            e.HasIndex(x => x.Status);
+            e.HasIndex(x => x.VendorId);
+            e.HasIndex(x => x.PoiPointId);
+
+            e.HasOne(x => x.Vendor)
+             .WithMany()
+             .HasForeignKey(x => x.VendorId)
+             .OnDelete(DeleteBehavior.Cascade);
+
+            e.HasOne(x => x.PoiPoint)
+             .WithMany()
+             .HasForeignKey(x => x.PoiPointId)
              .OnDelete(DeleteBehavior.Cascade);
         });
     }

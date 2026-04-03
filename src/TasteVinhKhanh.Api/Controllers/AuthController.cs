@@ -12,13 +12,54 @@ public class AuthController : ControllerBase
 
     public AuthController(IAuthService auth) => _auth = auth;
 
-    /// <summary>Đăng nhập — trả về JWT token để dùng cho các request cần auth</summary>
+    /// <summary>Đăng nhập — trả JWT token</summary>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var result = await _auth.LoginAsync(request);
         if (result == null)
             return Unauthorized(new { message = "Email hoặc mật khẩu không đúng" });
+        return Ok(result);
+    }
+
+    /// <summary>Đăng ký tài khoản vendor (public)</summary>
+    [HttpPost("vendor-register")]
+    public async Task<IActionResult> VendorRegister([FromBody] VendorRegisterRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Password) ||
+            string.IsNullOrWhiteSpace(request.BusinessName) ||
+            string.IsNullOrWhiteSpace(request.OwnerName) ||
+            string.IsNullOrWhiteSpace(request.Phone))
+            return BadRequest(new { message = "Vui lòng điền đầy đủ thông tin bắt buộc." });
+
+        var result = await _auth.VendorRegisterAsync(request);
+        if (!result.Success)
+            return BadRequest(new { message = result.Message });
+
+        return Ok(new { message = result.Message });
+    }
+
+    /// <summary>Đăng nhập vendor</summary>
+    [HttpPost("vendor-login")]
+    public async Task<IActionResult> VendorLogin([FromBody] VendorLoginRequest request)
+    {
+        var result = await _auth.LoginAsync(new LoginRequest
+        {
+            Email = request.Email,
+            Password = request.Password
+        });
+
+        if (result == null)
+            return Unauthorized(new { message = "Email hoặc mật khẩu không đúng." });
+
+        if (result.Role != "Vendor")
+            return StatusCode(403, new { message = "Tài khoản không có quyền truy cập vendor." });
+
+        // Kiểm tra vendor đã được admin duyệt chưa
+        var vendorApproved = await _auth.IsVendorApprovedAsync(request.Email);
+        if (!vendorApproved)
+            return StatusCode(403, new { message = "Tài khoản của bạn đang chờ được duyệt. Vui lòng liên hệ quản trị viên." });
 
         return Ok(result);
     }

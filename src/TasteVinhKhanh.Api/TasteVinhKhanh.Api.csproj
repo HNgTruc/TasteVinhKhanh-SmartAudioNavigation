@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x64</Platforms>
+    <UseStaticWebAssets>false</UseStaticWebAssets>
   </PropertyGroup>
 
   <ItemGroup>

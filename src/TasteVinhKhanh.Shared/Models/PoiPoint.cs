@@ -29,6 +29,7 @@ public class PoiPoint
     public bool IsActive { get; set; } = true;
 
     public string? ImageUrl { get; set; }
+    public string? IconUrl { get; set; }
     public string? MapUrl { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
