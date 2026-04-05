@@ -204,67 +204,6 @@ body {
     margin-bottom: 20px;
 }
 
-.stat-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
-/* ── IMAGE PREVIEW GRID ─────────────────────────────────── */
-
-.image-preview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 16px;
-    padding: 16px;
-}
-    margin-bottom: 24px;
-}
-
-.stat-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    padding: 20px;
-    box-shadow: var(--shadow);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-}
-
-    .stat-icon.blue {
-        background: #dbeafe;
-    }
-
-    .stat-icon.green {
-        background: #d1fae5;
-    }
-
-    .stat-icon.yellow {
-        background: #fef3c7;
-    }
-
-.stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: var(--gray-500);
-    margin-top: 4px;
-}
-
 /* ── TABLE ───────────────────────────────────────────────── */
 
 .table-header {
@@ -312,27 +251,14 @@ tbody tr:last-child td {
 
 /* ── BADGES ──────────────────────────────────────────────── */
 
-.badge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
 .badge-success {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--success);
+    color: white;
 }
 
 .badge-danger {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.badge-info {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--danger);
+    color: white;
 }
 
 .badge-gray {
@@ -395,14 +321,17 @@ tbody tr:last-child td {
 }
 
 .btn-icon {
-    padding: 6px;
+    padding: 4px 6px;
     background: transparent;
     border: none;
     cursor: pointer;
-    border-radius: 6px;
-    color: var(--gray-500);
-    font-size: 16px;
+    border-radius: 4px;
+    color: var(--gray-400);
+    font-size: 15px;
     transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
     .btn-icon:hover {
@@ -412,14 +341,17 @@ tbody tr:last-child td {
 
     .btn-icon.edit:hover {
         color: var(--info);
+        background: rgba(59, 130, 246, 0.08);
     }
 
     .btn-icon.delete:hover {
         color: var(--danger);
+        background: rgba(239, 68, 68, 0.08);
     }
 
     .btn-icon.script:hover {
         color: var(--success);
+        background: rgba(16, 185, 129, 0.08);
     }
 
 /* ── FORMS ───────────────────────────────────────────────── */
@@ -708,20 +640,112 @@ textarea.form-control {
 
 /* ── FILTER TABS (pending-updates page) ──────────────────── */
 
-.filter-tab {
-    flex: 1;
-    padding: 12px 16px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--gray-500);
+/* Note: .filter-tab defined in pending-updates section below */
+
+/* ── ROW HIGHLIGHT ───────────────────────────────────────── */
+
+tr.row-pending td {
+    background: #fffbeb;
+}
+
+/* ════════════════════════════════════════════════════════════ */
+/* PENDING-UPDATES PAGE ENHANCED STYLES                        */
+/* ════════════════════════════════════════════════════════════ */
+
+/* ── STAT GRID ───────────────────────────────────────────── */
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    transition: all 0.2s;
+    border-left: 4px solid var(--gray-300);
+}
+
+.stat-card.stat-pending { border-left-color: var(--warning); }
+.stat-card.stat-approved { border-left-color: var(--success); }
+.stat-card.stat-rejected { border-left-color: var(--danger); }
+.stat-card.stat-total { border-left-color: var(--info); }
+
+.stat-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    transition: all 0.15s;
+    font-size: 20px;
+}
+
+.stat-icon.yellow { background: #fef3c7; }
+.stat-icon.blue { background: #dbeafe; }
+.stat-icon.green { background: #d1fae5; }
+.stat-icon.purple { background: #e9d5ff; }
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--gray-900);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* ── TABS CONTAINER ──────────────────────────────────────── */
+
+.tabs-container {
+    background: var(--white);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.filter-tab {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    position: relative;
 }
 
 .filter-tab:hover {
@@ -732,11 +756,268 @@ textarea.form-control {
 .filter-tab.active {
     color: var(--primary);
     border-bottom-color: var(--primary);
+    background: rgba(79, 70, 229, 0.02);
     font-weight: 600;
 }
 
-/* ── ROW HIGHLIGHT ───────────────────────────────────────── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: auto;
+    height: auto;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
 
-tr.row-pending td {
-    background: #fffbeb;
+.badge-warning { background: var(--warning); color: white; }
+.badge-success { background: var(--success); color: white; }
+.badge-danger { background: var(--danger); color: white; }
+.badge-info { background: var(--info); color: white; }
+
+/* ── TABLE WRAPPER ───────────────────────────────────────── */
+
+.table-wrapper {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.search-bar {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    gap: 8px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.poi-cell {
+    font-weight: 600;
+    color: var(--gray-900);
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.action-buttons .btn-icon {
+    padding: 6px 8px;
+    font-size: 14px;
+}
+
+.action-buttons .btn-sm {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+/* ── IMAGE GRID ──────────────────────────────────────────── */
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 16px;
+}
+
+.image-card {
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    transition: all 0.2s;
+}
+
+.image-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.image-card img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+}
+
+.image-card-info {
+    padding: 10px;
+}
+
+.image-card-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.image-card-meta {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.image-card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+/* ── IMAGE ACTION BUTTONS ────────────────────────────────── */
+
+.image-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.btn-action-approve,
+.btn-action-reject {
+    flex: 1;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+}
+
+.btn-action-approve {
+    background: var(--success);
+    color: white;
+}
+
+    .btn-action-approve:hover {
+        background: #059669;
+        transform: scale(1.05);
+    }
+
+    .btn-action-approve:active {
+        transform: scale(0.98);
+    }
+
+.btn-action-reject {
+    background: var(--danger);
+    color: white;
+}
+
+    .btn-action-reject:hover {
+        background: #dc2626;
+        transform: scale(1.05);
+    }
+
+    .btn-action-reject:active {
+        transform: scale(0.98);
+    }
+
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--gray-500);
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ── DIFF TABLE ──────────────────────────────────────────── */
+
+.diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.diff-table tr:hover {
+    background: var(--gray-50);
+}
+
+.diff-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.diff-table .field-name {
+    font-weight: 600;
+    width: 130px;
+    color: var(--gray-900);
+}
+
+.diff-table .old-value {
+    color: var(--gray-500);
+    font-style: italic;
+}
+
+.diff-table .new-value {
+    color: var(--success);
+    font-weight: 500;
+}
+
+/* ── RESPONSIVE ──────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .stat-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+    
+    .filter-tabs {
+        overflow-x: auto;
+    }
+    
+    .filter-tab {
+        min-width: 100px;
+        font-size: 12px;
+    }
+    
+    table {
+        font-size: 12px;
+    }
+    
+    thead th, tbody td {
+        padding: 8px 10px;
+    }
+    
+    .image-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
 }

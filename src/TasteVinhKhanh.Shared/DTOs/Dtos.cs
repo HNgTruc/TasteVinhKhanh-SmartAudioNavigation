@@ -41,12 +41,12 @@ public class CreatePoiRequest
     public string? ImageUrl { get; set; }
     public string? IconUrl { get; set; }
     public string? MapUrl { get; set; }
+    public bool IsActive { get; set; } = true;
 }
 
-/// <summary>Cập nhật POI — kế thừa Create, thêm IsActive</summary>
+/// <summary>Cập nhật POI — kế thừa Create</summary>
 public class UpdatePoiRequest : CreatePoiRequest
 {
-    public bool IsActive { get; set; } = true;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

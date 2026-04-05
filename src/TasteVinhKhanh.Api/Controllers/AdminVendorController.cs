@@ -315,7 +315,7 @@ public class AdminVendorController : ControllerBase
                 u.ImagesPayload,
                 u.ScriptsPayload,
                 SubmittedBy = u.Vendor.OwnerName,
-                ChangeType = DetectChangeType(u.Payload, u.ImagesPayload, u.ScriptsPayload)
+                ChangeType = DetectChangeType(u.PoiPointId, u.Payload, u.ImagesPayload, u.ScriptsPayload)
             })
             .ToListAsync();
 
@@ -355,8 +355,12 @@ public class AdminVendorController : ControllerBase
         return Ok(new { items = result, stats });
     }
 
-    private static string DetectChangeType(string? payload, string? imagesPayload, string? scriptsPayload)
+    private static string DetectChangeType(int poiPointId, string? payload, string? imagesPayload, string? scriptsPayload)
     {
+        // PoiPointId = 0 → Thêm POI mới
+        if (poiPointId == 0) return "poi_created";
+        
+        // Còn lại → Cập nhật
         if (!string.IsNullOrEmpty(imagesPayload)) return "image_uploaded";
         if (!string.IsNullOrEmpty(scriptsPayload)) return "script_updated";
         if (!string.IsNullOrEmpty(payload)) return "poi_updated";
@@ -438,7 +442,7 @@ public class AdminVendorController : ControllerBase
         }
     }
 
-    /// <summary>Duyệt POI update — apply lên PoiPoint thật</summary>
+    /// <summary>Duyệt POI update — apply lên PoiPoint thật hoặc tạo mới</summary>
     [HttpPost("pending-updates/{id}/approve")]
     public async Task<IActionResult> ApproveUpdate(int id, [FromBody] ApproveUpdateRequest req)
     {
@@ -447,10 +451,25 @@ public class AdminVendorController : ControllerBase
         if (update.Status != "Pending")
             return BadRequest(new { message = "Update đã được xử lý trước đó." });
 
-        var poi = await _db.PoiPoints.FindAsync(update.PoiPointId);
-        if (poi == null) return NotFound(new { message = "POI không tồn tại." });
-
         var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? "admin";
+
+        Shared.Models.PoiPoint poi;
+
+        // Nếu PoiPointId = 0 → tạo POI mới
+        if (update.PoiPointId == 0)
+        {
+            poi = new Shared.Models.PoiPoint();
+            _db.PoiPoints.Add(poi);
+            await _db.SaveChangesAsync(); // Lưu trước để lấy ID
+
+            update.PoiPointId = poi.Id; // Update PoiPointId trong PendingPOIUpdates
+        }
+        else
+        {
+            // PoiPointId > 0 → tìm POI hiện có
+            poi = await _db.PoiPoints.FindAsync(update.PoiPointId);
+            if (poi == null) return NotFound(new { message = "POI không tồn tại." });
+        }
 
         // Apply Payload lên POI
         if (!string.IsNullOrEmpty(update.Payload))
@@ -464,12 +483,20 @@ public class AdminVendorController : ControllerBase
                     poi.Name = name.GetString()!;
                 if (root.TryGetProperty("shortDescription", out var desc) && desc.ValueKind == JsonValueKind.String)
                     poi.ShortDescription = desc.GetString()!;
-                if (root.TryGetProperty("iconUrl", out var icon) && icon.ValueKind == JsonValueKind.String)
-                    poi.IconUrl = icon.GetString();
+                if (root.TryGetProperty("latitude", out var lat) && lat.ValueKind == JsonValueKind.Number)
+                    poi.Latitude = lat.GetDouble();
+                if (root.TryGetProperty("longitude", out var lng) && lng.ValueKind == JsonValueKind.Number)
+                    poi.Longitude = lng.GetDouble();
                 if (root.TryGetProperty("triggerRadiusMeters", out var radius) && radius.ValueKind == JsonValueKind.Number)
                     poi.TriggerRadiusMeters = radius.GetDouble();
                 if (root.TryGetProperty("priority", out var prio) && prio.ValueKind == JsonValueKind.Number)
                     poi.Priority = prio.GetInt32();
+                if (root.TryGetProperty("imageUrl", out var img) && img.ValueKind == JsonValueKind.String)
+                    poi.ImageUrl = img.GetString();
+                if (root.TryGetProperty("mapUrl", out var mapUrl) && mapUrl.ValueKind == JsonValueKind.String)
+                    poi.MapUrl = mapUrl.GetString();
+                if (root.TryGetProperty("isActive", out var active) && active.ValueKind == JsonValueKind.True)
+                    poi.IsActive = active.GetBoolean();
             }
             catch { /* payload lỗi → bỏ qua */ }
         }
@@ -543,7 +570,7 @@ public class AdminVendorController : ControllerBase
             catch { /* scripts lỗi → bỏ qua */ }
         }
 
-        // Đán dấu update đã duyệt
+        // Đánh dấu update đã duyệt
         update.Status = "Approved";
         update.AdminNote = req.AdminNote;
         update.ReviewedAt = DateTime.UtcNow;
@@ -551,7 +578,7 @@ public class AdminVendorController : ControllerBase
 
         await _db.SaveChangesAsync();
 
-        return Ok(new { message = "Đã duyệt và áp dụng thay đổi lên POI." });
+        return Ok(new { message = "Đã duyệt và áp dụng thay đổi lên POI.", poiId = poi.Id });
     }
 
     /// <summary>Từ chối POI update</summary>
@@ -610,7 +637,11 @@ public class AdminVendorController : ControllerBase
         }).ToList();
 
         var pendingCount = await _db.StagingImages.CountAsync(x => x.Status == "Pending");
-        return Ok(new { items, pendingCount });
+        var approvedTodayCount = await _db.StagingImages.CountAsync(x => 
+            x.Status == "Approved" && x.ReviewedAt >= DateTime.UtcNow.Date);
+        var rejectedTodayCount = await _db.StagingImages.CountAsync(x => 
+            x.Status == "Rejected" && x.ReviewedAt >= DateTime.UtcNow.Date);
+        return Ok(new { items, pendingCount, stats = new { approvedToday = approvedTodayCount, rejectedToday = rejectedTodayCount } });
     }
 
         /// <summary>Duyệt 1 ảnh staging — copy file từ staging → wwwroot/images</summary>

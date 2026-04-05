@@ -50,51 +50,53 @@
         <!-- MAIN -->
         <main class="main">
             <div class="topbar">
-                <h2>⏳ Duyệt cập nhật</h2>
-                <div style="font-size:13px; color:var(--gray-500)">
-                    Những thay đổi từ Vendor chờ bạn duyệt trước khi hiển thị trên app
+                <div>
+                    <h2>⏳ Duyệt cập nhật</h2>
+                    <div style="font-size:12px; color:var(--gray-500); margin-top:4px">
+                        Quản lý các thay đổi từ vendors
+                    </div>
                 </div>
             </div>
 
             <div class="content">
 
                 <!-- STATS -->
-                <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr)">
-                    <div class="stat-card">
+                <div class="stat-grid">
+                    <div class="stat-card stat-pending">
                         <div class="stat-icon yellow">⏳</div>
                         <div>
                             <div class="stat-value" id="statPending">—</div>
                             <div class="stat-label">Chờ duyệt</div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon blue">✅</div>
+                    <div class="stat-card stat-approved">
+                        <div class="stat-icon green">✅</div>
                         <div>
                             <div class="stat-value" id="statApproved">—</div>
                             <div class="stat-label">Đã duyệt hôm nay</div>
                         </div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card stat-rejected">
                         <div class="stat-icon purple">❌</div>
                         <div>
                             <div class="stat-value" id="statRejected">—</div>
                             <div class="stat-label">Từ chối hôm nay</div>
                         </div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon green">📍</div>
+                    <div class="stat-card stat-total">
+                        <div class="stat-icon blue">📍</div>
                         <div>
                             <div class="stat-value" id="statPoiChanged">—</div>
-                            <div class="stat-label">POI bị thay đổi</div>
+                            <div class="stat-label">POI thay đổi</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- FILTER TABS -->
-                <div class="card" style="padding:0">
-                    <div style="display:flex; gap:0; border-bottom:1px solid var(--gray-200)">
+                <div class="tabs-container">
+                    <div class="filter-tabs" id="filterTabs">
                         <button class="filter-tab active" data-filter="pending" onclick="setFilter('pending')">
-                            ⏳ Chờ duyệt <span class="badge badge-warning" id="tabPending">0</span>
+                            ⏳ Chờ duyệt <span class="badge badge-warning" id="tabPending" style="display:none">0</span>
                         </button>
                         <button class="filter-tab" data-filter="approved" onclick="setFilter('approved')">
                             ✅ Đã duyệt
@@ -105,44 +107,61 @@
                         <button class="filter-tab" data-filter="all" onclick="setFilter('all')">
                             📋 Tất cả
                         </button>
-                        <button class="filter-tab" onclick="showImageTab()" id="imgTabBtn">
+                        <button class="filter-tab" onclick="showImageTab('Pending')" id="imgTabBtn">
                             🖼️ Ảnh <span class="badge badge-warning" id="imgPendingBadge" style="display:none">0</span>
                         </button>
                     </div>
 
-                    <!-- BẢNG CẬP NHẬT POI -->
+                    <!-- UPDATES TABLE -->
                     <div id="updateSection">
+                        <div class="search-bar">
+                            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Tìm POI, Vendor..." onkeyup="handleSearch()">
+                        </div>
+
                         <div id="tableLoading" class="loading"><div class="spinner"></div></div>
 
-                        <table id="updateTable" style="display:none">
-                            <thead>
-                                <tr>
-                                    <th>POI</th>
-                                    <th>Vendor</th>
-                                    <th style="width:140px">Loại thay đổi</th>
-                                    <th style="width:160px">Ngày gửi</th>
-                                    <th style="width:100px">Trạng thái</th>
-                                    <th style="width:180px">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody id="updateBody"></tbody>
-                        </table>
+                        <div class="table-wrapper" id="tableWrapper" style="display:none">
+                            <table id="updateTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width:25%">POI</th>
+                                        <th style="width:15%">Vendor</th>
+                                        <th style="width:15%">Loại thay đổi</th>
+                                        <th style="width:20%">Ngày gửi</th>
+                                        <th style="width:12%">Trạng thái</th>
+                                        <th style="width:13%" style="text-align:center">Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="updateBody"></tbody>
+                            </table>
+                        </div>
 
                         <div id="updateEmpty" class="empty-state" style="display:none">
                             <div class="empty-icon">📭</div>
-                            <p>Không có cập nhật nào.</p>
+                            <p>Không có cập nhật nào</p>
                         </div>
                     </div>
 
-                    <!-- BẢNG ẢNH CHỜ DUYỆT -->
+                    <!-- IMAGE SECTION -->
                     <div id="imageSection" style="display:none">
+                        <!-- Filter tabs for images -->
+                        <div style="border-bottom: 1px solid var(--gray-200); padding: 8px 16px; display:flex; gap:16px">
+                            <button class="filter-tab" data-filter="pending" onclick="setImageFilter('Pending')" style="padding: 8px 12px; font-size:12px">⏳ Chờ duyệt</button>
+                            <button class="filter-tab" data-filter="approved" onclick="setImageFilter('Approved')" style="padding: 8px 12px; font-size:12px">✅ Đã duyệt</button>
+                            <button class="filter-tab" data-filter="rejected" onclick="setImageFilter('Rejected')" style="padding: 8px 12px; font-size:12px">❌ Từ chối</button>
+                        </div>
+
+                        <div class="search-bar">
+                            <input type="text" id="searchImageInput" class="search-input" placeholder="🔍 Tìm ảnh, POI..." onkeyup="handleImageSearch()">
+                        </div>
+
                         <div id="imgLoading" class="loading"><div class="spinner"></div></div>
 
-                        <div id="imgGrid" class="image-preview-grid" style="display:none; padding:16px; gap:12px"></div>
+                        <div id="imgGrid" class="image-grid" style="display:none"></div>
 
                         <div id="imgEmpty" class="empty-state" style="display:none">
                             <div class="empty-icon">🖼️</div>
-                            <p>Không có ảnh nào chờ duyệt.</p>
+                            <p id="imgEmptyMsg">Không có ảnh nào</p>
                         </div>
                     </div>
                 </div>
@@ -153,25 +172,26 @@
 
     <!-- MODAL: CHI TIẾT CẬP NHẬT -->
     <div class="modal-overlay" id="detailModal">
-        <div class="modal" style="max-width:680px">
+        <div class="modal">
             <div class="modal-header">
-                <h3 id="detailTitle">Chi tiết cập nhật</h3>
+                <div style="flex:1">
+                    <h3 style="margin:0; margin-bottom:8px" id="detailTitle">Chi tiết cập nhật</h3>
+                    <div style="font-size:13px; color:var(--gray-600); line-height:1.4" id="detailMeta"></div>
+                </div>
                 <button class="btn-icon" onclick="closeModal('detailModal')">✕</button>
             </div>
             <div class="modal-body">
                 <div id="detailLoading" class="loading"><div class="spinner"></div></div>
                 <div id="detailContent" style="display:none">
-                    <div id="detailMeta" style="margin-bottom:16px; font-size:13px; color:var(--gray-500)"></div>
-
                     <div id="diffSection"></div>
 
                     <!-- APPROVAL BUTTONS -->
-                    <div id="approvalActions" style="margin-top:16px; display:flex; gap:8px; justify-content:flex-end">
-                        <button class="btn btn-danger" onclick="openRejectModal()">
+                    <div id="approvalActions" style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end">
+                        <button class="btn btn-outline" onclick="openRejectModal()">
                             ❌ Từ chối
                         </button>
                         <button class="btn btn-primary" onclick="approveCurrent()">
-                            ✅ Duyệt cập nhật
+                            ✅ Duyệt
                         </button>
                     </div>
                 </div>
@@ -182,11 +202,31 @@
         </div>
     </div>
 
+    <!-- MODAL: REJECT IMAGE -->
+    <div class="modal-overlay" id="rejectImageModal">
+        <div class="modal" style="max-width:360px">
+            <div class="modal-header" style="border-bottom:none; padding-bottom:16px">
+                <h3 style="margin:0; color:var(--danger)">❌ Từ chối ảnh</h3>
+                <button class="btn-icon" onclick="closeModal('rejectImageModal')">✕</button>
+            </div>
+            <div class="modal-body" style="padding:20px 24px">
+                <div class="form-group">
+                    <label style="color:var(--gray-700); font-size:13px; margin-bottom:8px; display:block">Lý do từ chối (tuỳ chọn)</label>
+                    <textarea id="rejectReason" class="form-control" rows="3" placeholder="Ví dụ: Ảnh bị mờ, chất lượng thấp..." style="resize:vertical"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('rejectImageModal')">Huỷ</button>
+                <button class="btn btn-danger" onclick="confirmRejectImage()">❌ Từ chối</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: LÝ DO TỪ CHỐI -->
     <div class="modal-overlay" id="rejectModal">
-        <div class="modal" style="max-width:480px">
+        <div class="modal" style="max-width:420px">
             <div class="modal-header">
-                <h3>Lý do từ chối</h3>
+                <h3 style="margin:0">Lý do từ chối</h3>
                 <button class="btn-icon" onclick="closeModal('rejectModal')">✕</button>
             </div>
             <div class="modal-body">
@@ -209,12 +249,16 @@
     if (!requireAuth()) throw new Error('Not authenticated');
 
     let allUpdates = [];
+    let filteredUpdates = [];
     let currentFilter = 'pending';
     let currentDetailId = null;
     let currentDetailData = null;
     let allImages = [];
-    let currentImgFilter = 'Pending';
+    let filteredImages = [];
+    let searchQuery = '';
     let showImages = false;
+    let currentImageFilter = 'Pending';
+    let rejectImageId = null;
 
     // ── LOAD ─────────────────────────────────────────────────────────────────
 
@@ -223,36 +267,61 @@
         document.getElementById('updateSection').style.display = 'block';
         document.getElementById('imageSection').style.display = 'none';
         document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
-        document.querySelector('.filter-tab[data-filter="' + currentFilter + '"]').classList.add('active');
+        document.querySelector('.filter-tab[data-filter="' + currentFilter + '"]')?.classList.add('active');
     }
 
     async function loadUpdates() {
         showUpdateTab();
         document.getElementById('tableLoading').style.display = 'block';
-        document.getElementById('updateTable').style.display = 'none';
+        document.getElementById('tableWrapper').style.display = 'none';
         document.getElementById('updateEmpty').style.display = 'none';
 
         try {
+            // Nếu filter là 'all', tải tất cả; nếu không, tải theo filter
+            // Map filter names sang status names: pending→Pending, approved→Approved, rejected→Rejected
+            const statusMap = {
+                'all': 'Pending',
+                'pending': 'Pending',
+                'approved': 'Approved',
+                'rejected': 'Rejected'
+            };
+            const status = statusMap[currentFilter] || 'Pending';
+            
             const [data, imgData] = await Promise.all([
-                getPendingUpdates(1, 100),
-                getStagingImages('Pending').catch(() => ({ items: [], pendingCount: 0 }))
+                getPendingUpdates(1, 100, status),
+                getStagingImages('Pending').catch(() => ({ items: [], pendingCount: 0, stats: {} }))
             ]);
             allUpdates = data?.items || data || [];
-            renderStats(data);
-            renderTable(allUpdates.filter(u => matchesFilter(u)));
+            console.log(`Loaded ${allUpdates.length} updates with status=${status}, currentFilter=${currentFilter}`);
+            renderStats(data, imgData);
+            renderTable(filterUpdates());
             updateTabBadges(data, imgData);
         } catch (e) {
+            console.error('Load updates error:', e);
             showToast('Không thể tải danh sách cập nhật', 'error');
         }
 
         document.getElementById('tableLoading').style.display = 'none';
     }
 
-    function renderStats(data) {
+    function renderStats(data, imgData = {}) {
         const stats = data?.stats || {};
+        const imgStats = imgData?.stats || {};
+        
         document.getElementById('statPending').textContent = stats.pending ?? 0;
-        document.getElementById('statApproved').textContent = stats.approvedToday ?? 0;
-        document.getElementById('statRejected').textContent = stats.rejectedToday ?? 0;
+        
+        // Tính tổng approved hôm nay từ cả POI updates và Staging images
+        const approvedUpdates = stats.approvedToday ?? 0;
+        const approvedImages = imgStats.approvedToday ?? 0;
+        const totalApproved = approvedUpdates + approvedImages;
+        document.getElementById('statApproved').textContent = totalApproved;
+        
+        // Tính tổng rejected hôm nay từ cả POI updates và Staging images
+        const rejectedUpdates = stats.rejectedToday ?? 0;
+        const rejectedImages = imgStats.rejectedToday ?? 0;
+        const totalRejected = rejectedUpdates + rejectedImages;
+        document.getElementById('statRejected').textContent = totalRejected;
+        
         document.getElementById('statPoiChanged').textContent = stats.uniquePoiCount ?? allUpdates.length;
 
         // Update sidebar badge
@@ -268,54 +337,85 @@
 
     function updateTabBadges(data, imgData) {
         const pending = allUpdates.filter(u => u.status === 'pending').length;
-        document.getElementById('tabPending').textContent = pending;
+        const tabPending = document.getElementById('tabPending');
+        if (pending > 0) {
+            tabPending.textContent = pending > 99 ? '99+' : pending;
+            tabPending.style.display = 'inline-flex';
+        } else {
+            tabPending.style.display = 'none';
+        }
+
         const imgBadge = document.getElementById('imgPendingBadge');
         const imgPending = imgData?.pendingCount || 0;
-        imgBadge.textContent = imgPending;
-        imgBadge.style.display = imgPending > 0 ? 'inline' : 'none';
+        if (imgPending > 0) {
+            imgBadge.textContent = imgPending > 99 ? '99+' : imgPending;
+            imgBadge.style.display = 'inline-flex';
+        } else {
+            imgBadge.style.display = 'none';
+        }
+
         // Update sidebar badge tổng
         const totalPending = pending + imgPending;
         const sidebarBadge = document.getElementById('pendingBadge');
         sidebarBadge.textContent = totalPending > 0 ? (totalPending > 99 ? '99+' : totalPending) : '';
         sidebarBadge.style.display = totalPending > 0 ? 'inline-block' : 'none';
-
-        // UX fix: nếu có ảnh pending nhưng bảng POI trống → auto-switch sang tab Ảnh
-        if (imgPending > 0 && pending === 0) {
-            showToast(`${imgPending} ảnh đang chờ duyệt — nhấn "🖼 Ảnh" để xem`, 'warning');
-        }
     }
 
-    function matchesFilter(update) {
-        if (currentFilter === 'all') return true;
-        return update.status === currentFilter;
+    function filterUpdates() {
+        return allUpdates.filter(u => {
+            // So sánh không phân biệt hoa/thường
+            const uStatus = (u.status || '').toLowerCase();
+            const filterStatus = currentFilter.toLowerCase();
+            
+            const matchFilter = currentFilter === 'all' || uStatus === filterStatus;
+            const matchSearch = !searchQuery || 
+                (u.poiName?.toLowerCase().includes(searchQuery) ||
+                 u.vendorName?.toLowerCase().includes(searchQuery) ||
+                 u.submittedBy?.toLowerCase().includes(searchQuery));
+            return matchFilter && matchSearch;
+        });
+    }
+
+    function handleSearch() {
+        searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+        renderTable(filterUpdates());
     }
 
     function renderTable(updates) {
         if (updates.length === 0) {
+            document.getElementById('tableWrapper').style.display = 'none';
             document.getElementById('updateEmpty').style.display = 'block';
             return;
         }
 
-        document.getElementById('updateTable').style.display = 'table';
+        document.getElementById('tableWrapper').style.display = 'block';
         document.getElementById('updateBody').innerHTML = updates.map(u => {
             const changeType = getChangeTypeLabel(u.changeType);
             const statusBadge = getStatusBadge(u.status);
+            const statusLower = (u.status || '').toLowerCase();
+            
+            // DEBUG
+            console.log(`Row ${u.id}: status = "${u.status}" → lowercase = "${statusLower}"`);
+            
+            // Nút duyệt/từ chối hiển thị nếu status = pending (không phân biệt hoa/thường)
+            let actionButtons = ``;
+            if (statusLower === 'pending') {
+                actionButtons = `
+                    <button class="btn-icon" style="color:#10b981; font-size:16px" onclick="quickApprove(${u.id})" title="Duyệt">✅</button>
+                    <button class="btn-icon" style="color:#ef4444; font-size:16px" onclick="quickReject(${u.id})" title="Từ chối">❌</button>`;
+            }
+            
             return `
-                <tr class="${u.status === 'pending' ? 'row-pending' : ''}">
-                    <td>
-                        <div style="font-weight:600">${escapeHtml(u.poiName || 'POI #' + u.poiId)}</div>
-                        ${u.poiShortDesc ? `<div style="font-size:12px; color:var(--gray-500)">${escapeHtml(u.poiShortDesc)}</div>` : ''}
-                    </td>
-                    <td style="font-size:13px">${escapeHtml(u.vendorName || u.submittedBy || '—')}</td>
+                <tr class="${statusLower === 'pending' ? 'row-pending' : ''}">
+                    <td><span class="poi-cell" title="${escapeHtml(u.poiName || 'POI #' + u.poiId)}">${escapeHtml(u.poiName || 'POI #' + u.poiId)}</span></td>
+                    <td>${escapeHtml(u.vendorName || u.submittedBy || '—')}</td>
                     <td><span class="badge badge-info">${changeType}</span></td>
                     <td style="font-size:12px; color:var(--gray-500)">${formatDateTime(u.submittedAt)}</td>
                     <td>${statusBadge}</td>
-                    <td>
-                        <button class="btn-icon edit" onclick="openDetailModal(${u.id})" title="Xem chi tiết">👁️</button>
-                        ${u.status === 'pending' ? `
-                            <button class="btn-icon" style="color:var(--success)" onclick="quickApprove(${u.id})" title="Duyệt nhanh">✅</button>
-                            <button class="btn-icon delete" onclick="quickReject(${u.id})" title="Từ chối">❌</button>
-                        ` : ''}
+                    <td style="text-align:center">
+                        <div class="action-buttons" style="display:inline-flex; gap:4px">
+                            ${actionButtons}
+                        </div>
                     </td>
                 </tr>
             `;
@@ -325,11 +425,17 @@
     // ── FILTER ───────────────────────────────────────────────────────────────
 
     function setFilter(filter) {
+        showUpdateTab();
         currentFilter = filter;
+        searchQuery = '';
+        document.getElementById('searchInput').value = '';
+        
         document.querySelectorAll('.filter-tab').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.filter === filter);
         });
-        renderTable(allUpdates.filter(u => matchesFilter(u)));
+        
+        // Load data từ backend khi switch tab để lấy data đúng status
+        loadUpdates();
     }
 
     // ── DETAIL MODAL ────────────────────────────────────────────────────────
@@ -351,52 +457,142 @@
     }
 
     function renderDetail(item) {
-        document.getElementById('detailTitle').textContent = `Cập nhật: ${item.poiName || 'POI #' + item.poiId}`;
+        // DEBUG: Log dữ liệu nhận được
+        console.log('renderDetail item:', item);
+        
+        // Xác định tiêu đề dựa vào loại thay đổi
+        let detailTitle = `Cập nhật POI`;
+        let isNewPoi = false;
+        
+        // Lấy payload anytime để xử lý
+        let payloadObj = null;
+        // MAPPING: Backend sends PascalCase (C# convention), JS uses camelCase
+        const payloadStr = item.Payload || item.payload || '';
+        const createdAt = item.CreatedAt || item.createdAt;
+        const businessName = item.BusinessName || item.businessName;
+        const vendorEmail = item.VendorEmail || item.vendorEmail;
+        const poiName = item.PoiName || item.poiName;
+        
+        if (payloadStr) {
+            try {
+                payloadObj = typeof payloadStr === 'string' ? JSON.parse(payloadStr) : payloadStr;
+            } catch (e) {
+                console.error('Error parsing payload:', e);
+                console.error('Payload string:', payloadStr);
+                payloadObj = null;
+            }
+        }
+        
+        // Xác định title
+        if (!poiName || poiName === '') {
+            isNewPoi = true;
+            const newPoiName = payloadObj?.name || 'POI mới';
+            detailTitle = `➕ Thêm POI mới: ${newPoiName}`;
+        } else {
+            detailTitle = `📝 Cập nhật: ${poiName}`;
+        }
+        
+        document.getElementById('detailTitle').textContent = detailTitle;
+        
+        // LUÔN hiển thị meta (ngày giờ, vendor, loại) — KHÔNG BỎ QUA
+        const displayVendor = businessName || vendorEmail?.split('@')[0] || '—';
+        const displayDate = createdAt ? formatDateTime(createdAt) : 'Không xác định';
+        const changeTypeLabel = isNewPoi ? '🆕 Thêm mới' : '✏️ Cập nhật';
+        
         document.getElementById('detailMeta').innerHTML = `
-            <span>👤 ${escapeHtml(item.vendorName || '—')}</span> &nbsp;|&nbsp;
-            <span>📅 ${formatDateTime(item.submittedAt)}</span> &nbsp;|&nbsp;
-            <span>🔖 Loại: <b>${getChangeTypeLabel(item.changeType)}</b></span>
+            <strong>👤 Vendor:</strong> ${escapeHtml(displayVendor)} <br>
+            <strong>📅 Gửi:</strong> ${displayDate}<br>
+            <strong>🔖 Loại:</strong> ${changeTypeLabel}
         `;
 
-        // Hiển thị diff (trước → sau)
-        const changes = item.changes || {};
-        const diffRows = Object.entries(changes).map(([key, val]) => {
-            const before = val.before !== undefined && val.before !== null ? String(val.before) : '—';
-            const after  = val.after  !== undefined && val.after  !== null ? String(val.after)  : '—';
-            const isDiff = before !== after;
-            return `
-                <tr>
-                    <td style="font-weight:500; width:140px">${getFieldLabel(key)}</td>
-                    <td style="color:var(--gray-500); text-decoration:${isDiff ? 'line-through' : 'none'}">
-                        ${escapeHtml(before)}
-                    </td>
-                    <td style="color:var(--success); font-weight:500">${isDiff ? escapeHtml(after) : '—'}</td>
-                </tr>
+        // Nếu là thêm POI mới, hiển thị toàn bộ dữ liệu payload
+        if (isNewPoi && payloadObj) {
+            const payload = payloadObj;
+            
+            // DEBUG: Show raw payload
+            console.log('Payload parsed object:', payload);
+            
+            const details = `
+                <div style="background: var(--gray-50); padding: 16px; border-radius: 8px; margin-bottom: 16px">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px">
+                        <div>
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">Tên điểm</div>
+                            <div style="font-weight: 600; color: var(--gray-900)">${escapeHtml(payload.name || '—')}</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">Mô tả</div>
+                            <div style="color: var(--gray-700)">${escapeHtml(payload.shortDescription || '—')}</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">Vĩ độ</div>
+                            <div style="font-weight: 600; color: var(--gray-900)">${payload.latitude?.toFixed(4) || '—'}</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">Kinh độ</div>
+                            <div style="font-weight: 600; color: var(--gray-900)">${payload.longitude?.toFixed(4) || '—'}</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">Bán kính (m)</div>
+                            <div style="font-weight: 600; color: var(--gray-900)">${payload.triggerRadiusMeters || '—'}</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">Ưu tiên</div>
+                            <div style="font-weight: 600; color: var(--gray-900)">${payload.priority || '—'}</div>
+                        </div>
+                        <div style="grid-column: 1 / -1">
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">URL Ảnh</div>
+                            <div style="color: var(--info); word-break: break-all; font-size: 12px">${escapeHtml(payload.imageUrl || '—')}</div>
+                        </div>
+                        <div style="grid-column: 1 / -1">
+                            <div style="color: var(--gray-500); font-size: 11px; text-transform: uppercase; margin-bottom: 4px">Google Maps</div>
+                            <div style="color: var(--info); word-break: break-all; font-size: 12px">${escapeHtml(payload.mapUrl || '—')}</div>
+                        </div>
+                    </div>
+                </div>
             `;
-        });
+            
+            // Check if all fields are empty (all "—")
+            const isEmpty = !payload.name && !payload.latitude && !payload.longitude && !payload.priority;
+            if (isEmpty) {
+                // Fallback: show raw payload for debugging
+                document.getElementById('diffSection').innerHTML = `
+                    <div style="background:#fef2f2; padding:12px; border-radius:8px; margin-bottom:16px; border-left:4px solid #ef4444">
+                        <p style="color:#dc2626; font-weight:600; margin:0">⚠️ Payload không có dữ liệu</p>
+                        <pre style="background:#fff; padding:8px; border-radius:4px; margin-top:8px; overflow-x:auto; font-size:11px">${escapeHtml(payloadStr)}</pre>
+                    </div>
+                `;
+            } else {
+                document.getElementById('diffSection').innerHTML = details;
+            }
+        } else if (!isNewPoi) {
+            // Hiển thị diff cho các update khác
+            const changes = item.changes || {};
+            const diffRows = Object.entries(changes).map(([key, val]) => {
+                const before = val.before !== undefined && val.before !== null ? String(val.before) : '—';
+                const after  = val.after  !== undefined && val.after  !== null ? String(val.after)  : '—';
+                const isDiff = before !== after;
+                return `
+                    <tr>
+                        <td class="field-name">${getFieldLabel(key)}</td>
+                        <td class="old-value" style="max-width:200px; overflow:hidden; text-overflow:ellipsis">${escapeHtml(before)}</td>
+                        <td class="new-value" style="max-width:200px; overflow:hidden; text-overflow:ellipsis">${isDiff ? escapeHtml(after) : '—'}</td>
+                    </tr>
+                `;
+            });
 
-        document.getElementById('diffSection').innerHTML = diffRows.length > 0
-            ? `
-                <table style="width:100%; border-collapse:collapse">
-                    <thead>
-                        <tr>
-                            <th style="text-align:left; padding:6px 0; font-size:12px; color:var(--gray-500)">Trường</th>
-                            <th style="text-align:left; padding:6px 0; font-size:12px; color:var(--gray-500)">Trước</th>
-                            <th style="text-align:left; padding:6px 0; font-size:12px; color:var(--gray-500)">Sau</th>
-                        </tr>
-                    </thead>
-                    <tbody>${diffRows.join('')}</tbody>
-                </table>
-              `
-            : '<p style="color:var(--gray-500)">Không có chi tiết thay đổi.</p>';
+            document.getElementById('diffSection').innerHTML = diffRows.length > 0
+                ? `<table class="diff-table"><tbody>${diffRows.join('')}</tbody></table>`
+                : '<p style="color:var(--gray-500); text-align:center; padding:20px">Không có chi tiết thay đổi</p>';
+        } else if (isNewPoi && !payloadObj) {
+            // Thêm POI mới nhưng payload bị lỗi
+            document.getElementById('diffSection').innerHTML = '<p style="color:var(--danger)">⚠️ Không thể tải dữ liệu POI từ yêu cầu gửi</p>';
+        } else {
+            document.getElementById('diffSection').innerHTML = '<p style="color:var(--gray-500); text-align:center; padding:20px">Không có chi tiết thay đổi</p>';
+        }
 
         // Ẩn nút duyệt nếu đã xử lý
         const actionsEl = document.getElementById('approvalActions');
-        if (item.status !== 'pending') {
-            actionsEl.style.display = 'none';
-        } else {
-            actionsEl.style.display = 'flex';
-        }
+        actionsEl.style.display = item.status !== 'pending' ? 'none' : 'flex';
     }
 
     // ── APPROVE ─────────────────────────────────────────────────────────────
@@ -405,21 +601,21 @@
         if (!currentDetailId) return;
         try {
             await approvePendingUpdate(currentDetailId);
-            showToast('Đã duyệt cập nhật!');
+            showToast('✅ Đã duyệt cập nhật!');
             closeModal('detailModal');
             await loadUpdates();
         } catch (e) {
-            showToast('Duyệt thất bại!', 'error');
+            showToast('❌ Duyệt thất bại!', 'error');
         }
     }
 
     async function quickApprove(id) {
         try {
             await approvePendingUpdate(id);
-            showToast('Đã duyệt!');
+            showToast('✅ Đã duyệt!');
             await loadUpdates();
         } catch (e) {
-            showToast('Duyệt thất bại!', 'error');
+            showToast('❌ Duyệt thất bại!', 'error');
         }
     }
 
@@ -434,12 +630,12 @@
         const reason = document.getElementById('rejectReason').value.trim();
         try {
             await rejectPendingUpdate(currentDetailId, reason);
-            showToast('Đã từ chối');
+            showToast('✅ Đã từ chối');
             closeModal('rejectModal');
             closeModal('detailModal');
             await loadUpdates();
         } catch (e) {
-            showToast('Từ chối thất bại!', 'error');
+            showToast('❌ Từ chối thất bại!', 'error');
         }
     }
 
@@ -447,74 +643,109 @@
         if (!confirm('Từ chối cập nhật này?')) return;
         try {
             await rejectPendingUpdate(id);
-            showToast('Đã từ chối');
+            showToast('✅ Đã từ chối');
             await loadUpdates();
         } catch (e) {
-            showToast('Từ chối thất bại!', 'error');
+            showToast('❌ Từ chối thất bại!', 'error');
         }
     }
 
     // ── IMAGE TAB ────────────────────────────────────────────────────────────
 
-    async function showImageTab() {
+    async function showImageTab(status = 'Pending') {
         showImages = true;
+        currentImageFilter = status;
         document.getElementById('updateSection').style.display = 'none';
         document.getElementById('imageSection').style.display = 'block';
 
-        document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
-        document.getElementById('imgTabBtn').classList.add('active');
+        // Update filter tabs
+        const filterTabs = document.querySelectorAll('#imageSection .filter-tab');
+        filterTabs.forEach(btn => {
+            const isActive = (status === 'Pending' && btn.dataset.filter === 'pending') ||
+                           (status === 'Approved' && btn.dataset.filter === 'approved') ||
+                           (status === 'Rejected' && btn.dataset.filter === 'rejected');
+            btn.classList.toggle('active', isActive);
+        });
 
         document.getElementById('imgLoading').style.display = 'block';
         document.getElementById('imgGrid').style.display = 'none';
         document.getElementById('imgEmpty').style.display = 'none';
 
         try {
-            const data = await getStagingImages(currentImgFilter);
+            console.log(`📷 Tải ảnh với status=${status}...`);
+            const data = await getStagingImages(status);
             allImages = data?.items || [];
+            console.log(`✅ Tải được ${allImages.length} ảnh`);
             renderImageGrid(allImages);
 
             const badge = document.getElementById('imgPendingBadge');
             const pending = data?.pendingCount || 0;
-            badge.textContent = pending > 0 ? pending : '0';
-            badge.style.display = pending > 0 ? 'inline' : 'none';
+            badge.textContent = pending > 0 ? (pending > 99 ? '99+' : pending) : '0';
+            badge.style.display = pending > 0 ? 'inline-flex' : 'none';
         } catch (e) {
-            showToast('Không thể tải danh sách ảnh', 'error');
+            console.error('❌ Load ảnh thất bại:', e);
+            showToast('❌ Không thể tải danh sách ảnh', 'error');
         }
 
         document.getElementById('imgLoading').style.display = 'none';
     }
 
+    function setImageFilter(status) {
+        currentImageFilter = status;
+        searchQuery = '';
+        document.getElementById('searchImageInput').value = '';
+        showImageTab(status);
+    }
+
+    function filterImages() {
+        return allImages.filter(img => {
+            return !searchQuery || 
+                (img.fileName?.toLowerCase().includes(searchQuery) ||
+                 img.vendorName?.toLowerCase().includes(searchQuery) ||
+                 img.poiName?.toLowerCase().includes(searchQuery));
+        });
+    }
+
+    function handleImageSearch() {
+        searchQuery = document.getElementById('searchImageInput').value.toLowerCase().trim();
+        renderImageGrid(filterImages());
+    }
+
     function renderImageGrid(images) {
         if (images.length === 0) {
+            document.getElementById('imgGrid').style.display = 'none';
             document.getElementById('imgEmpty').style.display = 'block';
+            
+            // Update empty message based on filter
+            const msgMap = {
+                'Pending': '🖼️ Không có ảnh nào chờ duyệt',
+                'Approved': '✅ Không có ảnh đã duyệt',
+                'Rejected': '❌ Không có ảnh từ chối'
+            };
+            document.getElementById('imgEmptyMsg').textContent = msgMap[currentImageFilter] || 'Không có ảnh nào';
             return;
         }
 
         document.getElementById('imgGrid').style.display = 'grid';
         document.getElementById('imgGrid').innerHTML = images.map(img => {
-            const statusBadge = getStatusBadge(img.status);
             const actions = img.status === 'Pending'
-                ? `
-                    <button class="btn btn-sm btn-primary" onclick="doApproveImage(${img.id})">✅ Duyệt</button>
-                    <button class="btn btn-sm btn-outline" style="color:var(--danger); border-color:var(--danger)" onclick="doRejectImage(${img.id})">❌ Từ chối</button>
-                `
-                : getStatusBadge(img.status);
+                ? `<div class="image-actions">
+                    <button class="btn-action-approve" onclick="doApproveImage(${img.id})" title="Duyệt ảnh">✅</button>
+                    <button class="btn-action-reject" onclick="doRejectImage(${img.id})" title="Từ chối ảnh">❌</button>
+                   </div>`
+                : `<span class="badge ${img.status === 'Approved' ? 'badge-success' : 'badge-danger'}" style="text-align:center; display:block">${img.status === 'Approved' ? '✅ Duyệt' : '❌ Từ chối'}</span>`;
             return `
-                <div style="border:1px solid var(--gray-200); border-radius:8px; overflow:hidden; background:white">
+                <div class="image-card">
                     <img src="${API_BASE}${escapeHtml(img.tempUrl).replace(/ /g, '')}" alt="${escapeHtml(img.fileName)}"
-                         style="width:100%; aspect-ratio:16/9; object-fit:cover; display:block"
                          onerror="this.style.display='none'">
-                    <div style="padding:10px">
-                        <div style="font-size:12px; font-weight:600; color:var(--gray-900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis"
-                             title="${escapeHtml(img.fileName)}">${escapeHtml(img.fileName)}</div>
-                        <div style="font-size:11px; color:var(--gray-500); margin-top:4px">
+                    <div class="image-card-info">
+                        <div class="image-card-name" title="${escapeHtml(img.fileName)}">${escapeHtml(img.fileName)}</div>
+                        <div class="image-card-meta">
                             <div>👤 ${escapeHtml(img.vendorName)}</div>
                             <div>📍 ${escapeHtml(img.poiName)}</div>
                             <div>📅 ${formatDateTime(img.createdAt)}</div>
                         </div>
-                        <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap">
-                            ${actions}
-                        </div>
+                        <div class="image-card-actions">${actions}</div>
                     </div>
                 </div>
             `;
@@ -523,46 +754,68 @@
 
     async function doApproveImage(id) {
         try {
+            console.log(`✅ Duyệt ảnh ${id}...`);
             await approveStagingImage(id);
-            showToast('Đã duyệt ảnh!');
-            await showImageTab();
+            console.log('✅ Duyệt thành công, reload danh sách...');
+            showToast('✅ Đã duyệt ảnh!');
+            await showImageTab('Approved'); // Chuyển sang tab "Đã duyệt" để xem
         } catch (e) {
-            showToast('Duyệt thất bại: ' + (e.message || ''), 'error');
+            console.error('❌ Duyệt thất bại:', e);
+            showToast('❌ Duyệt thất bại: ' + (e.message || ''), 'error');
         }
     }
 
     async function doRejectImage(id) {
-        const reason = prompt('Lý do từ chối (tuỳ chọn):');
+        rejectImageId = id;
+        document.getElementById('rejectReason').value = '';
+        openModal('rejectImageModal');
+    }
+
+    async function confirmRejectImage() {
+        if (!rejectImageId) return;
+        
+        const reason = document.getElementById('rejectReason').value.trim();
+        const btn = document.querySelector('#rejectImageModal .btn-danger');
+        btn.textContent = 'Đang xử lý...';
+        btn.disabled = true;
+
         try {
-            await rejectStagingImage(id, reason || '');
-            showToast('Đã từ chối ảnh.');
-            await showImageTab();
+            console.log(`❌ Từ chối ảnh ${rejectImageId}...`);
+            await rejectStagingImage(rejectImageId, reason || '');
+            console.log('✅ Từ chối thành công, reload danh sách...');
+            showToast('✅ Đã từ chối ảnh');
+            closeModal('rejectImageModal');
+            await showImageTab('Rejected');
         } catch (e) {
-            showToast('Thao tác thất bại: ' + (e.message || ''), 'error');
+            console.error('❌ Từ chối thất bại:', e);
+            showToast('❌ Thao tác thất bại: ' + (e.message || ''), 'error');
         }
+
+        btn.textContent = '❌ Từ chối';
+        btn.disabled = false;
     }
 
     // ── HELPERS ─────────────────────────────────────────────────────────────
 
     function getChangeTypeLabel(type) {
         const map = {
-            poi_created: 'Tạo POI mới',
-            poi_updated: 'Cập nhật POI',
-            script_added: 'Thêm script',
-            script_updated: 'Sửa script',
-            image_uploaded: 'Upload ảnh',
-            poi_deleted: 'Xoá POI'
+            poi_created: '➕ Thêm POI mới',
+            poi_updated: '✏️ Cập nhật POI',
+            script_added: '🎤 Thêm script',
+            script_updated: '🎤 Sửa script',
+            image_uploaded: '📷 Upload ảnh',
+            poi_deleted: '🗑️ Xoá POI'
         };
         return map[type] || type || '—';
     }
 
     function getStatusBadge(status) {
         const map = {
-            pending:   '<span class="badge badge-warning">⏳ Chờ duyệt</span>',
-            approved:  '<span class="badge badge-success">✅ Đã duyệt</span>',
+            pending:   '<span class="badge badge-warning">⏳ Chờ</span>',
+            approved:  '<span class="badge badge-success">✅ Ok</span>',
             rejected:  '<span class="badge badge-danger">❌ Từ chối</span>'
         };
-        return map[status] || `<span class="badge badge-gray">${status}</span>`;
+        return map[status] || `<span class="badge">${status}</span>`;
     }
 
     function getFieldLabel(key) {

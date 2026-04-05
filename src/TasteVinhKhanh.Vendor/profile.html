@@ -85,7 +85,7 @@
                             <div class="form-group">
                                 <label>Số điện thoại *</label>
                                 <input type="tel" id="fPhone" class="form-control"
-                                       placeholder="VD: 0901234567">
+                                       placeholder="VD: 0901234567" pattern="[0-9]{10}" maxlength="10" inputmode="numeric">
                             </div>
                         </div>
 
@@ -171,6 +171,18 @@
 
         if (!email.includes('@')) {
             alertBox.textContent = 'Email không hợp lệ.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        if (!/^\d{10}$/.test(phone)) {
+            alertBox.textContent = 'Số điện thoại phải là 10 chữ số liên tiếp.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        if (!phone.startsWith('0')) {
+            alertBox.textContent = 'Số điện thoại phải bắt đầu bằng 0.';
             alertBox.style.display = 'block';
             return;
         }
