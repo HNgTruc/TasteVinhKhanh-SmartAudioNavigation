@@ -168,8 +168,8 @@ async function getVendorPois(vendorId) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /** GET /api/admin/pending-updates — danh sách thay đổi chờ duyệt */
-async function getPendingUpdates(page = 1, pageSize = 20) {
-    const params = new URLSearchParams({ page, pageSize });
+async function getPendingUpdates(page = 1, pageSize = 20, status = 'Pending') {
+    const params = new URLSearchParams({ page, pageSize, status });
     return await apiCall('GET', `/api/admin/pending-updates?${params}`);
 }
 
@@ -180,7 +180,9 @@ async function getPendingUpdate(id) {
 
 /** POST /api/admin/pending-updates/:id/approve — duyệt */
 async function approvePendingUpdate(id) {
-    return await apiCall('POST', `/api/admin/pending-updates/${id}/approve`);
+    return await apiCall('POST', `/api/admin/pending-updates/${id}/approve`, {
+        AdminNote: 'Approved by admin'
+    });
 }
 
 /** POST /api/admin/pending-updates/:id/reject — từ chối */

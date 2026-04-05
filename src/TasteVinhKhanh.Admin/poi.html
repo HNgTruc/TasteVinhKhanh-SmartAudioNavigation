@@ -73,11 +73,11 @@
                             <tr>
                                 <th>Tên điểm</th>
                                 <th>Toạ độ</th>
-                                <th>Bán kính</th>
-                                <th>Ưu tiên</th>
-                                <th>Ngôn ngữ</th>
-                                <th>Trạng thái</th>
-                                <th style="width:120px">Thao tác</th>
+                                <th style="width:80px; text-align:center">Bán kính</th>
+                                <th style="width:60px; text-align:center">Ưu tiên</th>
+                                <th style="width:100px">Ngôn ngữ</th>
+                                <th style="width:80px">Trạng thái</th>
+                                <th style="width:80px; text-align:center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody id="poiBody"></tbody>
@@ -148,6 +148,28 @@
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('poiModal')">Huỷ</button>
                 <button class="btn btn-primary" onclick="savePoi()" id="saveBtn">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: XÁC NHẬN XOÁ POI -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal" style="max-width:380px">
+            <div class="modal-header" style="border-bottom: none">
+                <h3 style="margin:0; color:var(--danger)">⚠️ Xóa điểm thuyết minh</h3>
+                <button class="btn-icon" onclick="closeModal('deleteModal')">✕</button>
+            </div>
+            <div class="modal-body" style="text-align:center; padding:28px 24px">
+                <p style="font-size:14px; margin:0 0 8px 0; color:var(--gray-900)">
+                    <strong id="deletePoiName">POI</strong>
+                </p>
+                <p style="font-size:13px; color:var(--gray-600); margin:0 0 20px 0">
+                    Bạn có chắc muốn xóa địa điểm này không? Thao tác này không thể hoàn tác.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('deleteModal')">Huỷ</button>
+                <button class="btn btn-danger" onclick="doDeletePoi()">🗑️ Xóa</button>
             </div>
         </div>
     </div>
@@ -266,7 +288,7 @@
         document.getElementById('poiEmpty').style.display = 'none';
 
         try {
-            allPois = await getAllPois(true) || [];
+            allPois = await getAllPois(false) || [];
             renderTable(allPois);
         } catch (e) {
             showToast('Không thể tải danh sách POI', 'error');
@@ -291,22 +313,24 @@
                 <td style="font-size:12px; color:var(--gray-500)">
                     ${formatCoord(p.latitude)}, ${formatCoord(p.longitude)}
                 </td>
-                <td>${p.triggerRadiusMeters}m</td>
-                <td><span class="badge badge-gray">${p.priority}</span></td>
-                <td>
+                <td style="text-align:center; font-size:13px">${p.triggerRadiusMeters}m</td>
+                <td style="text-align:center"><span class="badge badge-gray">${p.priority}</span></td>
+                <td style="font-size:12px">
                     ${(p.audioScripts || []).map(s =>
-                        `<span class="badge badge-info" style="margin:1px">${s.languageCode.toUpperCase()}</span>`
+                        `<span class="badge badge-info" style="margin-right:2px; margin-bottom:2px; display:inline-block">${s.languageCode.toUpperCase()}</span>`
                     ).join('')}
                 </td>
                 <td>
-                    <span class="badge ${p.isActive ? 'badge-success' : 'badge-danger'}">
-                        ${p.isActive ? 'Hoạt động' : 'Ẩn'}
+                    <span class="badge ${p.isActive ? 'badge-success' : 'badge-danger'}" style="justify-content:center">
+                        ${p.isActive ? '✓ Hoạt động' : '⊘ Ẩn'}
                     </span>
                 </td>
-                <td>
-                    <button class="btn-icon edit" onclick="openEditModal(${p.id})" title="Sửa">✏️</button>
-                    <button class="btn-icon script" onclick="openScriptModal(${p.id})" title="Quản lý script">🎤</button>
-                    <button class="btn-icon delete" onclick="confirmDelete(${p.id}, '${p.name.replace(/'/g, "\\'")}')" title="Xoá">🗑️</button>
+                <td style="text-align:center">
+                    <div style="display:flex; gap:2px; justify-content:center; flex-wrap:nowrap">
+                        <button class="btn-icon edit" onclick="openEditModal(${p.id})" title="Sửa">✏️</button>
+                        <button class="btn-icon script" onclick="openScriptModal(${p.id})" title="Quản lý script">🎤</button>
+                        <button class="btn-icon delete" onclick="confirmDelete(${p.id}, '${p.name.replace(/'/g, "\\'")}')" title="Xóa">🗑️</button>
+                    </div>
                 </td>
             </tr>
         `).join('');
@@ -407,15 +431,35 @@
 
     // ── DELETE POI ────────────────────────────────────────────────────────────
 
-    async function confirmDelete(id, name) {
-        if (!confirm(`Ẩn điểm "${name}"?`)) return;
+    let deletePoiId = null;
+
+    function confirmDelete(id, name) {
+        deletePoiId = id;
+        document.getElementById('deletePoiName').textContent = `"${name}"`;
+        openModal('deleteModal');
+    }
+
+    async function doDeletePoi() {
+        if (!deletePoiId) return;
+        
+        const btn = document.querySelector('#deleteModal .btn-danger');
+        btn.textContent = 'Đang xóa...';
+        btn.disabled = true;
+
         try {
-            await deletePoi(id);
-            showToast('Đã ẩn điểm thuyết minh');
+            console.log(`🗑️ Xóa POI ${deletePoiId}...`);
+            await deletePoi(deletePoiId);
+            console.log('✅ Xóa thành công, reload danh sách...');
+            showToast('✅ Đã xóa điểm thuyết minh');
+            closeModal('deleteModal');
             await loadPois();
         } catch (e) {
-            showToast('Xoá thất bại!', 'error');
+            console.error('❌ Xóa thất bại:', e);
+            showToast('❌ Xóa thất bại: ' + (e.message || ''), 'error');
         }
+
+        btn.textContent = '🗑️ Xóa';
+        btn.disabled = false;
     }
 
     // ── SCRIPT MODAL ──────────────────────────────────────────────────────────

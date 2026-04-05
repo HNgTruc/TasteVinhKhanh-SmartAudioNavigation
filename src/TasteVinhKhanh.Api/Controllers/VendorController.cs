@@ -147,6 +147,55 @@ public class VendorController : ControllerBase
         return Ok(new { message = "Đã gửi yêu cầu cập nhật. Admin sẽ duyệt trong thời gian sớm nhất." });
     }
 
+    /// <summary>Gửi yêu cầu thêm POI mới chờ admin duyệt</summary>
+    [HttpPost("pois")]
+    public async Task<IActionResult> SubmitNewPOI([FromBody] CreatePoiRequest req)
+    {
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == userId);
+            if (vendor == null) return NotFound(new { message = "Vendor không tồn tại." });
+
+            if (vendor.Status != "Approved")
+                return BadRequest(new { message = "Tài khoản chưa được duyệt." });
+
+            // Tạo yêu cầu thêm POI mới, dùng PoiPointId = 0 để đánh dấu là "tạo mới"
+            var payload = new
+            {
+                req.Name,
+                req.ShortDescription,
+                req.Latitude,
+                req.Longitude,
+                req.TriggerRadiusMeters,
+                req.Priority,
+                req.ImageUrl,
+                req.MapUrl,
+                req.IsActive
+            };
+
+            var update = new Shared.Models.PendingPOIUpdate
+            {
+                VendorId = vendor.Id,
+                PoiPointId = 0, // 0 = yêu cầu tạo POI mới
+                Payload = JsonSerializer.Serialize(payload),
+                Status = "Pending",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.PendingPOIUpdates.Add(update);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Đã gửi yêu cầu thêm điểm mới. Admin sẽ xem xét trong thời gian sớm nhất." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Lỗi khi xử lý yêu cầu: " + ex.Message });
+        }
+    }
+
     /// <summary>Lấy POI mà vendor này được gán</summary>
     [HttpGet("pois")]
     public async Task<IActionResult> GetMyPois()
@@ -254,6 +303,59 @@ public class VendorController : ControllerBase
         });
     }
 
+    /// <summary>Gửi yêu cầu cập nhật POI được gán — chờ admin duyệt</summary>
+    [HttpPut("pois/{id}")]
+    public async Task<IActionResult> SubmitUpdateMyPoi(int id, [FromBody] UpdatePoiRequest req)
+    {
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == userId);
+            if (vendor == null) return NotFound(new { message = "Vendor không tồn tại." });
+
+            if (vendor.Status != "Approved")
+                return BadRequest(new { message = "Tài khoản chưa được duyệt." });
+
+            // Kiểm tra vendor chỉ update POI được gán
+            if (!vendor.PoiPointId.HasValue || vendor.PoiPointId.Value != id)
+                return BadRequest(new { message = "Bạn không có quyền cập nhật POI này." });
+
+            // Tạo pending update
+            var payload = new
+            {
+                req.Name,
+                req.ShortDescription,
+                req.Latitude,
+                req.Longitude,
+                req.TriggerRadiusMeters,
+                req.Priority,
+                req.ImageUrl,
+                req.MapUrl,
+                req.IsActive
+            };
+
+            var update = new Shared.Models.PendingPOIUpdate
+            {
+                VendorId = vendor.Id,
+                PoiPointId = id,
+                Payload = JsonSerializer.Serialize(payload),
+                Status = "Pending",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.PendingPOIUpdates.Add(update);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Đã gửi yêu cầu cập nhật. Admin sẽ duyệt trong thời gian sớm nhất." });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Lỗi khi xử lý yêu cầu: " + ex.Message });
+        }
+    }
+
     /// <summary>Xem lịch sử submit của mình</summary>
     [HttpGet("updates")]
     public async Task<IActionResult> GetMyUpdates()
@@ -310,6 +412,70 @@ public class VendorController : ControllerBase
             .ToListAsync();
 
         return Ok(images);
+    }
+
+    /// <summary>Cập nhật hoặc thêm mới audio script — chỉ cho POI được gán</summary>
+    [HttpPut("pois/{poiId}/scripts")]
+    public async Task<IActionResult> UpsertMyScript(int poiId, [FromBody] UpsertAudioScriptRequest req)
+    {
+        try
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == userId);
+            if (vendor == null) return NotFound(new { message = "Vendor không tồn tại." });
+
+            // Chỉ cho update script POI được gán
+            if (!vendor.PoiPointId.HasValue || vendor.PoiPointId.Value != poiId)
+                return BadRequest(new { message = "Bạn không có quyền cập nhật script POI này." });
+
+            var poi = await _db.PoiPoints
+                .Include(p => p.AudioScripts)
+                .FirstOrDefaultAsync(p => p.Id == poiId);
+
+            if (poi == null) return NotFound(new { message = "POI không tồn tại." });
+
+            // Tìm script hiện tại
+            var script = poi.AudioScripts.FirstOrDefault(s => s.LanguageCode == req.LanguageCode);
+
+            if (script == null)
+            {
+                // Tạo mới
+                script = new Shared.Models.AudioScript
+                {
+                    PoiPointId = poiId,
+                    LanguageCode = req.LanguageCode,
+                    TtsScript = req.TtsScript,
+                    AudioFileUrl = req.AudioFileUrl,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _db.AudioScripts.Add(script);
+            }
+            else
+            {
+                // Cập nhật
+                script.TtsScript = req.TtsScript;
+                script.AudioFileUrl = req.AudioFileUrl;
+                script.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new AudioScriptDto
+            {
+                Id = script.Id,
+                PoiPointId = script.PoiPointId,
+                LanguageCode = script.LanguageCode,
+                TtsScript = script.TtsScript,
+                AudioFileUrl = script.AudioFileUrl,
+                UpdatedAt = script.UpdatedAt
+            });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = "Lỗi khi xử lý yêu cầu: " + ex.Message });
+        }
     }
 
     /// <summary>Upload ảnh quán</summary>

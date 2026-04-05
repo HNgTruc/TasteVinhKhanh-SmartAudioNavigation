@@ -16,9 +16,27 @@ async function apiCall(method, endpoint, body = null) {
     };
     if (body) options.body = JSON.stringify(body);
 
-    const res = await fetch(`${API_BASE}${endpoint}`, options);
+    const url = `${API_BASE}${endpoint}`;
+    console.log(`📤 ${method} ${url}`, { token: !!token, body });
+    
+    const res = await fetch(url, options);
+    console.log(`📥 Response ${res.status}:`, res.statusText);
+    
     if (res.status === 401) { vendorLogout(); return null; }
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    
+    if (!res.ok) {
+        let errorMsg = `HTTP ${res.status}`;
+        try {
+            const errData = await res.json();
+            errorMsg = errData.message || errorMsg;
+        } catch (e) {
+            // Nếu response không phải JSON, dùng status text
+            errorMsg = res.statusText || errorMsg;
+        }
+        console.error(`❌ Error: ${errorMsg}`);
+        throw new Error(errorMsg);
+    }
+    
     if (res.status === 204) return true;
     return await res.json();
 }
@@ -110,6 +128,12 @@ async function getMyPoi(id) {
     return await apiCall('GET', `/api/vendor/pois/${id}`);
 }
 
+async function createMyPoi(data) {
+    return await apiCall('POST', '/api/vendor/pois', data);
+}
+async function createMyPoi(data) {
+    return await apiCall('POST', '/api/vendor/pois', data);
+}
 async function updateMyPoi(id, data) {
     return await apiCall('PUT', `/api/vendor/pois/${id}`, data);
 }
