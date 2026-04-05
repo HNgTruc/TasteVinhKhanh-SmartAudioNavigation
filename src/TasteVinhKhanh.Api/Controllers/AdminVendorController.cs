@@ -479,24 +479,78 @@ public class AdminVendorController : ControllerBase
                 var payload = JsonDocument.Parse(update.Payload);
                 var root = payload.RootElement;
 
-                if (root.TryGetProperty("name", out var name) && name.ValueKind == JsonValueKind.String)
-                    poi.Name = name.GetString()!;
-                if (root.TryGetProperty("shortDescription", out var desc) && desc.ValueKind == JsonValueKind.String)
-                    poi.ShortDescription = desc.GetString()!;
-                if (root.TryGetProperty("latitude", out var lat) && lat.ValueKind == JsonValueKind.Number)
-                    poi.Latitude = lat.GetDouble();
-                if (root.TryGetProperty("longitude", out var lng) && lng.ValueKind == JsonValueKind.Number)
-                    poi.Longitude = lng.GetDouble();
-                if (root.TryGetProperty("triggerRadiusMeters", out var radius) && radius.ValueKind == JsonValueKind.Number)
-                    poi.TriggerRadiusMeters = radius.GetDouble();
-                if (root.TryGetProperty("priority", out var prio) && prio.ValueKind == JsonValueKind.Number)
-                    poi.Priority = prio.GetInt32();
-                if (root.TryGetProperty("imageUrl", out var img) && img.ValueKind == JsonValueKind.String)
-                    poi.ImageUrl = img.GetString();
-                if (root.TryGetProperty("mapUrl", out var mapUrl) && mapUrl.ValueKind == JsonValueKind.String)
-                    poi.MapUrl = mapUrl.GetString();
-                if (root.TryGetProperty("isActive", out var active) && active.ValueKind == JsonValueKind.True)
-                    poi.IsActive = active.GetBoolean();
+                // Try both camelCase (từ frontend) và PascalCase (từ backend serialize)
+                var GetStringValue = (JsonElement el, string camelKey, string pascalKey) =>
+                {
+                    if (el.TryGetProperty(camelKey, out var val) && val.ValueKind == JsonValueKind.String)
+                        return val.GetString();
+                    if (el.TryGetProperty(pascalKey, out var val2) && val2.ValueKind == JsonValueKind.String)
+                        return val2.GetString();
+                    return null;
+                };
+
+                var GetNumberValue = (JsonElement el, string camelKey, string pascalKey) =>
+                {
+                    if (el.TryGetProperty(camelKey, out var val) && val.ValueKind == JsonValueKind.Number)
+                        return (double?)val.GetDouble();
+                    if (el.TryGetProperty(pascalKey, out var val2) && val2.ValueKind == JsonValueKind.Number)
+                        return (double?)val2.GetDouble();
+                    return null;
+                };
+
+                var GetIntValue = (JsonElement el, string camelKey, string pascalKey) =>
+                {
+                    if (el.TryGetProperty(camelKey, out var val) && val.ValueKind == JsonValueKind.Number)
+                        return (int?)val.GetInt32();
+                    if (el.TryGetProperty(pascalKey, out var val2) && val2.ValueKind == JsonValueKind.Number)
+                        return (int?)val2.GetInt32();
+                    return null;
+                };
+
+                var GetBoolValue = (JsonElement el, string camelKey, string pascalKey) =>
+                {
+                    if (el.TryGetProperty(camelKey, out var val) && (val.ValueKind == JsonValueKind.True || val.ValueKind == JsonValueKind.False))
+                        return (bool?)val.GetBoolean();
+                    if (el.TryGetProperty(pascalKey, out var val2) && (val2.ValueKind == JsonValueKind.True || val2.ValueKind == JsonValueKind.False))
+                        return (bool?)val2.GetBoolean();
+                    return null;
+                };
+
+                var nameVal = GetStringValue(root, "name", "Name");
+                if (!string.IsNullOrEmpty(nameVal))
+                    poi.Name = nameVal;
+
+                var descVal = GetStringValue(root, "shortDescription", "ShortDescription");
+                if (!string.IsNullOrEmpty(descVal))
+                    poi.ShortDescription = descVal;
+
+                var latVal = GetNumberValue(root, "latitude", "Latitude");
+                if (latVal.HasValue)
+                    poi.Latitude = latVal.Value;
+
+                var lngVal = GetNumberValue(root, "longitude", "Longitude");
+                if (lngVal.HasValue)
+                    poi.Longitude = lngVal.Value;
+
+                var radiusVal = GetNumberValue(root, "triggerRadiusMeters", "TriggerRadiusMeters");
+                if (radiusVal.HasValue)
+                    poi.TriggerRadiusMeters = radiusVal.Value;
+
+                var prioVal = GetIntValue(root, "priority", "Priority");
+                if (prioVal.HasValue)
+                    poi.Priority = prioVal.Value;
+
+                var imgVal = GetStringValue(root, "imageUrl", "ImageUrl");
+                if (!string.IsNullOrEmpty(imgVal))
+                    poi.ImageUrl = imgVal;
+
+                var mapVal = GetStringValue(root, "mapUrl", "MapUrl");
+                if (!string.IsNullOrEmpty(mapVal))
+                    poi.MapUrl = mapVal;
+
+                var activeVal = GetBoolValue(root, "isActive", "IsActive");
+                if (activeVal.HasValue)
+                    poi.IsActive = activeVal.Value;
             }
             catch { /* payload lỗi → bỏ qua */ }
         }
