@@ -2,6 +2,7 @@
 using Android.Content.PM;
 using Android.Views;
 using Android.OS;
+using Microsoft.Maui;
 
 namespace TasteVinhKhanh.MauiApp;
 
@@ -19,10 +20,12 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
+        var window = Platform.CurrentActivity?.Window;
+        if (window != null)
         {
-            Window.SetDecorFitsSystemWindows(false);
-            Window.StatusBarColor = Android.Graphics.Color.Transparent;
+            window.DecorView.SystemUiVisibility = (StatusBarVisibility)
+                (SystemUiFlags.LayoutStable | SystemUiFlags.LayoutFullscreen);
+            window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#1A0A00"));
         }
     }
 }

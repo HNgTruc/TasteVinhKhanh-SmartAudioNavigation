@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "Bbg9VlaqYSg=",
+  "dgSpecHash": "Ecv/w68u7f0=",
   "success": true,
   "projectFilePath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\TasteVinhKhanh.Api.csproj",
   "expectedPackageFiles": [
@@ -68,5 +68,15 @@
     "C:\\Users\\dell\\.nuget\\packages\\system.security.permissions\\9.0.0\\system.security.permissions.9.0.0.nupkg.sha512",
     "C:\\Users\\dell\\.nuget\\packages\\system.windows.extensions\\9.0.0\\system.windows.extensions.9.0.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "message": "Problem reading the cache file C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\obj\\project.nuget.cache : '<' is an invalid start of a property name. Expected a '\"'. Path: $ | LineNumber: 2 | BytePositionInLine: 0.",
+      "projectPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\TasteVinhKhanh.Api.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\TasteVinhKhanh.Api.csproj",
+      "targetGraphs": []
+    }
+  ]
 }

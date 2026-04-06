@@ -967,7 +967,39 @@ select.form-control {
     background: #f8fafc;
 }
 
-/* ── RESPONSIVE ────────────────────────────────────────────── */
+/* ── APPROVAL ICON BUTTONS (detail modal) ─────────────────── */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1.5px solid;
+    background: #fef9e7;
+    cursor: pointer;
+    transition: all .18s ease;
+}
+.icon-btn-approve {
+    border-color: #b5e8c0;
+    color: #22a856;
+}
+.icon-btn-approve:hover {
+    background: #d4f7e2;
+    border-color: #22a856;
+    transform: scale(1.06);
+    box-shadow: 0 4px 12px rgba(34,168,86,.2);
+}
+.icon-btn-reject {
+    border-color: #f5c5c5;
+    color: #d94040;
+}
+.icon-btn-reject:hover {
+    background: #fde8e8;
+    border-color: #d94040;
+    transform: scale(1.06);
+    box-shadow: 0 4px 12px rgba(217,64,64,.2);
+}
 @media (max-width: 768px) {
     .sidebar { width: 60px; }
     .sidebar-logo span, .sidebar-nav a span.txt, .sidebar-bottom > div { display: none; }

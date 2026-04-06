@@ -169,8 +169,9 @@ async function getVendorPois(vendorId) {
 
 /** GET /api/admin/pending-updates — danh sách thay đổi chờ duyệt */
 async function getPendingUpdates(page = 1, pageSize = 20, status = 'Pending') {
-    const params = new URLSearchParams({ page, pageSize, status });
-    return await apiCall('GET', `/api/admin/pending-updates?${params}`);
+    let url = `/api/admin/pending-updates?page=${page}&pageSize=${pageSize}`;
+    if (status && status !== 'all') url += `&status=${encodeURIComponent(status)}`;
+    return await apiCall('GET', url);
 }
 
 /** GET /api/admin/pending-updates/:id — chi tiết 1 pending update */
@@ -201,7 +202,9 @@ async function getPendingStats() {
 
 /** GET /api/admin/staging-images — danh sách ảnh chờ duyệt */
 async function getStagingImages(status = 'Pending') {
-    return await apiCall('GET', `/api/admin/staging-images?status=${encodeURIComponent(status)}`);
+    let url = '/api/admin/staging-images';
+    if (status && status !== 'all') url += `?status=${encodeURIComponent(status)}`;
+    return await apiCall('GET', url);
 }
 
 /** POST /api/admin/staging-images/:id/approve — duyệt ảnh */
@@ -234,7 +237,9 @@ async function deletePoiImage(poiId, imageId) {
 
 /** GET /api/admin/staging-images/deletion — danh sách yêu cầu xóa ảnh chờ duyệt */
 async function getDeletionRequests(status = 'Pending') {
-    return await apiCall('GET', `/api/admin/staging-images/deletion?status=${encodeURIComponent(status)}`);
+    let url = '/api/admin/staging-images/deletion';
+    if (status && status !== 'all') url += `?status=${encodeURIComponent(status)}`;
+    return await apiCall('GET', url);
 }
 
 /** POST /api/admin/staging-images/:id/approve-deletion — duyệt yêu cầu xóa ảnh */

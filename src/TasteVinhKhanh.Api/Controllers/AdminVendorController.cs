@@ -46,18 +46,31 @@ public class AdminVendorController : ControllerBase
     [HttpGet("pending-updates/stats")]
     public async Task<IActionResult> GetPendingStats()
     {
+        // Dùng UTC+7 (Việt Nam) làm mốc "hôm nay"
+        var vnNow = DateTime.UtcNow.AddHours(7);
+        var vnTodayStart = vnNow.Date; // 00:00 UTC+7 hôm nay = 17:00 UTC hôm qua
+
+        // Pending: POI updates + StagingImages (upload + deletion)
+        var poiPending = await _db.PendingPOIUpdates.CountAsync(x => x.Status == "Pending");
+        var imgPending = await _db.StagingImages.CountAsync(x => x.Status == "Pending");
+        var delPending = await _db.StagingImages.CountAsync(x => x.StagingType == "Deletion" && x.Status == "Pending");
+
+        // Approved/Rejected hôm nay: POI updates + StagingImages
+        var poiApprovedToday = await _db.PendingPOIUpdates
+            .CountAsync(x => x.Status == "Approved" && x.ReviewedAt >= vnTodayStart);
+        var poiRejectedToday = await _db.PendingPOIUpdates
+            .CountAsync(x => x.Status == "Rejected" && x.ReviewedAt >= vnTodayStart);
+        var imgApprovedToday = await _db.StagingImages
+            .CountAsync(x => x.Status == "Approved" && x.ReviewedAt >= vnTodayStart);
+        var imgRejectedToday = await _db.StagingImages
+            .CountAsync(x => x.Status == "Rejected" && x.ReviewedAt >= vnTodayStart);
+
         var stats = new PendingUpdatesStatsDto
         {
-            Pending = await _db.PendingPOIUpdates.CountAsync(x => x.Status == "Pending"),
-            ApprovedToday = await _db.PendingPOIUpdates
-                .CountAsync(x => x.Status == "Approved" && x.ReviewedAt >= DateTime.UtcNow.Date),
-            RejectedToday = await _db.PendingPOIUpdates
-                .CountAsync(x => x.Status == "Rejected" && x.ReviewedAt >= DateTime.UtcNow.Date),
-            UniquePoiCount = await _db.PendingPOIUpdates
-                .Where(x => x.Status == "Pending")
-                .Select(x => x.PoiPointId)
-                .Distinct()
-                .CountAsync()
+            Pending = poiPending + imgPending + delPending,
+            ApprovedToday = poiApprovedToday + imgApprovedToday,
+            RejectedToday = poiRejectedToday + imgRejectedToday,
+            UniquePoiCount = poiPending
         };
         return Ok(stats);
     }
@@ -341,19 +354,25 @@ public class AdminVendorController : ControllerBase
             Changes = ParsePayloadChanges(u.Payload)
         }).ToList();
 
-        // Stats (cho badge)
+        // Stats (cho badge) — dùng UTC+7 (Việt Nam) làm mốc "hôm nay"
+        var vnNow = DateTime.UtcNow.AddHours(7);
+        var vnTodayStart = vnNow.Date;
+
+        // Đếm đủ 3 loại: POI updates + StagingImages upload + StagingImages deletion
+        var poiPending = await _db.PendingPOIUpdates.CountAsync(x => x.Status == "Pending");
+        var imgPending = await _db.StagingImages.CountAsync(x => x.Status == "Pending");
+        var delPending = await _db.StagingImages.CountAsync(x => x.StagingType == "Deletion" && x.Status == "Pending");
+        var poiApprovedToday = await _db.PendingPOIUpdates.CountAsync(x => x.Status == "Approved" && x.ReviewedAt >= vnTodayStart);
+        var poiRejectedToday = await _db.PendingPOIUpdates.CountAsync(x => x.Status == "Rejected" && x.ReviewedAt >= vnTodayStart);
+        var imgApprovedToday = await _db.StagingImages.CountAsync(x => x.Status == "Approved" && x.ReviewedAt >= vnTodayStart);
+        var imgRejectedToday = await _db.StagingImages.CountAsync(x => x.Status == "Rejected" && x.ReviewedAt >= vnTodayStart);
+
         var stats = new PendingUpdatesStatsDto
         {
-            Pending = await _db.PendingPOIUpdates.CountAsync(x => x.Status == "Pending"),
-            ApprovedToday = await _db.PendingPOIUpdates
-                .CountAsync(x => x.Status == "Approved" && x.ReviewedAt >= DateTime.UtcNow.Date),
-            RejectedToday = await _db.PendingPOIUpdates
-                .CountAsync(x => x.Status == "Rejected" && x.ReviewedAt >= DateTime.UtcNow.Date),
-            UniquePoiCount = await _db.PendingPOIUpdates
-                .Where(x => x.Status == "Pending")
-                .Select(x => x.PoiPointId)
-                .Distinct()
-                .CountAsync()
+            Pending = poiPending + imgPending + delPending,
+            ApprovedToday = poiApprovedToday + imgApprovedToday,
+            RejectedToday = poiRejectedToday + imgRejectedToday,
+            UniquePoiCount = poiPending
         };
 
         return Ok(new { items = result, stats });
@@ -465,6 +484,13 @@ public class AdminVendorController : ControllerBase
             poi = new Shared.Models.PoiPoint();
             _db.PoiPoints.Add(poi);
             await _db.SaveChangesAsync(); // Lưu trước để lấy ID
+
+            // Gán POI cho vendor để vendor thấy được POI mới
+            var vendor = await _db.Vendors.FindAsync(update.VendorId);
+            if (vendor != null)
+            {
+                vendor.PoiPointId = poi.Id;
+            }
 
             update.PoiPointId = poi.Id; // Update PoiPointId trong PendingPOIUpdates
         }
