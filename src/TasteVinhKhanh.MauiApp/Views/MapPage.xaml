@@ -8,7 +8,7 @@
              x:Class="TasteVinhKhanh.MauiApp.Views.MapPage"
              x:DataType="vm:MapViewModel"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="#0D0D0D">
+             BackgroundColor="#1A0A00">
 
     <ContentPage.Resources>
         <conv:FavoriteIconConverter x:Key="FavoriteIconConverter"/>
@@ -46,11 +46,11 @@
             <StackLayout Spacing="0">
 
                 <!-- ══ HERO HEADER ══ -->
-                <Grid Padding="20,14,20,16">
+                <Grid Padding="20,8,20,16">
                     <Grid.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                             <GradientStop Color="#1A0A00" Offset="0"/>
-                            <GradientStop Color="#0D0D0D" Offset="1"/>
+                            <GradientStop Color="#1A0A00" Offset="1"/>
                         </LinearGradientBrush>
                     </Grid.Background>
 
@@ -110,7 +110,7 @@
                             <Rectangle.Fill>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                     <GradientStop Color="Transparent" Offset="0"/>
-                                    <GradientStop Color="#0D0D0D" Offset="1"/>
+                                    <GradientStop Color="#1A0A00" Offset="1"/>
                                 </LinearGradientBrush>
                             </Rectangle.Fill>
                         </Rectangle>
@@ -355,7 +355,7 @@
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                     <GradientStop Color="#111111" Offset="0"/>
-                    <GradientStop Color="#0D0D0D" Offset="1"/>
+                    <GradientStop Color="#1A0A00" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
             <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">

@@ -7,13 +7,13 @@
        Shell.TabBarIsVisible="False">
 
     <TabBar>
-        <ShellContent Route="HomePage"
+        <ShellContent Route="main"
                       ContentTemplate="{DataTemplate views:HomePage}"/>
-        <ShellContent Route="MapPage"
+        <ShellContent Route="map"
                       ContentTemplate="{DataTemplate views:MapPage}"/>
-        <ShellContent Route="AudioPage"
+        <ShellContent Route="audio"
                       ContentTemplate="{DataTemplate views:AudioPage}"/>
-        <ShellContent Route="SettingsPage"
+        <ShellContent Route="settings"
                       ContentTemplate="{DataTemplate views:SettingsPage}"/>
     </TabBar>
 

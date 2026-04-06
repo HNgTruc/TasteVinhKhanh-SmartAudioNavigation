@@ -476,7 +476,7 @@ public class AdminVendorController : ControllerBase
 
         var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? "admin";
 
-        Shared.Models.PoiPoint poi;
+        Shared.Models.PoiPoint? poi;
 
         // Nếu PoiPointId = 0 → tạo POI mới
         if (update.PoiPointId == 0)

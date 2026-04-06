@@ -245,15 +245,15 @@ public partial class MapViewModel : ObservableObject
 
     [RelayCommand]
     public async Task GoToHome()
-        => await Shell.Current.GoToAsync("//HomePage");
+        => await Shell.Current.GoToAsync("//main");
 
     [RelayCommand]
     public async Task GoToAudio()
-        => await Shell.Current.GoToAsync("//AudioPage");
+        => await Shell.Current.GoToAsync("//audio");
 
     [RelayCommand]
     public async Task GoToSettings()
-        => await Shell.Current.GoToAsync("//SettingsPage");
+        => await Shell.Current.GoToAsync("//settings");
 
     private void RefreshTexts()
     {

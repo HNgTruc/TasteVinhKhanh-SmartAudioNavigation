@@ -6,7 +6,7 @@
              x:Class="TasteVinhKhanh.MauiApp.Views.SettingsPage"
              x:DataType="vm:SettingsViewModel"
              Shell.NavBarIsVisible="False"
-             BackgroundColor="#0D0D0D">
+             BackgroundColor="#1A0A00">
 
     <ContentPage.Resources>
         <conv:LangActiveConverter x:Key="LangActiveConverter"/>
@@ -17,7 +17,7 @@
             <StackLayout Spacing="0">
 
                 <!-- Header -->
-                <Grid Padding="24,52,24,32">
+                <Grid Padding="24,8,24,32">
                     <StackLayout Spacing="6">
                         <Label Text="{Binding THeader}" FontSize="30"
                                FontAttributes="Bold" TextColor="#FFFFFF"/>

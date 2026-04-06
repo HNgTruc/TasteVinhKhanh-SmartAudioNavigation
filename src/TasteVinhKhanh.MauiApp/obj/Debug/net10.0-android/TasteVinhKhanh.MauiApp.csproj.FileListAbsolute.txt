@@ -2888,3 +2888,7 @@ C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhan
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\android\assets\arm64-v8a\_Microsoft.Android.Resource.Designer.typemap.xml
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\res\xml\network_security_config.xml
 C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\res\values\themes.xml
+C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\bin\Debug\net10.0-android\Microsoft.Maui.Controls.HotReload.Forms.dll
+C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\bin\Debug\net10.0-android\Microsoft.VisualStudio.DesignTools.MobileTapContracts.dll
+C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\bin\Debug\net10.0-android\Microsoft.VisualStudio.DesignTools.TapContract.dll
+C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\bin\Debug\net10.0-android\Microsoft.VisualStudio.DesignTools.XamlTapContract.dll
