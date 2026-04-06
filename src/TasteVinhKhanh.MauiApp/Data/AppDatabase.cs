@@ -63,6 +63,18 @@ public class SyncMeta
     public DateTime LastSyncAt { get; set; }
 }
 
+[Table("RestaurantImages")]
+public class LocalRestaurantImage
+{
+    [PrimaryKey]
+    public int Id { get; set; }
+    [Indexed]
+    public int PoiPointId { get; set; }
+    public string ImageUrl { get; set; } = string.Empty;
+    public bool IsPrimary { get; set; }
+    public int SortOrder { get; set; }
+}
+
 public class AppDatabase
 {
     private readonly SQLiteAsyncConnection _db;
@@ -87,6 +99,7 @@ public class AppDatabase
             await _db.CreateTableAsync<LocalAudioScript>();
             await _db.CreateTableAsync<LocalPlaybackLog>();
             await _db.CreateTableAsync<SyncMeta>();
+            await _db.CreateTableAsync<LocalRestaurantImage>();
             _initialized = true;
         }
         finally { _lock.Release(); }
@@ -151,6 +164,34 @@ public class AppDatabase
                         db.Update(existScript);
                     }
                 }
+
+                // Upsert gallery images
+                if (dto.Images != null && dto.Images.Count > 0)
+                {
+                    foreach (var img in dto.Images)
+                    {
+                        var existImg = db.Table<LocalRestaurantImage>()
+                            .Where(i => i.Id == img.Id).FirstOrDefault();
+                        if (existImg == null)
+                        {
+                            db.Insert(new LocalRestaurantImage
+                            {
+                                Id = img.Id,
+                                PoiPointId = img.PoiPointId,
+                                ImageUrl = img.ImageUrl,
+                                IsPrimary = img.IsPrimary,
+                                SortOrder = img.SortOrder
+                            });
+                        }
+                        else
+                        {
+                            existImg.ImageUrl = img.ImageUrl;
+                            existImg.IsPrimary = img.IsPrimary;
+                            existImg.SortOrder = img.SortOrder;
+                            db.Update(existImg);
+                        }
+                    }
+                }
             }
         });
     }
@@ -161,6 +202,14 @@ public class AppDatabase
         => _db.Table<LocalAudioScript>()
               .Where(s => s.PoiPointId == poiId && s.LanguageCode == lang)
               .FirstOrDefaultAsync();
+
+    // ── GALLERY IMAGES ────────────────────────────────────────
+
+    public Task<List<LocalRestaurantImage>> GetImagesForPoiAsync(int poiId)
+        => _db.Table<LocalRestaurantImage>()
+              .Where(i => i.PoiPointId == poiId)
+              .OrderBy(i => i.SortOrder)
+              .ToListAsync();
 
     public async Task MarkAudioDownloadedAsync(int scriptId, string localPath)
     {

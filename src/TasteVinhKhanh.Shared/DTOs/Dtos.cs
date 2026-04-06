@@ -471,6 +471,12 @@ public class StagingImageDto
     public int PoiPointId { get; set; }
     public string PoiName { get; set; } = string.Empty;
     public string FileName { get; set; } = string.Empty;
+    /// <summary>Upload | Deletion</summary>
+    public string StagingType { get; set; } = "Upload";
+    /// <summary>URL preview: TempUrl (upload) hoặc ReferencedImageUrl (deletion)</summary>
+    public string PreviewUrl { get; set; } = string.Empty;
+    /// <summary>URL ảnh gốc trong RestaurantImages (dùng cho Deletion)</summary>
+    public string? ReferencedImageUrl { get; set; }
     public string TempUrl { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
@@ -481,6 +487,33 @@ public class ApproveStagingImageRequest
 {
     [JsonPropertyName("poiPointId")]
     public int PoiPointId { get; set; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// POI IMAGE MANAGEMENT DTOs (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>Toàn bộ ảnh của một POI (admin xem gallery)</summary>
+public class PoiImageGalleryDto
+{
+    public int PoiId { get; set; }
+    public string PoiName { get; set; } = string.Empty;
+    public List<RestaurantImageDto> Images { get; set; } = new();
+}
+
+/// <summary>Vendor gửi yêu cầu xóa ảnh</summary>
+public class DeleteImageRequestDto
+{
+    /// <summary>Id của ảnh trong RestaurantImages cần xóa</summary>
+    public int ImageId { get; set; }
+    /// <summary>POI mà ảnh này thuộc về</summary>
+    public int PoiPointId { get; set; }
+}
+
+/// <summary>Duyệt yêu cầu xóa ảnh</summary>
+public class ApproveDeletionRequestDto
+{
+    public string? AdminNote { get; set; }
 }
 
 /// <summary>Badge counts cho dashboard</summary>

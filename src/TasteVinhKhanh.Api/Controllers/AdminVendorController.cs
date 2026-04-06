@@ -292,12 +292,16 @@ public class AdminVendorController : ControllerBase
             .Include(u => u.Vendor)
             .AsQueryable();
 
-        if (status == "Pending")
-            query = query.Where(u => u.Status == "Pending");
-        else if (status == "Approved")
-            query = query.Where(u => u.Status == "Approved");
-        else if (status == "Rejected")
-            query = query.Where(u => u.Status == "Rejected");
+        if (!string.IsNullOrEmpty(status))
+        {
+            if (status == "Pending")
+                query = query.Where(u => u.Status == "Pending");
+            else if (status == "Approved")
+                query = query.Where(u => u.Status == "Approved");
+            else if (status == "Rejected")
+                query = query.Where(u => u.Status == "Rejected");
+        }
+        // status == "" (rỗng) → trả về TẤT CẢ, không filter
 
         var updates = await query
             .OrderByDescending(u => u.CreatedAt)
@@ -657,27 +661,20 @@ public class AdminVendorController : ControllerBase
     // STAGING IMAGE MANAGEMENT
     // ═══════════════════════════════════════════════════════════════════════════
 
-    /// <summary>Danh sách ảnh staging chờ duyệt</summary>
+    /// <summary>Danh sách ảnh staging chờ duyệt (chỉ Upload, không gộp Deletion)</summary>
     [HttpGet("staging-images")]
     public async Task<IActionResult> GetStagingImages([FromQuery] string status = "Pending")
     {
-        // NOTE: EF Core silently ignores .Include() when followed by .Select() (projection).
-        // Fix: force client evaluation with .ToList() BEFORE the .Select() so navigation
-        // properties are actually loaded. An alternative would be subquery projections,
-        // but .ToList() is simpler and guarantees the Include is honoured.
         var query = _db.StagingImages
             .Include(x => x.Vendor)
             .Include(x => x.PoiPoint)
+            .Where(x => x.StagingType == "Upload")
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(status))
             query = query.Where(x => x.Status == status);
 
-        var stagingList = await query
-            .OrderByDescending(x => x.CreatedAt)
-            .ToListAsync();
-
-        var items = stagingList.Select(x => new StagingImageDto
+        var items = (await query.ToListAsync()).Select(x => new StagingImageDto
         {
             Id = x.Id,
             VendorId = x.VendorId,
@@ -685,20 +682,19 @@ public class AdminVendorController : ControllerBase
             PoiPointId = x.PoiPointId,
             PoiName = x.PoiPoint?.Name ?? "",
             FileName = x.FileName,
+            StagingType = x.StagingType,
+            PreviewUrl = x.TempUrl,
+            ReferencedImageUrl = x.ReferencedImageUrl,
             TempUrl = x.TempUrl,
             Status = x.Status,
             CreatedAt = x.CreatedAt
         }).ToList();
 
-        var pendingCount = await _db.StagingImages.CountAsync(x => x.Status == "Pending");
-        var approvedTodayCount = await _db.StagingImages.CountAsync(x => 
-            x.Status == "Approved" && x.ReviewedAt >= DateTime.UtcNow.Date);
-        var rejectedTodayCount = await _db.StagingImages.CountAsync(x => 
-            x.Status == "Rejected" && x.ReviewedAt >= DateTime.UtcNow.Date);
-        return Ok(new { items, pendingCount, stats = new { approvedToday = approvedTodayCount, rejectedToday = rejectedTodayCount } });
+        var pendingCount = await _db.StagingImages.CountAsync(x => x.StagingType == "Upload" && x.Status == "Pending");
+        return Ok(new { items, pendingCount });
     }
 
-        /// <summary>Duyệt 1 ảnh staging — copy file từ staging → wwwroot/images</summary>
+    /// <summary>Duyệt 1 ảnh staging — copy file từ staging → wwwroot/images</summary>
     [HttpPost("staging-images/{id}/approve")]
     public async Task<IActionResult> ApproveStagingImage(int id, [FromBody] ApproveStagingImageRequest req)
     {
@@ -713,7 +709,6 @@ public class AdminVendorController : ControllerBase
         var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? "admin";
         var poiId = req.PoiPointId > 0 ? req.PoiPointId : img.PoiPointId;
 
-        // Tách TempUrl="/staging/poi_1/file.jpg" → lấy phần path sau "/staging/"
         var relPath = img.TempUrl.TrimStart('/');
         var sourcePath = Path.Combine(WwwRoot, relPath);
 
@@ -733,16 +728,28 @@ public class AdminVendorController : ControllerBase
         img.ReviewedBy = adminEmail;
         img.ReviewedAt = DateTime.UtcNow;
 
-        var isFirst = !await _db.RestaurantImages.AnyAsync(i => i.PoiPointId == poiId);
+        // Xóa ảnh cũ
+        var oldImages = await _db.RestaurantImages.Where(i => i.PoiPointId == poiId).ToListAsync();
+        _db.RestaurantImages.RemoveRange(oldImages);
+
+        var existingCount = await _db.RestaurantImages.CountAsync(i => i.PoiPointId == poiId);
+
         _db.RestaurantImages.Add(new Shared.Models.RestaurantImage
         {
             PoiPointId = poiId,
             ImageUrl = relativeUrl,
-            IsPrimary = isFirst,
-            SortOrder = await _db.RestaurantImages.CountAsync(i => i.PoiPointId == poiId) + 1,
+            IsPrimary = true,
+            SortOrder = existingCount + 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         });
+
+        var poi = await _db.PoiPoints.FindAsync(poiId);
+        if (poi != null)
+        {
+            poi.UpdatedAt = DateTime.UtcNow;
+            _db.PoiPoints.Update(poi);
+        }
 
         await _db.SaveChangesAsync();
         return Ok(new { message = "Da duyet anh. File da luu vao " + relativeUrl });
@@ -766,5 +773,201 @@ public class AdminVendorController : ControllerBase
         img.ReviewedAt = DateTime.UtcNow;
         await _db.SaveChangesAsync();
         return Ok(new { message = "Da tu choi va xoa anh." });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // POI IMAGE MANAGEMENT (Admin xem gallery & xóa trực tiếp)
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>Lấy toàn bộ ảnh đã duyệt của một POI</summary>
+    [HttpGet("pois/{poiId}/images")]
+    public async Task<IActionResult> GetPoiImages(int poiId)
+    {
+        var poi = await _db.PoiPoints.FindAsync(poiId);
+        if (poi == null) return NotFound(new { message = "POI không tồn tại." });
+
+        var images = await _db.RestaurantImages
+            .Where(i => i.PoiPointId == poiId)
+            .OrderBy(i => i.SortOrder)
+            .Select(i => new RestaurantImageDto
+            {
+                Id = i.Id,
+                PoiPointId = i.PoiPointId,
+                ImageUrl = i.ImageUrl,
+                IsPrimary = i.IsPrimary,
+                SortOrder = i.SortOrder
+            })
+            .ToListAsync();
+
+        return Ok(new PoiImageGalleryDto
+        {
+            PoiId = poiId,
+            PoiName = poi.Name,
+            Images = images
+        });
+    }
+
+    /// <summary>Xóa trực tiếp một ảnh (admin không cần vendor gửi yêu cầu)</summary>
+    [HttpDelete("pois/{poiId}/images/{imageId}")]
+    public async Task<IActionResult> DeletePoiImage(int poiId, int imageId)
+    {
+        var image = await _db.RestaurantImages
+            .FirstOrDefaultAsync(i => i.Id == imageId && i.PoiPointId == poiId);
+
+        if (image == null) return NotFound(new { message = "Ảnh không tồn tại." });
+
+        var filePath = Path.Combine(WwwRoot, image.ImageUrl.TrimStart('/'));
+        if (System.IO.File.Exists(filePath))
+            System.IO.File.Delete(filePath);
+
+        _db.RestaurantImages.Remove(image);
+
+        if (image.IsPrimary)
+        {
+            var nextPrimary = await _db.RestaurantImages
+                .Where(i => i.PoiPointId == poiId && i.Id != imageId)
+                .OrderBy(i => i.SortOrder)
+                .FirstOrDefaultAsync();
+
+            if (nextPrimary != null)
+            {
+                nextPrimary.IsPrimary = true;
+                _db.RestaurantImages.Update(nextPrimary);
+            }
+
+            var poi = await _db.PoiPoints.FindAsync(poiId);
+            if (poi != null)
+            {
+                poi.UpdatedAt = DateTime.UtcNow;
+                _db.PoiPoints.Update(poi);
+            }
+        }
+
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Đã xóa ảnh." });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGING DELETION MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /// <summary>Danh sách yêu cầu xóa ảnh chờ duyệt</summary>
+    [HttpGet("staging-images/deletion")]
+    public async Task<IActionResult> GetDeletionRequests([FromQuery] string status = "Pending")
+    {
+        var query = _db.StagingImages
+            .Include(x => x.Vendor)
+            .Include(x => x.PoiPoint)
+            .Where(x => x.StagingType == "Deletion")
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(status))
+            query = query.Where(x => x.Status == status);
+
+        var items = await query
+            .OrderByDescending(x => x.CreatedAt)
+            .Select(x => new StagingImageDto
+            {
+                Id = x.Id,
+                VendorId = x.VendorId,
+                VendorName = x.Vendor != null ? x.Vendor.BusinessName : "",
+                PoiPointId = x.PoiPointId,
+                PoiName = x.PoiPoint != null ? x.PoiPoint.Name : "",
+                FileName = x.FileName,
+                StagingType = x.StagingType,
+                PreviewUrl = x.ReferencedImageUrl ?? "",
+                ReferencedImageUrl = x.ReferencedImageUrl,
+                TempUrl = x.TempUrl,
+                Status = x.Status,
+                CreatedAt = x.CreatedAt
+            })
+            .ToListAsync();
+
+        var pendingCount = await _db.StagingImages
+            .CountAsync(x => x.StagingType == "Deletion" && x.Status == "Pending");
+
+        return Ok(new { items, pendingCount });
+    }
+
+    /// <summary>Duyệt yêu cầu xóa ảnh — xóa khỏi RestaurantImages</summary>
+    [HttpPost("staging-images/{id}/approve-deletion")]
+    public async Task<IActionResult> ApproveDeletionRequest(int id, [FromBody] ApproveDeletionRequestDto req)
+    {
+        var staging = await _db.StagingImages
+            .Include(x => x.PoiPoint)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (staging == null) return NotFound(new { message = "Yêu cầu không tồn tại." });
+        if (staging.StagingType != "Deletion")
+            return BadRequest(new { message = "Yêu cầu này không phải là yêu cầu xóa ảnh." });
+        if (staging.Status != "Pending")
+            return BadRequest(new { message = "Yêu cầu đã được xử lý trước đó." });
+
+        var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? "admin";
+
+        var imageUrl = staging.ReferencedImageUrl;
+        var image = await _db.RestaurantImages
+            .FirstOrDefaultAsync(i => i.ImageUrl == imageUrl && i.PoiPointId == staging.PoiPointId);
+
+        if (image != null)
+        {
+            var filePath = Path.Combine(WwwRoot, imageUrl!.TrimStart('/'));
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
+
+            var wasPrimary = image.IsPrimary;
+            _db.RestaurantImages.Remove(image);
+
+            if (wasPrimary)
+            {
+                var nextPrimary = await _db.RestaurantImages
+                    .Where(i => i.PoiPointId == staging.PoiPointId)
+                    .OrderBy(i => i.SortOrder)
+                    .FirstOrDefaultAsync();
+
+                if (nextPrimary != null)
+                {
+                    nextPrimary.IsPrimary = true;
+                    _db.RestaurantImages.Update(nextPrimary);
+                }
+            }
+        }
+
+        staging.Status = "Approved";
+        staging.ReviewedBy = adminEmail;
+        staging.ReviewedAt = DateTime.UtcNow;
+        staging.AdminNote = req?.AdminNote;
+
+        if (staging.PoiPoint != null)
+        {
+            staging.PoiPoint.UpdatedAt = DateTime.UtcNow;
+            _db.PoiPoints.Update(staging.PoiPoint);
+        }
+
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Đã duyệt yêu cầu xóa ảnh." });
+    }
+
+    /// <summary>Từ chối yêu cầu xóa ảnh</summary>
+    [HttpPost("staging-images/{id}/reject-deletion")]
+    public async Task<IActionResult> RejectDeletionRequest(int id, [FromBody] RejectUpdateRequest req)
+    {
+        var staging = await _db.StagingImages.FindAsync(id);
+
+        if (staging == null) return NotFound(new { message = "Yêu cầu không tồn tại." });
+        if (staging.StagingType != "Deletion")
+            return BadRequest(new { message = "Yêu cầu này không phải là yêu cầu xóa ảnh." });
+        if (staging.Status != "Pending")
+            return BadRequest(new { message = "Yêu cầu đã được xử lý trước đó." });
+
+        var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? "admin";
+
+        staging.Status = "Rejected";
+        staging.AdminNote = req?.Reason ?? "";
+        staging.ReviewedBy = adminEmail;
+        staging.ReviewedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Đã từ chối yêu cầu xóa ảnh." });
     }
 }

@@ -131,9 +131,7 @@ async function getMyPoi(id) {
 async function createMyPoi(data) {
     return await apiCall('POST', '/api/vendor/pois', data);
 }
-async function createMyPoi(data) {
-    return await apiCall('POST', '/api/vendor/pois', data);
-}
+
 async function updateMyPoi(id, data) {
     return await apiCall('PUT', `/api/vendor/pois/${id}`, data);
 }
@@ -199,6 +197,20 @@ async function uploadImageForApproval(file, poiId) {
     if (!res.ok) throw new Error(data.message || `Upload failed: HTTP ${res.status}`);
 
     return { success: true, tempUrl: data.tempUrl, stagingId: data.stagingId };
+}
+
+// ── DELETE IMAGE REQUEST ─────────────────────────────────────────────────────
+
+/**
+ * Gửi yêu cầu xóa ảnh (chờ admin duyệt).
+ * @param {number} imageId - Id của ảnh trong RestaurantImages
+ * @param {number} poiPointId - POI của ảnh đó
+ */
+async function requestDeleteImage(imageId, poiPointId) {
+    return await apiCall('POST', '/api/vendor/images/delete-request', {
+        imageId,
+        poiPointId
+    });
 }
 
 // ── ANALYTICS ──────────────────────────────────────────────────────────────

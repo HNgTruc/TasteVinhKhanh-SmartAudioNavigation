@@ -213,3 +213,36 @@ async function approveStagingImage(id, poiPointId = 0) {
 async function rejectStagingImage(id, reason = '') {
     return await apiCall('POST', `/api/admin/staging-images/${id}/reject`, { reason });
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// POI IMAGE MANAGEMENT (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/admin/pois/:poiId/images — lấy gallery ảnh của một POI */
+async function getPoiImageGallery(poiId) {
+    return await apiCall('GET', `/api/admin/pois/${poiId}/images`);
+}
+
+/** DELETE /api/admin/pois/:poiId/images/:imageId — xóa trực tiếp ảnh của POI */
+async function deletePoiImage(poiId, imageId) {
+    return await apiCall('DELETE', `/api/admin/pois/${poiId}/images/${imageId}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// STAGING DELETION QUEUE (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/admin/staging-images/deletion — danh sách yêu cầu xóa ảnh chờ duyệt */
+async function getDeletionRequests(status = 'Pending') {
+    return await apiCall('GET', `/api/admin/staging-images/deletion?status=${encodeURIComponent(status)}`);
+}
+
+/** POST /api/admin/staging-images/:id/approve-deletion — duyệt yêu cầu xóa ảnh */
+async function approveDeletionRequest(id, adminNote = '') {
+    return await apiCall('POST', `/api/admin/staging-images/${id}/approve-deletion`, { adminNote });
+}
+
+/** POST /api/admin/staging-images/:id/reject-deletion — từ chối yêu cầu xóa ảnh */
+async function rejectDeletionRequest(id, reason = '') {
+    return await apiCall('POST', `/api/admin/staging-images/${id}/reject-deletion`, { reason });
+}

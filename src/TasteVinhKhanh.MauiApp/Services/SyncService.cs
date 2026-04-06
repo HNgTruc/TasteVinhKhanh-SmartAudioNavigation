@@ -70,12 +70,17 @@ public partial class SyncService : ObservableObject
             if (response == null)
                 throw new InvalidOperationException("Server trả về dữ liệu rỗng");
 
-            // ── 3. Lưu vào SQLite ─────────────────────────────────────
-            if (response.HasChanges)
+            // Chuyển SyncedAt về UTC (server trả UTC, SQLite lưu local → cần UTC để query đúng)
+            var utcSyncedAt = response.SyncedAt.Kind == DateTimeKind.Utc
+                ? response.SyncedAt
+                : response.SyncedAt.ToUniversalTime();
+
+            // Lưu dù có thay đổi hay không (kể cả full sync)
+            if (response.HasChanges || response.Pois.Count > 0)
             {
                 await _db.UpsertPoisFromServerAsync(response.Pois);
-                await _db.SaveLastSyncAtAsync(response.SyncedAt);
-                LastSyncAt = response.SyncedAt;
+                await _db.SaveLastSyncAtAsync(utcSyncedAt);
+                LastSyncAt = utcSyncedAt;
                 SyncStatus = $"Đã cập nhật {response.Pois.Count} điểm từ server";
 
                 return new SyncResult
@@ -86,8 +91,31 @@ public partial class SyncService : ObservableObject
                 };
             }
 
-            await _db.SaveLastSyncAtAsync(response.SyncedAt);
-            LastSyncAt = response.SyncedAt;
+            // Fallback: filter trả 0 → gọi full sync để đảm bảo dữ liệu đầy đủ
+            if (lastSync.HasValue)
+            {
+                SyncStatus = "Full refresh...";
+                var full = await _http.GetFromJsonAsync<SyncResponse>("api/sync", cts.Token);
+                if (full != null && full.Pois.Count > 0)
+                {
+                    await _db.UpsertPoisFromServerAsync(full.Pois);
+                    var fullUtc = full.SyncedAt.Kind == DateTimeKind.Utc
+                        ? full.SyncedAt
+                        : full.SyncedAt.ToUniversalTime();
+                    await _db.SaveLastSyncAtAsync(fullUtc);
+                    LastSyncAt = fullUtc;
+                    SyncStatus = $"Full: {full.Pois.Count} điểm";
+                    return new SyncResult
+                    {
+                        Success = true,
+                        UpdatedCount = full.Pois.Count,
+                        Message = $"Full refresh: {full.Pois.Count} điểm"
+                    };
+                }
+            }
+
+            await _db.SaveLastSyncAtAsync(utcSyncedAt);
+            LastSyncAt = utcSyncedAt;
             SyncStatus = "";
 
             return new SyncResult

@@ -600,4 +600,58 @@ public class VendorController : ControllerBase
             message = "Ảnh đã được tải lên, đang chờ quản trị viên duyệt."
         });
     }
+
+    /// <summary>Gửi yêu cầu xóa ảnh — chờ admin duyệt mới xóa thật</summary>
+    [HttpPost("images/delete-request")]
+    public async Task<IActionResult> RequestDeleteImage([FromBody] DeleteImageRequestDto req)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == userId);
+        if (vendor == null) return NotFound();
+
+        if (vendor.Status != "Approved")
+            return BadRequest(new { message = "Tài khoản chưa được duyệt." });
+
+        if (!vendor.PoiPointId.HasValue || vendor.PoiPointId.Value != req.PoiPointId)
+            return BadRequest(new { message = "Bạn không có quyền xóa ảnh của POI này." });
+
+        var image = await _db.RestaurantImages
+            .FirstOrDefaultAsync(i => i.Id == req.ImageId && i.PoiPointId == req.PoiPointId);
+
+        if (image == null)
+            return NotFound(new { message = "Ảnh không tồn tại." });
+
+        var existingRequest = await _db.StagingImages
+            .AnyAsync(s => s.StagingType == "Deletion"
+                        && s.ReferencedImageUrl == image.ImageUrl
+                        && s.PoiPointId == req.PoiPointId
+                        && s.Status == "Pending");
+
+        if (existingRequest)
+            return BadRequest(new { message = "Đã có yêu cầu xóa ảnh này đang chờ duyệt." });
+
+        var staging = new Shared.Models.StagingImage
+        {
+            VendorId = vendor.Id,
+            PoiPointId = req.PoiPointId,
+            FileName = Path.GetFileName(image.ImageUrl),
+            TempUrl = image.ImageUrl,
+            ReferencedImageUrl = image.ImageUrl,
+            StagingType = "Deletion",
+            Status = "Pending",
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _db.StagingImages.Add(staging);
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            success = true,
+            stagingId = staging.Id,
+            message = "Đã gửi yêu cầu xóa ảnh. Quản trị viên sẽ duyệt trong thời gian sớm nhất."
+        });
+    }
 }

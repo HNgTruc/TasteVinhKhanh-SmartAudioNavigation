@@ -1,14 +1,14 @@
-﻿namespace TasteVinhKhanh.MauiApp;
+namespace TasteVinhKhanh.MauiApp;
 
-public partial class App : Application
+public partial class App : Microsoft.Maui.Controls.Application
 {
     public App()
     {
         InitializeComponent();
     }
 
-    protected override Window CreateWindow(IActivationState? activationState)
+    protected override Microsoft.Maui.Controls.Window CreateWindow(IActivationState? activationState)
     {
-        return new Window(new AppShell());
+        return new Microsoft.Maui.Controls.Window(new AppShell());
     }
 }

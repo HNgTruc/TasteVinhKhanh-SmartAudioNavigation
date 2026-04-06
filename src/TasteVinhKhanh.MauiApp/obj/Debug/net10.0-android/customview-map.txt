@@ -41,6 +41,8 @@ corners;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\Taste
 declare-styleable;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\178\jl\res\values\attr.xml
 declare-styleable;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\values\values.xml
 declare-styleable;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\191\jl\res\values\values.xml
+domain;obj\Debug\net10.0-android\res\xml\network_security_config.xml
+domain-config;obj\Debug\net10.0-android\res\xml\network_security_config.xml
 eat-comment;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\values\values.xml
 eat-comment;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\values-af\values.xml
 eat-comment;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\values-am\values.xml
@@ -229,6 +231,7 @@ item;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVin
 item;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_text_light.xml
 item;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_text_light_focused.xml
 item;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_text_light_normal.xml
+item;obj\Debug\net10.0-android\res\values\themes.xml
 item;obj\Debug\net10.0-android\resizetizer\sp\drawable\maui_splash_image.xml
 item;obj\Debug\net10.0-android\resizetizer\sp\drawable-v31\maui_splash_image.xml
 layer-list;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\178\jl\res\drawable\maui_splash.xml
@@ -248,6 +251,7 @@ layer-list;obj\Debug\net10.0-android\resizetizer\sp\drawable-v31\maui_splash_ima
 microsoft.maui.controls.platform.compatibility.ShellFlyoutLayout;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\176\jl\res\layout\flyoutcontent.xml
 monochrome;obj\Debug\net10.0-android\resizetizer\r\mipmap-anydpi-v26\appicon.xml
 monochrome;obj\Debug\net10.0-android\resizetizer\r\mipmap-anydpi-v26\appicon_round.xml
+network-security-config;obj\Debug\net10.0-android\res\xml\network_security_config.xml
 padding;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_icon_disabled.xml
 padding;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_text_disabled.xml
 paths;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\179\jl\res\xml\microsoft_maui_essentials_fileprovider_file_paths.xml
@@ -421,6 +425,7 @@ resources;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\Tas
 resources;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\189\jl\res\values-zu\values.xml
 resources;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\191\jl\res\values\values.xml
 resources;obj\Debug\net10.0-android\res\values\colors.xml
+resources;obj\Debug\net10.0-android\res\values\themes.xml
 resources;obj\Debug\net10.0-android\resizetizer\sp\values\maui_colors.xml
 selector;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_icon_dark.xml
 selector;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_icon_light.xml
@@ -617,6 +622,7 @@ stroke;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteV
 stroke;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_text_dark_focused.xml
 stroke;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\188\jl\res\drawable\common_google_signin_btn_text_light_focused.xml
 style;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\178\jl\res\values\styles.xml
+style;obj\Debug\net10.0-android\res\values\themes.xml
 translate;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\176\jl\res\anim\enterfromleft.xml
 translate;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\176\jl\res\anim\enterfromright.xml
 translate;C:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.MauiApp\obj\Debug\net10.0-android\lp\176\jl\res\anim\exittoleft.xml

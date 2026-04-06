@@ -4,6 +4,24 @@
         <name>TasteVinhKhanh.MauiApp</name>
     </assembly>
     <members>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.CountToVisibilityConverter">
+            <summary>True nếu Images.Count > 0</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.InverseCountToVisibilityConverter">
+            <summary>True nếu count == 0</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.ImageUrlConverter">
+            <summary>
+            Chuyển "/images/poi_1/xxx.jpg" → full URL
+            và giữ nguyên URL đầy đủ (https://, http://).
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.TabBgConverter">
+            <summary>Tab Background: active = cam mờ, inactive = trong suốt.</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.TabTextConverter">
+            <summary>Tab Text Color: active = cam, inactive = xám.</summary>
+        </member>
         <member name="M:TasteVinhKhanh.MauiApp.Data.AppDatabase.WasRecentlyPlayedAsync(System.Int32,System.TimeSpan)">
             <summary>Kiểm tra cooldown — tránh phát lại cùng POI quá nhanh</summary>
         </member>
@@ -399,6 +417,14 @@
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._poiId"/>
@@ -409,10 +435,42 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.Scripts">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._scripts"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.Images">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._images"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.Dots">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._dots"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentImageIndex">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._currentImageIndex"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.SelectedTabIndex">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._selectedTabIndex"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.DebugInfo">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._debugInfo"/>
+        </member>
         <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnPoiIdChanged(System.Int32)">
             <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId"/> just changed.</summary>
             <param name="value">The new property value that was set.</param>
             <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId"/> is changed.</remarks>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnCurrentImageIndexChanged(System.Int32)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentImageIndex"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentImageIndex"/> is changed.</remarks>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.previousImageCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PreviousImageCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PreviousImageCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PreviousImage"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.nextImageCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.NextImageCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.NextImageCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.NextImage"/>.</summary>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.playNarrationCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PlayNarrationCommand"/>.</summary>
@@ -425,6 +483,42 @@
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OpenMapCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OpenMap"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.selectTabCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.SelectTabCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.SelectTabCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.SelectTab(System.Int32)"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.toggleFavoriteCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.ToggleFavoriteCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.ToggleFavoriteCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.ToggleFavoriteAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToHomeCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToHomeCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToHomeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToHome"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToMapCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToMapCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToMapCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToMap"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToAudioCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToAudioCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToAudioCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToAudio"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToSettingsCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToSettingsCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToSettingsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToSettings"/>.</summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel">
             <inheritdoc/>
@@ -847,6 +941,21 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Scripts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Scripts" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Images">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Images" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Dots">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Dots" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentImageIndex">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentImageIndex" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedTabIndex">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedTabIndex" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.DebugInfo">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "DebugInfo" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.AutoPlayAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>
         </member>
@@ -1080,6 +1189,21 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Scripts">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Scripts" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Images">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Images" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Dots">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Dots" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentImageIndex">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentImageIndex" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedTabIndex">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedTabIndex" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.DebugInfo">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "DebugInfo" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.AutoPlayAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>

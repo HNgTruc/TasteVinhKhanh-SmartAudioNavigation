@@ -37,6 +37,18 @@ public class StagingImage
     /// <summary>Thời điểm vendor tải lên</summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>
+    /// Loại staging: "Upload" = vendor upload ảnh mới, "Deletion" = vendor xin xóa ảnh cũ.
+    /// Mặc định "Upload" để backward-compatible.
+    /// </summary>
+    public string StagingType { get; set; } = "Upload";
+
+    /// <summary>
+    /// Khi StagingType = "Deletion": URL ảnh cần xóa (từ bảng RestaurantImages).
+    /// Khi StagingType = "Upload": chứa TempUrl (path trong staging/).
+    /// </summary>
+    public string? ReferencedImageUrl { get; set; }
+
     // Navigation
     public Vendor Vendor { get; set; } = null!;
     public PoiPoint PoiPoint { get; set; } = null!;

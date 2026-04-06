@@ -7,6 +7,31 @@ USE [TasteVinhKhanhDb]
 GO
 
 -- ================================================================
+-- 0. Thêm 2 cột mới cho bảng StagingImages
+--    Hỗ trợ yêu cầu xóa ảnh từ Vendor (cần Admin duyệt)
+-- ================================================================
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = 'StagingImages' AND COLUMN_NAME = 'StagingType')
+BEGIN
+    ALTER TABLE [dbo].[StagingImages]
+        ADD [StagingType] NVARCHAR(20) NOT NULL DEFAULT 'Upload';
+    PRINT N'✅ Đã thêm cột StagingType vào StagingImages';
+END
+ELSE
+    PRINT N'ℹ️  Cột StagingType đã tồn tại — bỏ qua';
+
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = 'StagingImages' AND COLUMN_NAME = 'ReferencedImageUrl')
+BEGIN
+    ALTER TABLE [dbo].[StagingImages]
+        ADD [ReferencedImageUrl] NVARCHAR(500) NULL;
+    PRINT N'✅ Đã thêm cột ReferencedImageUrl vào StagingImages';
+END
+ELSE
+    PRINT N'ℹ️  Cột ReferencedImageUrl đã tồn tại — bỏ qua';
+GO
+
+-- ================================================================
 -- 1. Tạo bảng RestaurantImages
 -- ================================================================
 IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'RestaurantImages')

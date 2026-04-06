@@ -12,74 +12,155 @@
 
     <ContentPage.Resources>
         <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+        <conv:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <conv:InverseCountToVisibilityConverter x:Key="InverseCountToVisibilityConverter"/>
+        <conv:ImageUrlConverter x:Key="ImageUrlConverter"/>
+        <conv:TabBgConverter x:Key="TabBgConverter"/>
+        <conv:TabTextConverter x:Key="TabTextConverter"/>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto">
-        <!-- HEADER -->
-        <Grid Grid.Row="0" Padding="20,52,20,16" BackgroundColor="#0D0D0D">
+        <!-- HEADER: giảm top padding để không có khoảng đen trên -->
+        <Grid Grid.Row="0" Padding="16,16,16,12" BackgroundColor="#0D0D0D">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"
-                    Text="←" FontSize="20"
-                    BackgroundColor="Transparent"
-                    TextColor="#FF6B35"
-                    VerticalOptions="Center"
-                    Clicked="OnBackClicked"/>
+            <Button Grid.Column="0" Text="←" FontSize="20"
+                    BackgroundColor="Transparent" TextColor="#FF6B35"
+                    VerticalOptions="Center" Clicked="OnBackClicked"/>
             <Label Grid.Column="1" Text="{Binding Poi.Name}"
-                   FontSize="20" FontAttributes="Bold"
-                   TextColor="#FFFFFF"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Center"
-                   Margin="0,0,40,0"/>
+                   FontSize="20" FontAttributes="Bold" TextColor="#FFFFFF"
+                   VerticalOptions="Center" HorizontalOptions="Center" Margin="0,0,40,0"/>
         </Grid>
 
         <ScrollView Grid.Row="1">
             <StackLayout Padding="16" Spacing="16">
 
-                <!-- ẢNH -->
+                <!-- DEBUG: hiển thị số ảnh -->
+                <Label Text="{Binding DebugInfo}" FontSize="10" TextColor="#888888" Margin="0,0,0,4"
+                       IsVisible="{Binding DebugInfo, Converter={StaticResource NullToBoolConverter}}"/>
+
+                <!-- CAROUSEL ẢNH GALLERY -->
+                <Grid HeightRequest="220"
+                      IsVisible="{Binding ImagesCount, Converter={StaticResource CountToVisibilityConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- ẢNH HIỆN TẠI -->
+                    <Border Grid.Row="0" StrokeShape="RoundRectangle 20" Stroke="Transparent">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#2A1500" Offset="0"/>
+                                <GradientStop Color="#1A0D00" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Image Source="{Binding CurrentImage.ImageUrl, Converter={StaticResource ImageUrlConverter}}"
+                               Aspect="AspectFill"/>
+                    </Border>
+
+                    <!-- NÚT ← -->
+                    <Button Grid.Row="0"
+                            Text="&#x276E;" FontSize="32" FontAttributes="Bold"
+                            BackgroundColor="#80000000" TextColor="White"
+                            WidthRequest="44" HeightRequest="44" CornerRadius="22"
+                            HorizontalOptions="Start" VerticalOptions="Center"
+                            Margin="8,0,0,0"
+                            Command="{Binding PreviousImageCommand}"/>
+
+                    <!-- NÚT → -->
+                    <Button Grid.Row="0"
+                            Text="&#x276F;" FontSize="32" FontAttributes="Bold"
+                            BackgroundColor="#80000000" TextColor="White"
+                            WidthRequest="44" HeightRequest="44" CornerRadius="22"
+                            HorizontalOptions="End" VerticalOptions="Center"
+                            Margin="0,0,8,0"
+                            Command="{Binding NextImageCommand}"/>
+
+                    <!-- DOT INDICATOR -->
+                    <StackLayout Grid.Row="1" HorizontalOptions="Center" Margin="0,0,0,12">
+                        <CollectionView ItemsSource="{Binding Dots}" HeightRequest="10" WidthRequest="0">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="6"/>
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ImageDotItem">
+                                    <BoxView WidthRequest="8" HeightRequest="8" CornerRadius="4"
+                                             BackgroundColor="{Binding DotColor}"/>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </StackLayout>
+                </Grid>
+
+                <!-- ẢNH COVER (khi không có gallery) -->
                 <Border StrokeShape="RoundRectangle 20" Stroke="Transparent"
                         HeightRequest="220"
-                        IsVisible="{Binding Poi.ImageUrl, Converter={StaticResource NullToBoolConverter}}">
+                        IsVisible="{Binding ImagesCount, Converter={StaticResource InverseCountToVisibilityConverter}}">
                     <Border.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                             <GradientStop Color="#2A1500" Offset="0"/>
                             <GradientStop Color="#1A0D00" Offset="1"/>
                         </LinearGradientBrush>
                     </Border.Background>
-                    <Image Source="{Binding Poi.ImageUrl}" Aspect="AspectFill"/>
+                    <Image Source="{Binding Poi.ImageUrl, Converter={StaticResource ImageUrlConverter}}" Aspect="AspectFill"/>
                 </Border>
 
                 <!-- TÊN + MÔ TẢ -->
                 <StackLayout Spacing="8">
-                    <Label Text="{Binding Poi.Name}"
-                           FontSize="26" FontAttributes="Bold" TextColor="#FFFFFF"/>
-                    <Label Text="{Binding Poi.ShortDescription}"
-                           FontSize="14" TextColor="#888888"
-                           LineBreakMode="WordWrap"/>
+                    <Label Text="{Binding Poi.Name}" FontSize="26" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                    <Label Text="{Binding Poi.ShortDescription}" FontSize="14" TextColor="#888888" LineBreakMode="WordWrap"/>
                 </StackLayout>
 
-                <!-- THÔNG TIN -->
-                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16"
-                        Stroke="#252525" Padding="16">
-                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*">
-                        <StackLayout Grid.Column="0" HorizontalOptions="Center">
-                            <Label Text="📍" FontSize="22" HorizontalOptions="Center"/>
-                            <Label Text="Địa điểm" FontSize="11" TextColor="#666666" HorizontalOptions="Center"/>
+                <!-- TABS CÓ THỂ CLICK -->
+                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16">
+                    <Grid ColumnDefinitions="*,*,*">
+
+                        <!-- Địa điểm -->
+                        <StackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="8">
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="0"/>
+                            </StackLayout.GestureRecognizers>
+                            <Border StrokeShape="RoundRectangle 12" Stroke="Transparent"
+                                    Padding="10" BackgroundColor="{Binding IsTabLocation, Converter={StaticResource TabBgConverter}}">
+                                <Label Text="&#x1F4CD;" FontSize="22" HorizontalOptions="Center"/>
+                            </Border>
+                            <Label Text="Địa điểm" FontSize="11"
+                                   TextColor="{Binding IsTabLocation, Converter={StaticResource TabTextConverter}}"
+                                   HorizontalOptions="Center"/>
                         </StackLayout>
-                        <StackLayout Grid.Column="1" HorizontalOptions="Center">
-                            <Label Text="🎵" FontSize="22" HorizontalOptions="Center"/>
-                            <Label Text="Thuyết minh" FontSize="11" TextColor="#666666" HorizontalOptions="Center"/>
+
+                        <!-- Thuyết minh -->
+                        <StackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="8">
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="1"/>
+                            </StackLayout.GestureRecognizers>
+                            <Border StrokeShape="RoundRectangle 12" Stroke="Transparent"
+                                    Padding="10">
+                                <Label Text="&#x1F3B5;" FontSize="22" HorizontalOptions="Center"/>
+                            </Border>
+                            <Label Text="Thuyết minh" FontSize="11" TextColor="#666666"
+                                   HorizontalOptions="Center"/>
                         </StackLayout>
-                        <StackLayout Grid.Column="2" HorizontalOptions="Center">
-                            <Label Text="⭐" FontSize="22" HorizontalOptions="Center"/>
-                            <Label Text="Yêu thích" FontSize="11" TextColor="#666666" HorizontalOptions="Center"/>
+
+                        <!-- Yêu thích -->
+                        <StackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="8">
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding ToggleFavoriteCommand}"/>
+                            </StackLayout.GestureRecognizers>
+                            <Border StrokeShape="RoundRectangle 12" Stroke="Transparent"
+                                    Padding="10">
+                                <Label Text="&#x2B50;" FontSize="22" HorizontalOptions="Center"/>
+                            </Border>
+                            <Label Text="Yêu thích" FontSize="11" TextColor="#666666"
+                                   HorizontalOptions="Center"/>
                         </StackLayout>
                     </Grid>
                 </Border>
 
-                <!-- NÚT PHÁT -->
+                <!-- NÚT PHÁT THUYẾT MINH -->
                 <Border StrokeShape="RoundRectangle 16" Stroke="Transparent">
                     <Border.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
@@ -87,43 +168,33 @@
                             <GradientStop Color="#FF4500" Offset="1"/>
                         </LinearGradientBrush>
                     </Border.Background>
-                    <Button Text="🔊  Nghe thuyết minh"
+                    <Button Text="&#x1F50A;  Nghe thuyết minh"
                             Command="{Binding PlayNarrationCommand}"
-                            BackgroundColor="Transparent"
-                            TextColor="White"
-                            FontSize="16" FontAttributes="Bold"
-                            CornerRadius="0" HeightRequest="54"/>
+                            BackgroundColor="Transparent" TextColor="White"
+                            FontSize="16" FontAttributes="Bold" CornerRadius="0" HeightRequest="54"/>
                 </Border>
 
                 <!-- NÚT XEM BẢN ĐỒ -->
-                <Border StrokeShape="RoundRectangle 16"
-                        Stroke="#FF6B3540" Padding="1"
+                <Border StrokeShape="RoundRectangle 16" Stroke="#FF6B3540" Padding="1"
                         IsVisible="{Binding Poi.MapUrl, Converter={StaticResource NullToBoolConverter}}">
-                    <Button Text="🗺️  Xem trên Google Maps"
+                    <Button Text="&#x1F5FA;  Xem trên Google Maps"
                             Command="{Binding OpenMapCommand}"
-                            BackgroundColor="#1A1A1A"
-                            TextColor="#FF6B35"
-                            FontSize="15" FontAttributes="Bold"
-                            CornerRadius="15" HeightRequest="50"/>
+                            BackgroundColor="#1A1A1A" TextColor="#FF6B35"
+                            FontSize="15" FontAttributes="Bold" CornerRadius="15" HeightRequest="50"/>
                 </Border>
 
                 <!-- NGÔN NGỮ CÓ SẴN -->
-                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16"
-                        Stroke="#252525" Padding="16">
+                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16">
                     <StackLayout Spacing="10">
-                        <Label Text="Ngôn ngữ thuyết minh" FontAttributes="Bold"
-                               FontSize="14" TextColor="#FFFFFF"/>
+                        <Label Text="Ngôn ngữ thuyết minh" FontAttributes="Bold" FontSize="14" TextColor="#FFFFFF"/>
                         <FlexLayout BindableLayout.ItemsSource="{Binding Scripts}"
                                     Wrap="Wrap" Direction="Row" JustifyContent="Start">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="data:LocalAudioScript">
-                                    <Border BackgroundColor="#FF6B3520"
-                                            StrokeShape="RoundRectangle 20"
-                                            Stroke="Transparent"
-                                            Padding="12,6" Margin="4,2">
-                                        <Label Text="{Binding LanguageCode, StringFormat='{}{0}'}"
-                                               FontSize="12" FontAttributes="Bold"
-                                               TextColor="#FF6B35"/>
+                                    <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 20"
+                                            Stroke="Transparent" Padding="12,6" Margin="4,2">
+                                        <Label Text="{Binding LanguageCode}" FontSize="12"
+                                               FontAttributes="Bold" TextColor="#FF6B35"/>
                                     </Border>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
@@ -131,9 +202,7 @@
                     </StackLayout>
                 </Border>
 
-                <!-- VERSION SPACER -->
                 <BoxView HeightRequest="40" Color="Transparent"/>
-
             </StackLayout>
         </ScrollView>
 
@@ -146,15 +215,27 @@
                 </LinearGradientBrush>
             </Border.Background>
             <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+
                 <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
-                    <Label Text="⊞" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="&#x229E;" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Home" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
+
                 <StackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
-                    <Label Text="🗺" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="&#x1F5FA;" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Map" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
+
                 <Grid Grid.Column="2" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToAudioCommand}"/>
+                    </StackLayout.GestureRecognizers>
                     <Border StrokeShape="RoundRectangle 30" Stroke="Transparent"
                             WidthRequest="58" HeightRequest="58"
                             HorizontalOptions="Center" Margin="0,-28,0,0">
@@ -164,12 +245,15 @@
                                 <GradientStop Color="#FF4500" Offset="1"/>
                             </LinearGradientBrush>
                         </Border.Background>
-                        <Label Text="🎵" FontSize="24"
-                               HorizontalOptions="Center" VerticalOptions="Center"/>
+                        <Label Text="&#x1F3B5;" FontSize="24" HorizontalOptions="Center" VerticalOptions="Center"/>
                     </Border>
                 </Grid>
+
                 <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
-                    <Label Text="⚙" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="&#x2699;" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="Settings" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
                 </StackLayout>
             </Grid>

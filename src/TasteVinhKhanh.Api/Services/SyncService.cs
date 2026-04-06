@@ -27,8 +27,13 @@ public class SyncService : ISyncService
             .Include(p => p.Images)
             .AsQueryable();
 
-        if (lastSyncAt.HasValue)
-            query = query.Where(p => p.UpdatedAt > lastSyncAt.Value);
+        // Chuyển lastSyncAt về UTC trước khi so sánh với UpdatedAt (UTC từ SQL)
+        DateTime? utcLastSync = lastSyncAt.HasValue
+            ? lastSyncAt.Value.ToUniversalTime()
+            : null;
+
+        if (utcLastSync.HasValue)
+            query = query.Where(p => p.UpdatedAt > utcLastSync.Value);
 
         var pois = await query.OrderByDescending(p => p.Priority).ToListAsync();
 

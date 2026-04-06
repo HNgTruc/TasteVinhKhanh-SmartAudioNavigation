@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(curl -s http://localhost:5000/api/admin/staging-images -H \"Authorization: Bearer test\" -o /dev/null -w \"%{http_code}\")"
+      "Bash(curl -s http://localhost:5000/api/admin/staging-images -H \"Authorization: Bearer test\" -o /dev/null -w \"%{http_code}\")",
+      "Bash(git -C /c/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation status --short)",
+      "Bash(git -C /c/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation diff --name-only HEAD)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Admin\")",
+      "Bash(dir /s /b \"C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Vendor\")",
+      "Bash(powershell -Command \"cd 'c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation'; dotnet build src/TasteVinhKhanh.MauiApp/TasteVinhKhanh.MauiApp.csproj -c Debug -f net10.0-android 2>&1 | Select-String 'error|Build succeeded|0 Error' | Select-Object -First 5\")",
+      "Bash(powershell -Command \"cd 'c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation'; dotnet build src/TasteVinhKhanh.Api/TasteVinhKhanh.Api.csproj -c Debug 2>&1 | Select-String 'error|Build succeeded|0 Error'\")",
+      "Bash(dotnet build:*)"
     ]
   }
 }

@@ -19,7 +19,7 @@
             <StackLayout Spacing="0">
 
                 <!-- ══ HERO SECTION ══ -->
-                <Grid Padding="24,56,24,32">
+                <Grid Padding="24,12,24,32">
                     <Grid.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                             <GradientStop Color="#1A0A00" Offset="0"/>

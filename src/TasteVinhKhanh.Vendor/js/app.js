@@ -1,3 +1,46 @@
+// ── CONFIRM DIALOG ───────────────────────────────────────────────────────────
+
+function confirmDialog(message, onConfirm, onCancel) {
+    // Remove existing confirm modal if any
+    const existing = document.getElementById('confirmModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'confirmModal';
+    overlay.className = 'modal-overlay show';
+    overlay.innerHTML = `
+        <div class="confirm-dialog">
+            <div class="confirm-icon">
+                <svg width="28" height="28" fill="none" stroke="var(--warning)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-alert-triangle"/></svg>
+            </div>
+            <div class="confirm-message">${message}</div>
+            <div class="confirm-actions">
+                <button class="btn btn-outline" id="confirmCancelBtn">Huỷ</button>
+                <button class="btn btn-danger" id="confirmOkBtn">Xác nhận</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+
+    document.getElementById('confirmCancelBtn').onclick = () => {
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.remove(), 220);
+        if (onCancel) onCancel();
+    };
+    document.getElementById('confirmOkBtn').onclick = () => {
+        overlay.classList.remove('show');
+        setTimeout(() => overlay.remove(), 220);
+        if (onConfirm) onConfirm();
+    };
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) {
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.remove(), 220);
+            if (onCancel) onCancel();
+        }
+    });
+}
+
 // ── TOAST ────────────────────────────────────────────────────────────────────
 
 function showToast(message, type = 'success') {

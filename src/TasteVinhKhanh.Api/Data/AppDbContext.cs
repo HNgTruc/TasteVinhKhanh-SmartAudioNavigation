@@ -171,6 +171,8 @@ public class AppDbContext : IdentityDbContext<AppUser>
             e.Property(x => x.FileName).IsRequired().HasMaxLength(255);
             e.Property(x => x.TempUrl).IsRequired().HasMaxLength(500);
             e.Property(x => x.ApprovedUrl).HasMaxLength(500);
+            e.Property(x => x.StagingType).IsRequired().HasMaxLength(20).HasDefaultValue("Upload");
+            e.Property(x => x.ReferencedImageUrl).HasMaxLength(500);
             e.Property(x => x.Status).IsRequired().HasMaxLength(20);
             e.Property(x => x.AdminNote).HasMaxLength(500);
             e.Property(x => x.ReviewedBy).HasMaxLength(256);
