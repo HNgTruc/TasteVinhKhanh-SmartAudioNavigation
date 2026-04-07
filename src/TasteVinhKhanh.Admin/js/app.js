@@ -100,8 +100,10 @@ function initTabs(containerId) {
 
 function formatDateTime(iso) {
     if (!iso) return '—';
+    // Chuyển từ UTC về giờ Việt Nam (UTC+7)
     const d = new Date(iso);
-    return d.toLocaleString('vi-VN', {
+    const vnDate = new Date(d.getTime() + 7 * 60 * 60 * 1000);
+    return vnDate.toLocaleString('vi-VN', {
         day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
     });

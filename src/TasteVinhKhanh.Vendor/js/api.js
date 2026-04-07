@@ -213,6 +213,12 @@ async function requestDeleteImage(imageId, poiPointId) {
     });
 }
 
+// ── UPDATE HISTORY ─────────────────────────────────────────────────────────
+
+async function getMyUpdates() {
+    return await apiCall('GET', '/api/vendor/updates');
+}
+
 // ── ANALYTICS ──────────────────────────────────────────────────────────────
 
 async function getVendorSummary() {

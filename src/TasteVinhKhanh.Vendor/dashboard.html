@@ -112,6 +112,33 @@
                     </div>
                 </div>
 
+                <!-- UPDATE HISTORY -->
+                <div class="card">
+                    <div class="table-header">
+                        <h3>📋 Lịch sử duyệt đơn</h3>
+                    </div>
+
+                    <div id="historyLoading" class="loading"><div class="spinner"></div></div>
+
+                    <table id="historyTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>Tên điểm</th>
+                                <th style="width:110px">Trạng thái</th>
+                                <th style="width:200px">Ghi chú quản trị</th>
+                                <th style="width:160px">Ngày gửi</th>
+                                <th style="width:160px">Ngày duyệt</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+
+                    <div id="historyEmpty" class="empty-state" style="display:none">
+                        <div class="empty-icon">📭</div>
+                        <p>Chưa có yêu cầu nào.</p>
+                    </div>
+                </div>
+
                 <!-- LANGUAGE COVERAGE -->
                 <div class="card">
                     <div class="table-header">
@@ -135,9 +162,10 @@
 
     async function loadDashboard() {
         try {
-            const [summary, pois] = await Promise.all([
+            const [summary, pois, history] = await Promise.all([
                 getVendorSummary().catch(() => null),
-                getMyPois().catch(() => [])
+                getMyPois().catch(() => []),
+                getMyUpdates().catch(() => [])
             ]);
 
             // Stats
@@ -148,6 +176,9 @@
 
             // POI table
             renderPois(pois || []);
+
+            // Update history
+            renderHistory(history || []);
 
             // Language coverage
             renderLangCoverage(pois || []);
@@ -185,6 +216,31 @@
                 </td>
             </tr>
         `).join('');
+    }
+
+    function renderHistory(history) {
+        document.getElementById('historyLoading').style.display = 'none';
+        if (history.length === 0) {
+            document.getElementById('historyEmpty').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('historyTable').style.display = 'table';
+        document.getElementById('historyBody').innerHTML = history.map(h => {
+            let badgeClass = 'badge-gray';
+            let label = '⏳ Chờ duyệt';
+            if (h.status === 'Approved') { badgeClass = 'badge-success'; label = '✅ Đã duyệt'; }
+            if (h.status === 'Rejected') { badgeClass = 'badge-danger';  label = '❌ Từ chối'; }
+            return `
+            <tr>
+                <td style="font-weight:600">${escapeHtml(h.poiName || '(Điểm mới)')}</td>
+                <td><span class="badge ${badgeClass}">${label}</span></td>
+                <td style="font-size:12px; color:var(--gray-600)">${escapeHtml(h.adminNote || '—')}</td>
+                <td style="font-size:12px; color:var(--gray-500)">${formatDate(h.createdAt)}</td>
+                <td style="font-size:12px; color:var(--gray-500)">${h.reviewedAt ? formatDate(h.reviewedAt) : '—'}</td>
+            </tr>
+            `;
+        }).join('');
     }
 
     function renderLangCoverage(pois) {

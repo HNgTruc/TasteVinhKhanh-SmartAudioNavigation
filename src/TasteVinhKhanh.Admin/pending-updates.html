@@ -137,9 +137,6 @@
                         </div>
 
                         <div id="updateEmpty" class="empty-state" style="display:none">
-                            <div class="empty-icon">
-                                <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gray-300)"><use href="#icon-inbox"/></svg>
-                            </div>
                             <p id="emptyMsg">Không có cập nhật nào</p>
                         </div>
                     </div>
@@ -273,17 +270,25 @@
 
     function renderStats(apiStats) {
         // Lấy "hôm nay" theo múi giờ Việt Nam (UTC+7)
-        const now = new Date();
-        const vnOffset = now.getTimezoneOffset() + 420; // phút chênh lệch từ local → UTC+7
-        const vnNow = new Date(now.getTime() + vnOffset * 60000);
-        const todayStr = vnNow.toISOString().slice(0, 10); // "2026-04-06" theo giờ VN
+        // Cách đúng: lấy giờ UTC hiện tại + 7 giờ
+        const nowUtc = new Date();
+        const vnNow = new Date(nowUtc.getTime() + 7 * 60 * 60 * 1000);
+        const todayStr = vnNow.toISOString().slice(0, 10); // "2026-04-07" theo giờ VN
 
         function isToday(dateStr) {
             if (!dateStr) return false;
+            // dateStr có thể là ISO string hoặc "2026-04-07T..."
             return dateStr.slice(0, 10) === todayStr;
         }
 
-        // Tính từ dữ liệu trong bảng (thay vì tự tính sai)
+        // Logo rejections hôm nay
+        const logoPending = allLogos.filter(l => (l.status || '').toLowerCase() === 'pending').length;
+        const logoApprovedToday = allLogos.filter(l =>
+            (l.status || '').toLowerCase() === 'approved' && isToday(l.reviewedAt || l.createdAt)).length;
+        const logoRejectedToday = allLogos.filter(l =>
+            (l.status || '').toLowerCase() === 'rejected' && isToday(l.reviewedAt || l.createdAt)).length;
+
+        // POI updates
         const updPending = allUpdates.filter(u => (u.status || '').toLowerCase() === 'pending').length;
         const updApprovedToday = allUpdates.filter(u =>
             (u.status || '').toLowerCase() === 'approved' && isToday(u.reviewedAt || u.createdAt)).length;
@@ -304,10 +309,10 @@
         const delRejectedToday = allDeletions.filter(d =>
             (d.status || '').toLowerCase() === 'rejected' && isToday(d.reviewedAt || d.createdAt)).length;
 
-        // Stat card: tổng TẤT CẢ = POI updates + StagingImages upload + StagingImages deletion
-        const totalPending   = updPending + imgPending + delPending + (allLogos.filter(l => (l.status || '').toLowerCase() === 'pending').length);
-        const totalApproved = updApprovedToday + imgApprovedToday + delApprovedToday;
-        const totalRejected = updRejectedToday + imgRejectedToday + delRejectedToday;
+        // Stat card: tổng TẤT CẢ = POI updates + StagingImages upload + StagingImages deletion + Logo
+        const totalPending   = updPending + imgPending + delPending + logoPending;
+        const totalApproved = updApprovedToday + imgApprovedToday + delApprovedToday + logoApprovedToday;
+        const totalRejected = updRejectedToday + imgRejectedToday + delRejectedToday + logoRejectedToday;
         const totalAll      = allUpdates.length + allImages.length + allDeletions.length + allLogos.length;
 
         document.getElementById('statPending').textContent   = totalPending;

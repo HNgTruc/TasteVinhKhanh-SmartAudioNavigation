@@ -366,15 +366,6 @@ table tbody td {
     text-align: center;
     gap: 12px;
 }
-.empty-state .empty-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 16px;
-    background: var(--gray-50);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 .empty-state p { color: var(--gray-400); font-size: 13px; margin: 0; }
 
 /* ── UPDATE TABLE ───────────────────────────────────────────── */
@@ -712,11 +703,6 @@ select.form-control {
     text-align: center;
     padding: 48px 20px;
     color: var(--gray-500);
-}
-.empty-state .empty-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-    opacity: .5;
 }
 .empty-state p { font-size: 14px; margin: 0; color: var(--gray-500); }
 
