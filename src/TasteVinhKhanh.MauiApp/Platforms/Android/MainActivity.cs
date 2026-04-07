@@ -1,8 +1,7 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content.PM;
-using Android.Views;
 using Android.OS;
-using Microsoft.Maui;
+using Android.Views;
 
 namespace TasteVinhKhanh.MauiApp;
 
@@ -20,12 +19,24 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle? savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
-        var window = Platform.CurrentActivity?.Window;
-        if (window != null)
+
+        // Set status bar color — use modern API on Android 30+
+        // Falls back to legacy API (with pragma suppress) on older versions
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
         {
-            window.DecorView.SystemUiVisibility = (StatusBarVisibility)
-                (SystemUiFlags.LayoutStable | SystemUiFlags.LayoutFullscreen);
-            window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#1A0A00"));
+            Window?.SetStatusBarColor(Android.Graphics.Color.ParseColor("#1A0A00"));
+        }
+        else
+        {
+#pragma warning disable CA1416 // Platform compatibility check already done via SdkInt check
+            var window = Window;
+            if (window != null)
+            {
+                window.DecorView.SystemUiVisibility = (StatusBarVisibility)
+                    (SystemUiFlags.LayoutStable | SystemUiFlags.LayoutFullscreen);
+                window.SetStatusBarColor(Android.Graphics.Color.ParseColor("#1A0A00"));
+            }
+#pragma warning restore CA1416
         }
     }
 }

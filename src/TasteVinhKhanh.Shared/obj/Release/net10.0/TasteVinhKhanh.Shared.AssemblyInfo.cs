@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TasteVinhKhanh.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9e0f086f600ef4b956592c5a6136391230a8da8b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c659a4e384900d9cf857691ef5fb6ea41e471744")]
 [assembly: System.Reflection.AssemblyProductAttribute("TasteVinhKhanh.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TasteVinhKhanh.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -12,7 +12,7 @@ public class ImageUrlConverter : IValueConverter
         object? parameter, CultureInfo culture)
     {
         if (value is not string url || string.IsNullOrWhiteSpace(url))
-            return null;
+            return string.Empty;
 
         // Đã là URL tuyệt đối → trả nguyên
         if (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||

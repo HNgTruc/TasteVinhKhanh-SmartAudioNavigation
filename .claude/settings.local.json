@@ -25,7 +25,22 @@
       "Bash(powershell -Command \"Remove-Item -Recurse -Force 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\staging' -ErrorAction SilentlyContinue; Write-Host 'Done'\")",
       "Bash(powershell -Command \"Get-ChildItem 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\images\\\\poi_1' | Select-Object Name, Length\")",
       "Bash(powershell -Command \"Stop-Process -Name 'TasteVinhKhanh.Api' -Force -ErrorAction SilentlyContinue; Write-Host 'stopped'\")",
-      "Bash(Remove-Item -Recurse -Force \"obj\" -ErrorAction SilentlyContinue)"
+      "Bash(Remove-Item -Recurse -Force \"obj\" -ErrorAction SilentlyContinue)",
+      "Bash(taskkill /F /PID 21768)",
+      "Bash(tasklist)",
+      "Bash(findstr \"21768\")",
+      "Bash(powershell -Command \"Stop-Process -Id 21768 -Force\")",
+      "Bash(powershell -Command \"if \\(\\(Get-Process -Id 21768 -ErrorAction SilentlyContinue\\)\\) { 'Still running' } else { 'Process killed successfully' }\")",
+      "Bash(powershell -Command \"Remove-Item -Recurse -Force 'src/TasteVinhKhanh.Api/obj', 'src/TasteVinhKhanh.Api/bin', 'src/TasteVinhKhanh.MauiApp/obj', 'src/TasteVinhKhanh.MauiApp/bin' -ErrorAction SilentlyContinue; 'Clean done'\")",
+      "Bash(powershell -Command \"Stop-Process -Name 'TasteVinhKhanh.MauiApp' -Force -ErrorAction SilentlyContinue; 'Done'\")",
+      "Bash(powershell -Command \"Remove-Item -Recurse -Force 'src/TasteVinhKhanh.MauiApp/obj', 'src/TasteVinhKhanh.MauiApp/bin' -ErrorAction SilentlyContinue; 'Clean done'\")",
+      "Bash(powershell -Command \"dotnet --list-sdks 2>&1\")",
+      "Bash(dotnet sln:*)",
+      "Bash(curl -s \"http://localhost:5000/api/poi\")",
+      "Bash(findstr /i \"alo\")",
+      "Bash(findstr /c:\"LogoUrl\")",
+      "Bash(findstr /c:\"images\")",
+      "Bash(dir /s /b \"C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\images\\\\poi_1\\\\logo\")"
     ]
   }
 }

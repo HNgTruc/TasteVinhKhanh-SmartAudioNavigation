@@ -13,6 +13,7 @@
     <ContentPage.Resources>
         <conv:FavoriteIconConverter x:Key="FavoriteIconConverter"/>
         <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
+        <conv:ImageUrlConverter x:Key="ImageUrlConverter"/>
 
         <!-- Card shadow style -->
         <Style x:Key="CardShadow" TargetType="Border">
@@ -209,23 +210,40 @@
                                               ColumnDefinitions="Auto,*,Auto"
                                               Padding="14,12">
 
-                                            <!-- Food icon -->
-                                            <Border Grid.Column="0"
-                                                    StrokeShape="RoundRectangle 16"
-                                                    Stroke="Transparent"
-                                                    WidthRequest="58"
-                                                    HeightRequest="58">
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0,0"
-                                                                         EndPoint="1,1">
-                                                        <GradientStop Color="#2A1200" Offset="0"/>
-                                                        <GradientStop Color="#1A0A00" Offset="1"/>
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                                <Label Text="🍜" FontSize="28"
+                                            <!-- Food icon: logo nếu có, fallback 🍜 -->
+                                            <Grid Grid.Column="0"
+                                                  WidthRequest="58"
+                                                  HeightRequest="58">
+                                                <Border StrokeShape="RoundRectangle 16"
+                                                        Stroke="Transparent"
+                                                        WidthRequest="58"
+                                                        HeightRequest="58">
+                                                    <Border.Background>
+                                                        <LinearGradientBrush StartPoint="0,0"
+                                                                             EndPoint="1,1">
+                                                            <GradientStop Color="#2A1200" Offset="0"/>
+                                                            <GradientStop Color="#1A0A00" Offset="1"/>
+                                                        </LinearGradientBrush>
+                                                    </Border.Background>
+                                                    <!-- Fallback emoji -->
+                                                    <Label Text="🍜" FontSize="28"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center"
+                                                           IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBoolConverter}, ConverterParameter=Inverse}"/>
+                                                </Border>
+                                                <!-- Logo quán -->
+                                                <Image Source="{Binding LogoUrl, Converter={StaticResource ImageUrlConverter}}"
+                                                       Aspect="AspectFill"
+                                                       WidthRequest="58"
+                                                       HeightRequest="58"
                                                        HorizontalOptions="Center"
-                                                       VerticalOptions="Center"/>
-                                            </Border>
+                                                       VerticalOptions="Center"
+                                                       IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBoolConverter}}">
+                                                    <Image.Clip>
+                                                        <RoundRectangleGeometry CornerRadius="16" Rect="0,0,58,58"/>
+                                                    </Image.Clip>
+                                                </Image>
+                                            </Grid>
 
                                             <!-- Name + address -->
                                             <StackLayout Grid.Column="1" Spacing="5"

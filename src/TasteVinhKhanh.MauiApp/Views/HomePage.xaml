@@ -12,6 +12,7 @@
     <ContentPage.Resources>
         <conv:FavoriteIconConverter x:Key="FavIcon"/>
         <conv:NullToBoolConverter x:Key="NullToBool"/>
+        <conv:ImageUrlConverter x:Key="ImageUrlConverter"/>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="*,Auto">
@@ -160,7 +161,7 @@
                                                            VerticalOptions="Center" Opacity="0.8"
                                                            IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBool}, ConverterParameter=Inverse}"/>
                                                     <!-- Logo quán (hiển thị khi có LogoUrl) -->
-                                                    <Image Source="{Binding LogoUrl}"
+                                                    <Image Source="{Binding LogoUrl, Converter={StaticResource ImageUrlConverter}}"
                                                            Aspect="AspectFill"
                                                            HorizontalOptions="Fill"
                                                            VerticalOptions="Fill"

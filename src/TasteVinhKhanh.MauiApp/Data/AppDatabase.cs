@@ -112,7 +112,7 @@ public class AppDatabase
         => _db.Table<LocalPoi>().Where(p => p.IsActive).ToListAsync();
 
     public Task<LocalPoi?> GetPoiByIdAsync(int id)
-        => _db.Table<LocalPoi>().Where(p => p.Id == id).FirstOrDefaultAsync();
+        => _db.Table<LocalPoi>().Where(p => p.Id == id).FirstOrDefaultAsync()!;
 
     public async Task UpsertPoisFromServerAsync(IEnumerable<PoiDto> dtos)
     {
@@ -203,7 +203,7 @@ public class AppDatabase
     public Task<LocalAudioScript?> GetAudioScriptAsync(int poiId, string lang)
         => _db.Table<LocalAudioScript>()
               .Where(s => s.PoiPointId == poiId && s.LanguageCode == lang)
-              .FirstOrDefaultAsync();
+              .FirstOrDefaultAsync()!;
 
     // ── GALLERY IMAGES ────────────────────────────────────────
 

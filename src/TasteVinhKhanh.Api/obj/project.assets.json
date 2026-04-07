@@ -3976,23 +3976,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\PC\\.nuget\\packages\\": {},
+    "C:\\Users\\dell\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\TasteVinhKhanh.Api.csproj",
+      "projectUniqueName": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\TasteVinhKhanh.Api.csproj",
       "projectName": "TasteVinhKhanh.Api",
-      "projectPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\TasteVinhKhanh.Api.csproj",
-      "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-      "outputPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\obj\\",
+      "projectPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\TasteVinhKhanh.Api.csproj",
+      "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Api\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -4008,8 +4008,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj": {
-              "projectPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj"
+            "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj": {
+              "projectPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj"
             }
           }
         }
