@@ -70,7 +70,7 @@ dotnet build
 dotnet build src/TasteVinhKhanh.Api
 
 # Chạy API (development)
-dotnet run --project src/TasteVinhKhanh.Api
+dotnet run --urls "http://localhost:5000"
 
 # Xóa cache + build (fix build lỗi do cache hỏng)
 Remove-Item -Recurse -Force "src/TasteVinhKhanh.Api/obj"

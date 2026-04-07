@@ -1,0 +1,10 @@
+<api type="debug" assembly-name="CommunityToolkit.Maui.Core" mvid="a90f1831baec43ceba16d57459a0e1ec">
+  <java-to-managed>
+    <entry java-name="crc64159f3caeb1269279/MauiDrawingView" managed-name="CommunityToolkit.Maui.Core.Views.MauiDrawingView, CommunityToolkit.Maui.Core" managed-type-token-id="33554467" />
+    <entry java-name="crc64159f3caeb1269279/MauiPopup" managed-name="CommunityToolkit.Maui.Core.Views.MauiPopup, CommunityToolkit.Maui.Core" managed-type-token-id="33554471" />
+  </java-to-managed>
+  <managed-to-java>
+    <entry java-name="crc64159f3caeb1269279/MauiDrawingView" managed-name="CommunityToolkit.Maui.Core.Views.MauiDrawingView, CommunityToolkit.Maui.Core" managed-type-token-id="33554467" />
+    <entry java-name="crc64159f3caeb1269279/MauiPopup" managed-name="CommunityToolkit.Maui.Core.Views.MauiPopup, CommunityToolkit.Maui.Core" managed-type-token-id="33554471" />
+  </managed-to-java>
+</api>

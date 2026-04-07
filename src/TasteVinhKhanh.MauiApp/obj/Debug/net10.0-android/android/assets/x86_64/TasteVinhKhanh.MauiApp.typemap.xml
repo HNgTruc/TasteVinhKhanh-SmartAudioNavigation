@@ -1,4 +1,4 @@
-<api type="debug" assembly-name="TasteVinhKhanh.MauiApp" mvid="9b2cece2fc784135afd8b4d185a7407f">
+<api type="debug" assembly-name="TasteVinhKhanh.MauiApp" mvid="a4dc5c579ddf4839bd1a213cb06e1822">
   <java-to-managed>
     <entry java-name="crc64e53e43c6011b6ba6/MainActivity" managed-name="TasteVinhKhanh.MauiApp.MainActivity, TasteVinhKhanh.MauiApp" managed-type-token-id="33554454" />
     <entry java-name="crc64e53e43c6011b6ba6/MainApplication" managed-name="TasteVinhKhanh.MauiApp.MainApplication, TasteVinhKhanh.MauiApp" managed-type-token-id="33554455" />

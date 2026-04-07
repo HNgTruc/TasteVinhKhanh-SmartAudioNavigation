@@ -45,6 +45,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
             e.Property(p => p.ImageUrl).HasMaxLength(500);
             e.Property(p => p.IconUrl).HasMaxLength(500);
             e.Property(p => p.MapUrl).HasMaxLength(500);
+            e.Property(p => p.LogoUrl).HasMaxLength(500);
 
             e.HasMany(p => p.AudioScripts)
              .WithOne(a => a.PoiPoint)

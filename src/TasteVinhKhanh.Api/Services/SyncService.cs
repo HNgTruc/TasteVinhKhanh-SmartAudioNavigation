@@ -53,6 +53,7 @@ public class SyncService : ISyncService
                 IsActive = p.IsActive,
                 ImageUrl = p.ImageUrl,
                 MapUrl = p.MapUrl,
+                LogoUrl = p.LogoUrl,
                 UpdatedAt = p.UpdatedAt,
                 AudioScripts = p.AudioScripts.Select(s => new AudioScriptDto
                 {

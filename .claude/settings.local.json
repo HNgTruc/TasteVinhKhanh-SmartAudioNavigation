@@ -24,7 +24,8 @@
       "Bash(powershell -Command \"Stop-Process -Id 7920 -Force -ErrorAction SilentlyContinue; Write-Host 'stopped'\")",
       "Bash(powershell -Command \"Remove-Item -Recurse -Force 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\staging' -ErrorAction SilentlyContinue; Write-Host 'Done'\")",
       "Bash(powershell -Command \"Get-ChildItem 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\images\\\\poi_1' | Select-Object Name, Length\")",
-      "Bash(powershell -Command \"Stop-Process -Name 'TasteVinhKhanh.Api' -Force -ErrorAction SilentlyContinue; Write-Host 'stopped'\")"
+      "Bash(powershell -Command \"Stop-Process -Name 'TasteVinhKhanh.Api' -Force -ErrorAction SilentlyContinue; Write-Host 'stopped'\")",
+      "Bash(Remove-Item -Recurse -Force \"obj\" -ErrorAction SilentlyContinue)"
     ]
   }
 }

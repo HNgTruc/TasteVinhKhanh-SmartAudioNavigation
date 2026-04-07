@@ -211,6 +211,7 @@
     let allUpdates   = [];   // POI pending updates
     let allImages     = [];   // Staging images
     let allDeletions  = [];   // Deletion requests
+    let allLogos      = [];   // Logo requests
 
     let currentFilter = 'pending';
     let searchQuery   = '';
@@ -251,6 +252,13 @@
             allUpdates   = updateData?.items || [];
             allImages    = imgData?.items || [];
             allDeletions = delData?.items || [];
+
+            // Load logo pending
+            const logoPromise = currentFilter === 'all' || currentFilter === 'pending'
+                ? getPendingLogos(currentFilter === 'all' ? 'all' : 'Pending').catch(() => ({ items: [] }))
+                : getPendingLogos(currentFilter).catch(() => ({ items: [] }));
+            const logoData = await logoPromise;
+            allLogos = logoData?.items || [];
 
             // Dùng stats từ backend API (đã tính đúng UTC+7)
             renderStats(updateData?.stats);
@@ -297,10 +305,10 @@
             (d.status || '').toLowerCase() === 'rejected' && isToday(d.reviewedAt || d.createdAt)).length;
 
         // Stat card: tổng TẤT CẢ = POI updates + StagingImages upload + StagingImages deletion
-        const totalPending   = updPending + imgPending + delPending;
+        const totalPending   = updPending + imgPending + delPending + (allLogos.filter(l => (l.status || '').toLowerCase() === 'pending').length);
         const totalApproved = updApprovedToday + imgApprovedToday + delApprovedToday;
         const totalRejected = updRejectedToday + imgRejectedToday + delRejectedToday;
-        const totalAll      = allUpdates.length + allImages.length + allDeletions.length;
+        const totalAll      = allUpdates.length + allImages.length + allDeletions.length + allLogos.length;
 
         document.getElementById('statPending').textContent   = totalPending;
         document.getElementById('statApproved').textContent = totalApproved;
@@ -364,7 +372,14 @@
                 || (d.poiName || '').toLowerCase().includes(searchQuery))
             .map(d => ({ ...d, _type: 'deletion' }));
 
-        return [...poiRows, ...imgRows, ...delRows];
+        const logoRows = allLogos
+            .filter(l => isAll || (l.status || '').toLowerCase() === filterLower)
+            .filter(l => !searchQuery || (l.fileName || '').toLowerCase().includes(searchQuery)
+                || (l.vendorName || '').toLowerCase().includes(searchQuery)
+                || (l.poiName || '').toLowerCase().includes(searchQuery))
+            .map(l => ({ ...l, _type: l.stagingType === 'LogoDeletion' ? 'logoDeletion' : 'logoUpload' }));
+
+        return [...poiRows, ...imgRows, ...delRows, ...logoRows];
     }
 
     function handleSearch() {
@@ -452,6 +467,64 @@
                     </td>
                 </tr>`;
         }
+
+        if (row._type === 'logoUpload') {
+            return `
+                <tr class="${isPending ? 'row-pending' : ''}">
+                    <td><span class="poi-cell" title="${escapeHtml(row.poiName || '—')}">${escapeHtml(row.poiName || '—')}</span></td>
+                    <td>${escapeHtml(row.vendorName || '—')}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px">
+                            <img src="${API_BASE}${row.previewUrl || row.tempUrl}" alt="logo"
+                                 style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--gray-200)"
+                                 onerror="this.style.display='none'">
+                            <span class="badge" style="background:#dbeafe;color:#1e40af;border:1px solid #93c5fd">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Upload logo
+                            </span>
+                        </div>
+                    </td>
+                    <td style="font-size:12px; color:var(--gray-500)">${formatDateTime(row.createdAt)}</td>
+                    <td>${getStatusBadge(row.status)}</td>
+                    <td style="text-align:center">
+                        ${isPending ? `
+                        <button class="action-btn approve" onclick="quickApproveLogo(${row.id})" title="Duyệt logo">
+                            &#10003;
+                        </button>
+                        <button class="action-btn reject" onclick="quickRejectLogo(${row.id})" title="Từ chối logo">
+                            &#10005;
+                        </button>` : '—'}
+                    </td>
+                </tr>`;
+        }
+
+        if (row._type === 'logoDeletion') {
+            return `
+                <tr class="${isPending ? 'row-pending' : ''}">
+                    <td><span class="poi-cell" title="${escapeHtml(row.poiName || '—')}">${escapeHtml(row.poiName || '—')}</span></td>
+                    <td>${escapeHtml(row.vendorName || '—')}</td>
+                    <td>
+                        <div style="display:flex; align-items:center; gap:8px">
+                            <img src="${API_BASE}${row.previewUrl || row.tempUrl}" alt="logo"
+                                 style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--gray-200);opacity:0.45"
+                                 onerror="this.style.display='none'">
+                            <span class="badge" style="background:#fee2e2;color:#991b1b;border:1px solid #fca5a5">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Xóa logo
+                            </span>
+                        </div>
+                    </td>
+                    <td style="font-size:12px; color:var(--gray-500)">${formatDateTime(row.createdAt)}</td>
+                    <td>${getStatusBadge(row.status)}</td>
+                    <td style="text-align:center">
+                        ${isPending ? `
+                        <button class="action-btn approve" onclick="quickApproveLogoDeletion(${row.id})" title="Duyệt xóa logo">
+                            &#10003;
+                        </button>
+                        <button class="action-btn reject" onclick="quickRejectLogoDeletion(${row.id})" title="Từ chối xóa logo">
+                            &#10005;
+                        </button>` : '—'}
+                    </td>
+                </tr>`;
+        }
     }
 
     // ── POI ACTIONS ─────────────────────────────────────────────────────────
@@ -514,6 +587,47 @@
         rejectDeletionId = id;
         rejectCallback = 'deletion';
         document.getElementById('rejectModalTitle').textContent = 'Từ chối yêu cầu xóa ảnh';
+        document.getElementById('rejectReason').value = '';
+        openModal('rejectModal');
+    }
+
+    // ── LOGO ACTIONS ──────────────────────────────────────────────────────────
+
+    let rejectLogoId = null;
+    let rejectLogoDeletionId = null;
+
+    async function quickApproveLogo(id) {
+        try {
+            await approveLogo(id);
+            showToast('✅ Đã duyệt logo!');
+            await loadAll();
+        } catch (e) {
+            showToast('❌ Duyệt thất bại!', 'error');
+        }
+    }
+
+    async function quickRejectLogo(id) {
+        rejectLogoId = id;
+        rejectCallback = 'logoUpload';
+        document.getElementById('rejectModalTitle').textContent = 'Từ chối upload logo';
+        document.getElementById('rejectReason').value = '';
+        openModal('rejectModal');
+    }
+
+    async function quickApproveLogoDeletion(id) {
+        try {
+            await approveLogoDeletion(id);
+            showToast('✅ Đã duyệt xóa logo!');
+            await loadAll();
+        } catch (e) {
+            showToast('❌ Thao tác thất bại!', 'error');
+        }
+    }
+
+    async function quickRejectLogoDeletion(id) {
+        rejectLogoDeletionId = id;
+        rejectCallback = 'logoDeletion';
+        document.getElementById('rejectModalTitle').textContent = 'Từ chối xóa logo';
         document.getElementById('rejectReason').value = '';
         openModal('rejectModal');
     }
@@ -630,6 +744,12 @@
             } else if (rejectCallback === 'deletion') {
                 await rejectDeletionRequest(rejectDeletionId, reason);
                 showToast('✅ Đã từ chối yêu cầu xóa');
+            } else if (rejectCallback === 'logoUpload') {
+                await rejectLogo(rejectLogoId, reason);
+                showToast('✅ Đã từ chối upload logo');
+            } else if (rejectCallback === 'logoDeletion') {
+                await rejectLogoDeletion(rejectLogoDeletionId, reason);
+                showToast('✅ Đã từ chối yêu cầu xóa logo');
             } else {
                 // POI update via detail modal
                 await rejectPendingUpdate(currentDetailId, reason);
@@ -645,6 +765,8 @@
             rejectCallback = null;
             rejectImageId = null;
             rejectDeletionId = null;
+            rejectLogoId = null;
+            rejectLogoDeletionId = null;
         }
     }
 

@@ -218,3 +218,48 @@ async function requestDeleteImage(imageId, poiPointId) {
 async function getVendorSummary() {
     return await apiCall('GET', '/api/vendor/analytics/summary');
 }
+
+// ── LOGO UPLOAD ───────────────────────────────────────────────────────────
+
+/**
+ * Upload logo quán (chờ admin duyệt).
+ * @param {File} file - File ảnh logo
+ * @returns {{ success, tempUrl, stagingId }}
+ */
+async function uploadLogoForApproval(file) {
+    const token = localStorage.getItem('vendorToken');
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${API_BASE}/api/vendor/logo/upload`, {
+        method: 'POST',
+        headers: {
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: formData
+    });
+
+    if (res.status === 401) { vendorLogout(); return null; }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || `Upload failed: HTTP ${res.status}`);
+    return { success: true, tempUrl: data.tempUrl, stagingId: data.stagingId };
+}
+
+/**
+ * Gửi yêu cầu xóa logo hiện tại (chờ admin duyệt).
+ * @returns {{ success, stagingId }}
+ */
+async function requestDeleteLogo() {
+    const token = localStorage.getItem('vendorToken');
+    const res = await fetch(`${API_BASE}/api/vendor/logo/delete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+    });
+    if (res.status === 401) { vendorLogout(); return null; }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || `Request failed: HTTP ${res.status}`);
+    return { success: true, stagingId: data.stagingId };
+}

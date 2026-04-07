@@ -32,6 +32,9 @@ public class PoiPoint
     public string? IconUrl { get; set; }
     public string? MapUrl { get; set; }
 
+    /// <summary>Logo quán — upload bởi vendor, duyệt bởi admin, hiển thị trong MauiApp</summary>
+    public string? LogoUrl { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

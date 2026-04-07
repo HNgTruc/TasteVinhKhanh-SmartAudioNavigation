@@ -65,6 +65,65 @@
                     </div>
                 </div>
 
+                <!-- LOGO SECTION -->
+                <div id="logoSection" class="card" style="display:none">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l2-4h16l2 4"/><path d="M4 7v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                        <span style="font-weight:600; font-size:14px; color:var(--gray-800)">Logo quán</span>
+                        <span id="logoStatus" class="badge" style="font-size:11px"></span>
+                    </div>
+
+                    <!-- Logo preview -->
+                    <div id="logoCurrent" style="display:none; margin-bottom:16px">
+                        <div style="display:flex; align-items:center; gap:12px">
+                            <img id="logoCurrentImg" src="" alt="Logo hiện tại"
+                                 style="width:72px; height:72px; object-fit:cover; border-radius:12px; border:2px solid var(--gray-200)">
+                            <div>
+                                <div style="font-size:12px; color:var(--gray-500); margin-bottom:4px">Logo hiện tại</div>
+                                <button class="btn btn-outline btn-sm" onclick="clearLogo()" style="color:var(--danger); border-color:var(--danger)">
+                                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg>
+                                    Xóa logo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload new logo -->
+                    <div id="logoUploadArea">
+                        <div id="logoDropZone" class="upload-drop-zone" style="padding:24px; min-height:80px">
+                            <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="onLogoSelected()">
+                            <div style="display:flex; align-items:center; gap:16px; cursor:pointer" onclick="document.getElementById('logoFileInput').click()">
+                                <div style="width:48px; height:48px; background:var(--gray-100); border-radius:8px; display:flex; align-items:center; justify-content:center">
+                                    <svg width="22" height="22" fill="none" stroke="var(--gray-400)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg>
+                                </div>
+                                <div>
+                                    <div style="font-size:13px; color:var(--gray-700); font-weight:500">Tải lên logo mới</div>
+                                    <div style="font-size:11px; color:var(--gray-400); margin-top:2px">PNG, JPG, WEBP • Tối đa 5MB</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending logo preview (TÁCH RIÊNG — không nằm trong logoUploadArea) -->
+                    <div id="logoPendingArea" style="display:none; margin-top:12px">
+                        <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px">
+                            <img id="logoPendingImg" src="" alt="Logo mới"
+                                 style="width:48px; height:48px; object-fit:cover; border-radius:8px">
+                            <div style="flex:1">
+                                <div style="font-size:12px; font-weight:500; color:var(--gray-800)">Logo mới</div>
+                                <div style="font-size:11px; color:var(--gray-500); margin-top:2px">Đang chờ gửi duyệt</div>
+                            </div>
+                            <button class="btn-icon" onclick="clearPendingLogo()" title="Xóa" style="color:var(--gray-400)">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-x"/></svg>
+                            </button>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="sendLogoForApproval()" id="logoSendBtn" style="margin-top:10px; width:100%">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg>
+                            Gửi logo để duyệt
+                        </button>
+                    </div>
+                </div>
+
                 <!-- UPLOAD SECTION -->
                 <div id="uploadSection" class="upload-master" style="display:none">
 
@@ -189,6 +248,8 @@
     let currentImages = [];        // ảnh đã duyệt (hiện có)
     let pendingImages = [];         // ảnh chờ gửi duyệt (blob/url tạm)
     let pendingBlobUrls = [];      // blob URLs để revoke later
+    let pendingLogoFile = null;     // logo file chờ gửi duyệt
+    let pendingLogoBlobUrl = null; // blob URL cho logo pending
 
     // ── INIT ─────────────────────────────────────────────────────────────────
 
@@ -250,8 +311,10 @@
 
         uploadSection.style.display = 'block';
         approvedSection.style.display = 'block';
+        document.getElementById('logoSection').style.display = 'block';
         await loadImages();
         await loadDeletionRequests();
+        await loadCurrentLogo();
     }
 
     // ── LOAD APPROVED IMAGES ───────────────────────────────────────────────────
@@ -336,6 +399,103 @@
                 }
             }
         );
+    }
+
+    // ── LOGO ─────────────────────────────────────────────────────────────────
+
+    async function loadCurrentLogo() {
+        if (!selectedPoiId) return;
+        const poi = allPois.find(p => p.id === selectedPoiId);
+        const logoSection = document.getElementById('logoSection');
+        if (!poi) { logoSection.style.display = 'none'; return; }
+        logoSection.style.display = 'block';
+
+        // Logo hiện tại
+        const currentEl = document.getElementById('logoCurrent');
+        const currentImg = document.getElementById('logoCurrentImg');
+        const statusEl = document.getElementById('logoStatus');
+        const uploadArea = document.getElementById('logoUploadArea');
+
+        if (poi.logoUrl) {
+            currentImg.src = `${API_BASE}${poi.logoUrl}`;
+            currentEl.style.display = 'flex';
+            statusEl.className = 'badge badge-success';
+            statusEl.textContent = '✓ Đã duyệt';
+            uploadArea.style.display = 'none'; // Đã có logo → ẩn upload, muốn đổi phải xóa trước
+        } else {
+            currentImg.src = '';
+            currentEl.style.display = 'none';
+            statusEl.className = 'badge badge-gray';
+            statusEl.textContent = 'Chưa có logo';
+            uploadArea.style.display = 'block'; // Chưa có logo → cho upload
+        }
+
+        // Reset pending
+        clearPendingLogo();
+    }
+
+    function onLogoSelected() {
+        const file = document.getElementById('logoFileInput').files[0];
+        if (!file) return;
+
+        const MAX_SIZE = 5 * 1024 * 1024;
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        if (file.size > MAX_SIZE) { showToast('Logo vượt quá 5MB!', 'error'); return; }
+        if (!allowed.includes(file.type)) { showToast('Chỉ chấp nhận JPG, PNG, WEBP!', 'error'); return; }
+
+        pendingLogoFile = file;
+        if (pendingLogoBlobUrl) URL.revokeObjectURL(pendingLogoBlobUrl);
+        pendingLogoBlobUrl = URL.createObjectURL(file);
+
+        document.getElementById('logoPendingImg').src = pendingLogoBlobUrl;
+        document.getElementById('logoPendingArea').style.display = 'block';
+        document.getElementById('logoUploadArea').style.display = 'none';
+        document.getElementById('logoFileInput').value = '';
+    }
+
+    function clearPendingLogo() {
+        if (pendingLogoBlobUrl) { URL.revokeObjectURL(pendingLogoBlobUrl); pendingLogoBlobUrl = null; }
+        pendingLogoFile = null;
+        document.getElementById('logoPendingArea').style.display = 'none';
+        document.getElementById('logoUploadArea').style.display = 'block';
+    }
+
+    function clearLogo() {
+        // Xóa logo = gửi yêu cầu xóa → đặt LogoUrl về null
+        confirmDialog('Xóa logo quán này? Logo sẽ bị gỡ khỏi ứng dụng sau khi admin duyệt.', async () => {
+            try {
+                await requestDeleteLogo();
+                showToast('Đã gửi yêu cầu xóa logo. Chờ admin duyệt!', 'success');
+                // Reload logo
+                await loadCurrentLogo();
+            } catch (e) {
+                showToast('Lỗi: ' + (e.message || ''), 'error');
+            }
+        });
+    }
+
+    async function sendLogoForApproval() {
+        if (!pendingLogoFile || !selectedPoiId) { showToast('Chưa chọn logo!', 'error'); return; }
+
+        const btn = document.getElementById('logoSendBtn');
+        btn.disabled = true;
+        btn.textContent = 'Đang gửi...';
+        try {
+            const result = await uploadLogoForApproval(pendingLogoFile);
+            if (result && result.success) {
+                showToast('✅ Logo đã gửi duyệt!', 'success');
+                clearPendingLogo();
+                // Reload POI để cập nhật logo pending
+                allPois = await getMyPois() || [];
+                await loadCurrentLogo();
+            } else {
+                showToast('Gửi logo thất bại.', 'error');
+            }
+        } catch (e) {
+            showToast('Lỗi: ' + (e.message || ''), 'error');
+        }
+        btn.disabled = false;
+        btn.textContent = 'Gửi logo để duyệt';
     }
 
     // ── DELETION REQUESTS SECTION ─────────────────────────────────────────────

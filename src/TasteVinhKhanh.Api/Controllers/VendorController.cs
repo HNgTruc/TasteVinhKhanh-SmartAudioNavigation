@@ -233,6 +233,7 @@ public class VendorController : ControllerBase
                 ImageUrl = poi.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? poi.ImageUrl,
                 IconUrl = poi.IconUrl,
                 MapUrl = poi.MapUrl,
+                LogoUrl = poi.LogoUrl,
                 UpdatedAt = poi.UpdatedAt,
                 AudioScripts = poi.AudioScripts.Select(s => new AudioScriptDto
                 {
@@ -290,6 +291,7 @@ public class VendorController : ControllerBase
             ImageUrl = poi.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? poi.ImageUrl,
             IconUrl = poi.IconUrl,
             MapUrl = poi.MapUrl,
+            LogoUrl = poi.LogoUrl,
             UpdatedAt = poi.UpdatedAt,
             AudioScripts = poi.AudioScripts.Select(s => new AudioScriptDto
             {
@@ -666,6 +668,137 @@ public class VendorController : ControllerBase
             success = true,
             stagingId = staging.Id,
             message = "Đã gửi yêu cầu xóa ảnh. Quản trị viên sẽ duyệt trong thời gian sớm nhất."
+        });
+    }
+
+    /// <summary>Upload logo quán — chờ admin duyệt mới hiển thị trong app</summary>
+    [HttpPost("logo/upload")]
+    [RequestSizeLimit(10 * 1024 * 1024)] // 10MB
+    public async Task<IActionResult> UploadLogo([FromForm] IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest(new { message = "Không có tệp nào được chọn." });
+
+        const long maxSize = 5 * 1024 * 1024; // 5MB
+        var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+
+        if (file.Length > maxSize)
+            return BadRequest(new { message = "Logo vượt quá 5MB." });
+
+        var ext = Path.GetExtension(file.FileName).ToLower();
+        if (!allowed.Contains(ext))
+            return BadRequest(new { message = "Chỉ chấp nhận: jpg, png, webp." });
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == userId);
+        if (vendor == null) return Unauthorized();
+
+        if (vendor.Status != "Approved")
+            return BadRequest(new { message = "Tài khoản chưa được duyệt." });
+
+        if (!vendor.PoiPointId.HasValue)
+            return BadRequest(new { message = "Bạn chưa được gán quán nào." });
+
+        // Lưu vào thư mục staging/logo
+        var stagingFolder = Path.Combine(WwwRoot, "staging", $"poi_{vendor.PoiPointId.Value}", "logo");
+        Directory.CreateDirectory(stagingFolder);
+
+        // Xóa logo cũ trong staging nếu có (vendor chỉ giữ 1 logo pending)
+        var oldStaging = await _db.StagingImages
+            .Where(s => s.PoiPointId == vendor.PoiPointId.Value
+                     && s.StagingType == "Logo"
+                     && s.Status == "Pending")
+            .ToListAsync();
+        foreach (var old in oldStaging)
+        {
+            var oldPath = Path.Combine(WwwRoot, old.TempUrl.TrimStart('/'));
+            if (System.IO.File.Exists(oldPath))
+                System.IO.File.Delete(oldPath);
+        }
+        _db.StagingImages.RemoveRange(oldStaging);
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        var path = Path.Combine(stagingFolder, fileName);
+        await using var stream = new FileStream(path, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        var tempUrl = $"/staging/poi_{vendor.PoiPointId.Value}/logo/{fileName}";
+
+        var staging = new Shared.Models.StagingImage
+        {
+            VendorId = vendor.Id,
+            PoiPointId = vendor.PoiPointId.Value,
+            FileName = file.FileName,
+            TempUrl = tempUrl,
+            StagingType = "Logo",
+            Status = "Pending",
+            CreatedAt = DateTime.UtcNow
+        };
+        _db.StagingImages.Add(staging);
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            success = true,
+            stagingId = staging.Id,
+            tempUrl,
+            message = "Logo đã được tải lên, đang chờ quản trị viên duyệt."
+        });
+    }
+
+    /// <summary>Gửi yêu cầu xóa logo hiện tại — admin duyệt mới xóa</summary>
+    [HttpPost("logo/delete")]
+    public async Task<IActionResult> RequestDeleteLogo()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var vendor = await _db.Vendors
+            .FirstOrDefaultAsync(v => v.UserId == userId && v.Status == "Approved");
+
+        if (vendor == null) return Unauthorized(new { message = "Tài khoản chưa được duyệt." });
+        if (!vendor.PoiPointId.HasValue)
+            return BadRequest(new { message = "Bạn chưa được gán quán nào." });
+
+        var poiId = vendor.PoiPointId.Value;
+        var poi = await _db.PoiPoints.FindAsync(poiId);
+        if (poi == null) return NotFound(new { message = "POI không tồn tại." });
+        if (string.IsNullOrEmpty(poi.LogoUrl))
+            return BadRequest(new { message = "Quán chưa có logo để xóa." });
+
+        // Kiểm tra đã có yêu cầu xóa logo pending chưa
+        var existing = await _db.StagingImages
+            .AnyAsync(s => s.PoiPointId == poiId
+                         && s.StagingType == "LogoDeletion"
+                         && s.Status == "Pending");
+        if (existing)
+            return BadRequest(new { message = "Đã có yêu cầu xóa logo đang chờ duyệt." });
+
+        // Kiểm tra có upload logo mới đang pending không
+        var pendingUpload = await _db.StagingImages
+            .AnyAsync(s => s.PoiPointId == poiId
+                         && s.StagingType == "Logo"
+                         && s.Status == "Pending");
+        if (pendingUpload)
+            return BadRequest(new { message = "Logo mới đang chờ duyệt. Vui lòng chờ duyệt xong trước khi xóa." });
+
+        // Tạo StagingImage cho yêu cầu xóa logo
+        var staging = new Shared.Models.StagingImage
+        {
+            VendorId = vendor.Id,
+            PoiPointId = poiId,
+            FileName = Path.GetFileName(poi.LogoUrl),
+            TempUrl = poi.LogoUrl,           // lưu URL logo cũ để admin thấy
+            ReferencedImageUrl = poi.LogoUrl,
+            StagingType = "LogoDeletion",
+            Status = "Pending",
+            CreatedAt = DateTime.UtcNow
+        };
+        _db.StagingImages.Add(staging);
+        await _db.SaveChangesAsync();
+
+        return Ok(new {
+            success = true,
+            stagingId = staging.Id,
+            message = "Đã gửi yêu cầu xóa logo. Quản trị viên sẽ duyệt trong thời gian sớm nhất."
         });
     }
 }

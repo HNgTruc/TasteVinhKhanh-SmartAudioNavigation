@@ -147,6 +147,7 @@ public class PoiService : IPoiService
         ImageUrl = p.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? p.ImageUrl,
         IconUrl = p.IconUrl,
         MapUrl = p.MapUrl,
+        LogoUrl = p.LogoUrl,
         UpdatedAt = p.UpdatedAt,
         AudioScripts = p.AudioScripts.Select(ToScriptDto).ToList(),
         Images = p.Images.Select(i => new RestaurantImageDto

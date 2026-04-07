@@ -20,6 +20,8 @@ public class PoiDto
     public string? ImageUrl { get; set; }
     public string? IconUrl { get; set; }
     public string? MapUrl { get; set; }
+    /// <summary>Logo quán — được admin duyệt mới hiển thị</summary>
+    public string? LogoUrl { get; set; }
     public DateTime UpdatedAt { get; set; }
 
     /// <summary>Scripts của tất cả ngôn ngữ đi kèm</summary>
@@ -41,6 +43,7 @@ public class CreatePoiRequest
     public string? ImageUrl { get; set; }
     public string? IconUrl { get; set; }
     public string? MapUrl { get; set; }
+    public string? LogoUrl { get; set; }
     public bool IsActive { get; set; } = true;
 }
 
@@ -537,4 +540,11 @@ public class PendingUpdatesStatsDto
     public int ApprovedToday { get; set; }
     public int RejectedToday { get; set; }
     public int UniquePoiCount { get; set; }
+}
+
+/// <summary>Duyệt logo</summary>
+public class ApproveLogoRequest
+{
+    [JsonPropertyName("poiPointId")]
+    public int PoiPointId { get; set; }
 }

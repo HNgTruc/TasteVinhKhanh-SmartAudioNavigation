@@ -218,6 +218,37 @@ async function rejectStagingImage(id, reason = '') {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// LOGO MANAGEMENT APIs (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/admin/staging-images/logo — danh sách logo chờ duyệt */
+async function getPendingLogos(status = 'Pending') {
+    let url = '/api/admin/staging-images/logo';
+    if (status && status !== 'all') url += `?status=${encodeURIComponent(status)}`;
+    return await apiCall('GET', url);
+}
+
+/** POST /api/admin/staging-images/logo/:id/approve — duyệt logo */
+async function approveLogo(id, poiPointId = 0) {
+    return await apiCall('POST', `/api/admin/staging-images/logo/${id}/approve`, { PoiPointId: poiPointId });
+}
+
+/** POST /api/admin/staging-images/logo/:id/reject — từ chối logo upload */
+async function rejectLogo(id, reason = '') {
+    return await apiCall('POST', `/api/admin/staging-images/logo/${id}/reject`, { reason });
+}
+
+/** POST /api/admin/staging-images/logo/:id/approve-deletion — duyệt xóa logo */
+async function approveLogoDeletion(id) {
+    return await apiCall('POST', `/api/admin/staging-images/logo/${id}/approve-deletion`);
+}
+
+/** POST /api/admin/staging-images/logo/:id/reject-deletion — từ chối xóa logo */
+async function rejectLogoDeletion(id, reason = '') {
+    return await apiCall('POST', `/api/admin/staging-images/logo/${id}/reject-deletion`, { reason });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // POI IMAGE MANAGEMENT (Admin)
 // ═══════════════════════════════════════════════════════════════════════════════
 

@@ -11,6 +11,7 @@
 
     <ContentPage.Resources>
         <conv:FavoriteIconConverter x:Key="FavIcon"/>
+        <conv:NullToBoolConverter x:Key="NullToBool"/>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="*,Auto">
@@ -142,7 +143,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="Auto,*" Padding="0">
 
-                                            <!-- Image area -->
+                                            <!-- Image area: logo nếu có, fallback 🍜 -->
                                             <Border Grid.Row="0" HeightRequest="110"
                                                     StrokeShape="RoundRectangle 16,16,0,0"
                                                     Stroke="Transparent">
@@ -152,9 +153,19 @@
                                                         <GradientStop Color="#1A0D00" Offset="1"/>
                                                     </LinearGradientBrush>
                                                 </Border.Background>
-                                                <Label Text="🍜" FontSize="48"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center" Opacity="0.8"/>
+                                                <Grid>
+                                                    <!-- Fallback emoji -->
+                                                    <Label Text="🍜" FontSize="48"
+                                                           HorizontalOptions="Center"
+                                                           VerticalOptions="Center" Opacity="0.8"
+                                                           IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBool}, ConverterParameter=Inverse}"/>
+                                                    <!-- Logo quán (hiển thị khi có LogoUrl) -->
+                                                    <Image Source="{Binding LogoUrl}"
+                                                           Aspect="AspectFill"
+                                                           HorizontalOptions="Fill"
+                                                           VerticalOptions="Fill"
+                                                           IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBool}}"/>
+                                                </Grid>
                                             </Border>
 
                                             <!-- Info -->

@@ -20,6 +20,7 @@ public class LocalPoi
     public bool IsActive { get; set; } = true;
     public string? ImageUrl { get; set; }
     public string? MapUrl { get; set; }
+    public string? LogoUrl { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
 
@@ -131,6 +132,7 @@ public class AppDatabase
                     IsActive = dto.IsActive,
                     ImageUrl = dto.ImageUrl,
                     MapUrl = dto.MapUrl,
+                    LogoUrl = dto.LogoUrl,
                     UpdatedAt = dto.UpdatedAt
                 };
 

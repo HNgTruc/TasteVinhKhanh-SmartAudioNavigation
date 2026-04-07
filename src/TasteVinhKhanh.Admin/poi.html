@@ -114,6 +114,36 @@
             <div class="modal-body">
                 <div id="modalAlert" class="alert alert-error" style="display:none"></div>
                 <input type="hidden" id="poiId">
+
+                <!-- LOGO QUÁN -->
+                <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:16px">
+                    <div style="font-size:11px; font-weight:600; color:var(--gray-500); margin-bottom:8px; letter-spacing:0.5px; text-transform:uppercase">Logo quán</div>
+
+                    <!-- Vùng tròn đen -->
+                    <div id="logoCircleWrapper" style="position:relative; width:88px; height:88px; cursor:pointer"
+                         onclick="document.getElementById('logoFileInput').click()" title="Nhấp để đổi logo">
+                        <div id="logoCircleBg" style="width:88px; height:88px; border-radius:50%; background:#111; border:2px dashed #333; overflow:hidden; display:flex; align-items:center; justify-content:center">
+                            <img id="logoPreviewImg" src="" alt="Logo"
+                                 style="width:100%; height:100%; object-fit:cover; display:none; border-radius:50%">
+                            <svg id="logoPlaceholderIcon" width="28" height="28" fill="none" stroke="#444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                <path d="M2 7l2-4h16l2 4"/><path d="M4 7v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                            </svg>
+                        </div>
+                        <!-- Icon camera góc phải -->
+                        <div style="position:absolute; bottom:0; right:0; width:26px; height:26px; border-radius:50%; background:#FF6B35; border:2px solid #111; display:flex; align-items:center; justify-content:center">
+                            <svg width="12" height="12" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="onAdminLogoSelected()">
+                    <div id="logoStatusText" style="font-size:11px; color:var(--gray-400); margin-top:6px">Chưa có logo</div>
+                    <button class="btn btn-primary btn-sm" id="logoUploadBtn" style="margin-top:8px; display:none" onclick="uploadAdminLogo()">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg>
+                        Lưu logo
+                    </button>
+                </div>
+
                 <div class="form-group">
                     <label>Tên điểm *</label>
                     <input type="text" id="poiName" class="form-control" placeholder="Bánh mì Cô Ba">
@@ -332,6 +362,9 @@
 
     let allPois = [];
     let galleryCurrentPoiId = null;
+    let logoCurrentPoiId = null;        // POI đang đổi logo
+    let logoSelectedFile = null;         // file logo đã chọn
+    let logoSelectedBlobUrl = null;      // blob URL preview
     let galleryCurrentPoiName = '';
 
     // ── LOAD TABLE ────────────────────────────────────────────────────────────
@@ -372,8 +405,18 @@
         document.getElementById('poiBody').innerHTML = pois.map(p => `
             <tr>
                 <td>
-                    <div style="font-weight:600">${p.name}</div>
-                    <div style="font-size:12px; color:var(--gray-500)">${p.shortDescription || ''}</div>
+                    <div style="display:flex; align-items:center; gap:10px">
+                        <div style="width:36px;height:36px;flex-shrink:0;border-radius:50%;background:#111;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1.5px solid #333">
+                            ${p.logoUrl
+                                ? `<img src="${API_BASE}${p.logoUrl}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=16 height=16 fill=none stroke=#444 stroke-width=1.5 viewBox=\'0 0 24 24\'><path d=\'M2 7l2-4h16l2 4\'/><path d=\'M4 7v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7\'/><path d=\'M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2\'/></svg>'">`
+                                : `<svg width=16 height=16 fill=none stroke=#444 stroke-width=1.5 stroke-linecap=round stroke-linejoin=round viewBox="0 0 24 24"><path d="M2 7l2-4h16l2 4"/><path d="M4 7v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`
+                            }
+                        </div>
+                        <div>
+                            <div style="font-weight:600">${p.name}</div>
+                            <div style="font-size:12px; color:var(--gray-500)">${p.shortDescription || ''}</div>
+                        </div>
+                    </div>
                 </td>
                 <td style="font-size:12px; color:var(--gray-500)">
                     ${formatCoord(p.latitude)}, ${formatCoord(p.longitude)}
@@ -413,6 +456,77 @@
 
     // ── CREATE / EDIT POI ─────────────────────────────────────────────────────
 
+    // ── LOGO UPLOAD (trong modal sửa POI) ────────────────────────────────
+
+    function onAdminLogoSelected() {
+        const file = document.getElementById('logoFileInput').files[0];
+        if (!file) return;
+        const MAX_SIZE = 5 * 1024 * 1024;
+        const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+        if (file.size > MAX_SIZE) { showToast('Logo vượt quá 5MB!', 'error'); return; }
+        if (!allowed.includes(file.type)) { showToast('Chỉ chấp nhận JPG, PNG, WEBP!', 'error'); return; }
+
+        logoSelectedFile = file;
+        if (logoSelectedBlobUrl) URL.revokeObjectURL(logoSelectedBlobUrl);
+        logoSelectedBlobUrl = URL.createObjectURL(file);
+
+        // Preview
+        document.getElementById('logoPreviewImg').src = logoSelectedBlobUrl;
+        document.getElementById('logoPreviewImg').style.display = 'block';
+        document.getElementById('logoPlaceholderIcon').style.display = 'none';
+        document.getElementById('logoUploadBtn').style.display = 'inline-block';
+        document.getElementById('logoStatusText').textContent = file.name;
+        document.getElementById('logoStatusText').style.color = '#f59e0b';
+        document.getElementById('logoCircleBg').style.border = '2px solid #f59e0b';
+    }
+
+    async function uploadAdminLogo() {
+        if (!logoSelectedFile || !logoCurrentPoiId) { showToast('Chưa chọn logo!', 'error'); return; }
+        const btn = document.getElementById('logoUploadBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><use href="#icon-loader"/></svg> Đang lưu...';
+
+        const formData = new FormData();
+        formData.append('file', logoSelectedFile);
+        formData.append('poiId', logoCurrentPoiId);
+
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/staging-images/logo/upload`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                body: formData
+            });
+            if (!res.ok) throw new Error((await res.json()).message || 'Upload thất bại');
+
+            showToast('✅ Logo đã được gửi duyệt!', 'success');
+            document.getElementById('logoUploadBtn').style.display = 'none';
+            document.getElementById('logoStatusText').textContent = 'Logo đã gửi duyệt';
+            document.getElementById('logoStatusText').style.color = '#10b981';
+            document.getElementById('logoCircleBg').style.border = '2px solid #10b981';
+            // Giữ preview hiển thị, chỉ clear file input
+            logoSelectedFile = null;
+            if (logoSelectedBlobUrl) { URL.revokeObjectURL(logoSelectedBlobUrl); logoSelectedBlobUrl = null; }
+            document.getElementById('logoFileInput').value = '';
+        } catch (e) {
+            showToast('Lỗi: ' + e.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> Lưu logo';
+        }
+    }
+
+    function resetLogoUI() {
+        logoSelectedFile = null;
+        if (logoSelectedBlobUrl) { URL.revokeObjectURL(logoSelectedBlobUrl); logoSelectedBlobUrl = null; }
+        document.getElementById('logoFileInput').value = '';
+        document.getElementById('logoPreviewImg').src = '';
+        document.getElementById('logoPreviewImg').style.display = 'none';
+        document.getElementById('logoPlaceholderIcon').style.display = 'block';
+        document.getElementById('logoUploadBtn').style.display = 'none';
+        document.getElementById('logoUploadBtn').disabled = false;
+        document.getElementById('logoUploadBtn').innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> Lưu logo';
+        document.getElementById('logoCircleBg').style.border = '2px dashed #333';
+    }
+
     function openCreateModal() {
         document.getElementById('modalTitle').textContent = 'Thêm điểm mới';
         document.getElementById('poiId').value = '';
@@ -426,6 +540,10 @@
         document.getElementById('poiMap').value = '';
         document.getElementById('activeGroup').style.display = 'none';
         document.getElementById('modalAlert').style.display = 'none';
+        logoCurrentPoiId = null;
+        resetLogoUI();
+        document.getElementById('logoStatusText').textContent = 'Chưa có logo';
+        document.getElementById('logoStatusText').style.color = 'var(--gray-400)';
         openModal('poiModal');
     }
 
@@ -446,6 +564,22 @@
         document.getElementById('poiActive').checked = poi.isActive;
         document.getElementById('activeGroup').style.display = 'block';
         document.getElementById('modalAlert').style.display = 'none';
+
+        // Logo: reset + load existing
+        logoCurrentPoiId = poi.id;
+        resetLogoUI();
+        if (poi.logoUrl) {
+            document.getElementById('logoPreviewImg').src = `${API_BASE}${poi.logoUrl}`;
+            document.getElementById('logoPreviewImg').style.display = 'block';
+            document.getElementById('logoPlaceholderIcon').style.display = 'none';
+            document.getElementById('logoStatusText').textContent = '✓ Logo hiện tại';
+            document.getElementById('logoStatusText').style.color = '#10b981';
+            document.getElementById('logoCircleBg').style.border = '2px solid #10b981';
+        } else {
+            document.getElementById('logoStatusText').textContent = 'Chưa có logo';
+            document.getElementById('logoStatusText').style.color = 'var(--gray-400)';
+        }
+
         openModal('poiModal');
     }
 
