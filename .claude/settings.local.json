@@ -11,7 +11,20 @@
       "Bash(dotnet build:*)",
       "Read(//mnt/c/Users/dell/source/repos/**)",
       "Read(//c/Users/dell/**)",
-      "Bash(python -c ':*)"
+      "Bash(python -c ':*)",
+      "Bash(taskkill /F /PID 11260)",
+      "Bash(powershell -Command \"Stop-Process -Id 11260 -Force -ErrorAction SilentlyContinue; Write-Host 'done'\")",
+      "Bash(powershell -Command \"Stop-Process -Id 20076 -Force -ErrorAction SilentlyContinue; Write-Host 'stopped'\")",
+      "Bash(powershell -Command \"Get-ChildItem 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\images' -Recurse -File | Select-Object FullName\")",
+      "Bash(powershell -Command \"Remove-Item -Recurse -Force 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\images\\\\*'; Write-Host 'Done'\")",
+      "Bash(powershell -Command \"Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object OwningProcess\")",
+      "Bash(findstr /i \"PID\\\\|Process\")",
+      "Bash(powershell -Command \"\\(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess\\)\")",
+      "Bash(tasklist /FI \"PID eq $\\(powershell -Command \"\\(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess\\)\"\\)\")",
+      "Bash(powershell -Command \"Stop-Process -Id 7920 -Force -ErrorAction SilentlyContinue; Write-Host 'stopped'\")",
+      "Bash(powershell -Command \"Remove-Item -Recurse -Force 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\staging' -ErrorAction SilentlyContinue; Write-Host 'Done'\")",
+      "Bash(powershell -Command \"Get-ChildItem 'C:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.Api\\\\wwwroot\\\\images\\\\poi_1' | Select-Object Name, Length\")",
+      "Bash(powershell -Command \"Stop-Process -Name 'TasteVinhKhanh.Api' -Force -ErrorAction SilentlyContinue; Write-Host 'stopped'\")"
     ]
   }
 }

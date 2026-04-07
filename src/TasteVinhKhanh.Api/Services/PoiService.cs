@@ -143,7 +143,8 @@ public class PoiService : IPoiService
         TriggerRadiusMeters = p.TriggerRadiusMeters,
         Priority = p.Priority,
         IsActive = p.IsActive,
-        ImageUrl = p.ImageUrl,
+        // Ưu tiên ảnh chính từ gallery; fallback về ImageUrl trên POI
+        ImageUrl = p.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? p.ImageUrl,
         IconUrl = p.IconUrl,
         MapUrl = p.MapUrl,
         UpdatedAt = p.UpdatedAt,

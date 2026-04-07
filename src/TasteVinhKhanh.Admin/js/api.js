@@ -226,6 +226,11 @@ async function getPoiImageGallery(poiId) {
     return await apiCall('GET', `/api/admin/pois/${poiId}/images`);
 }
 
+/** POST /api/admin/pois/:poiId/images — thêm ảnh mới vào gallery */
+async function addPoiImageApi(poiId, data) {
+    return await apiCall('POST', `/api/admin/pois/${poiId}/images`, data);
+}
+
 /** DELETE /api/admin/pois/:poiId/images/:imageId — xóa trực tiếp ảnh của POI */
 async function deletePoiImage(poiId, imageId) {
     return await apiCall('DELETE', `/api/admin/pois/${poiId}/images/${imageId}`);

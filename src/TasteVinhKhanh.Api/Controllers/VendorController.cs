@@ -229,7 +229,8 @@ public class VendorController : ControllerBase
                 TriggerRadiusMeters = poi.TriggerRadiusMeters,
                 Priority = poi.Priority,
                 IsActive = poi.IsActive,
-                ImageUrl = poi.ImageUrl,
+                // Ưu tiên ảnh chính từ gallery; fallback về ImageUrl trên POI
+                ImageUrl = poi.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? poi.ImageUrl,
                 IconUrl = poi.IconUrl,
                 MapUrl = poi.MapUrl,
                 UpdatedAt = poi.UpdatedAt,
@@ -285,7 +286,8 @@ public class VendorController : ControllerBase
             TriggerRadiusMeters = poi.TriggerRadiusMeters,
             Priority = poi.Priority,
             IsActive = poi.IsActive,
-            ImageUrl = poi.ImageUrl,
+            // Ưu tiên ảnh chính từ gallery; fallback về ImageUrl trên POI
+            ImageUrl = poi.Images.FirstOrDefault(i => i.IsPrimary)?.ImageUrl ?? poi.ImageUrl,
             IconUrl = poi.IconUrl,
             MapUrl = poi.MapUrl,
             UpdatedAt = poi.UpdatedAt,
@@ -532,6 +534,18 @@ public class VendorController : ControllerBase
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });
+
+            // Nếu là ảnh đầu tiên → cập nhật ImageUrl trên PoiPoint
+            if (sortOrder == 1)
+            {
+                var poi = await _db.PoiPoints.FindAsync(poiId);
+                if (poi != null)
+                {
+                    poi.ImageUrl = relativePath;
+                    poi.UpdatedAt = DateTime.UtcNow;
+                    _db.PoiPoints.Update(poi);
+                }
+            }
 
             urls.Add(relativePath);
         }

@@ -167,15 +167,10 @@
                     <!-- APPROVAL BUTTONS -->
                     <div id="approvalActions" style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end">
                         <button class="icon-btn icon-btn-reject" onclick="openRejectModal()" title="Từ chối">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"/>
-                                <line x1="6" y1="6" x2="18" y2="18"/>
-                            </svg>
+                            &#10005;
                         </button>
                         <button class="icon-btn icon-btn-approve" onclick="approveCurrent()" title="Duyệt">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"/>
-                            </svg>
+                            &#10003;
                         </button>
                     </div>
                 </div>
@@ -191,14 +186,14 @@
     <div class="modal-overlay" id="rejectModal">
         <div class="modal" style="max-width:420px">
             <div class="modal-header">
-                <h3 style="margin:0">Lý do từ chối</h3>
+                <h3 style="margin:0" id="rejectModalTitle">Lý do từ chối</h3>
                 <button class="btn-icon" onclick="closeModal('rejectModal')">✕</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Lý do (tuỳ chọn)</label>
+                    <label>Lý do từ chối (tuỳ chọn)</label>
                     <textarea id="rejectReason" class="form-control" rows="3"
-                              placeholder="VD: Toạ độ không chính xác, nội dung vi phạm..."></textarea>
+                              placeholder="VD: Ảnh mờ, không đúng quán, nội dung vi phạm..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -224,6 +219,7 @@
     let currentDetailData = null;
     let rejectImageId     = null;
     let rejectDeletionId  = null;
+    let rejectCallback    = null; // 'image' | 'deletion'
 
     // ── LOAD ─────────────────────────────────────────────────────────────────
 
@@ -404,10 +400,10 @@
                     <td style="text-align:center">
                         ${isPending ? `
                         <button class="action-btn approve" onclick="quickApprovePoi(${row.id})" title="Duyệt">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            &#10003;
                         </button>
                         <button class="action-btn reject" onclick="quickRejectPoi(${row.id})" title="Từ chối">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            &#10005;
                         </button>` : '—'}
                     </td>
                 </tr>`;
@@ -419,17 +415,17 @@
                     <td><span class="poi-cell" title="${escapeHtml(row.poiName || '—')}">${escapeHtml(row.poiName || '—')}</span></td>
                     <td>${escapeHtml(row.vendorName || '—')}</td>
                     <td><span class="badge badge-info">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Upload ảnh
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Upload ảnh
                     </span></td>
                     <td style="font-size:12px; color:var(--gray-500)">${formatDateTime(row.createdAt)}</td>
                     <td>${getStatusBadge(row.status)}</td>
                     <td style="text-align:center">
                         ${isPending ? `
                         <button class="action-btn approve" onclick="quickApproveImage(${row.id})" title="Duyệt ảnh">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            &#10003;
                         </button>
                         <button class="action-btn reject" onclick="quickRejectImage(${row.id})" title="Từ chối ảnh">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            &#10005;
                         </button>` : '—'}
                     </td>
                 </tr>`;
@@ -441,17 +437,17 @@
                     <td><span class="poi-cell" title="${escapeHtml(row.poiName || '—')}">${escapeHtml(row.poiName || '—')}</span></td>
                     <td>${escapeHtml(row.vendorName || '—')}</td>
                     <td><span class="badge badge-danger">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Xóa ảnh
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Xóa ảnh
                     </span></td>
                     <td style="font-size:12px; color:var(--gray-500)">${formatDateTime(row.createdAt)}</td>
                     <td>${getStatusBadge(row.status)}</td>
                     <td style="text-align:center">
                         ${isPending ? `
                         <button class="action-btn approve" onclick="quickApproveDeletion(${row.id})" title="Duyệt xóa">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                            &#10003;
                         </button>
                         <button class="action-btn reject" onclick="quickRejectDeletion(${row.id})" title="Từ chối xóa">
-                            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            &#10005;
                         </button>` : '—'}
                     </td>
                 </tr>`;
@@ -495,14 +491,11 @@
     }
 
     async function quickRejectImage(id) {
-        const reason = prompt('Lý do từ chối (tuỳ chọn):');
-        try {
-            await rejectStagingImage(id, reason || '');
-            showToast('✅ Đã từ chối ảnh');
-            await loadAll();
-        } catch (e) {
-            showToast('❌ Thao tác thất bại!', 'error');
-        }
+        rejectImageId = id;
+        rejectCallback = 'image';
+        document.getElementById('rejectModalTitle').textContent = 'Từ chối ảnh';
+        document.getElementById('rejectReason').value = '';
+        openModal('rejectModal');
     }
 
     // ── DELETION ACTIONS ─────────────────────────────────────────────────────
@@ -518,14 +511,11 @@
     }
 
     async function quickRejectDeletion(id) {
-        const reason = prompt('Lý do từ chối (tuỳ chọn):');
-        try {
-            await rejectDeletionRequest(id, reason || '');
-            showToast('✅ Đã từ chối yêu cầu xóa');
-            await loadAll();
-        } catch (e) {
-            showToast('❌ Thao tác thất bại!', 'error');
-        }
+        rejectDeletionId = id;
+        rejectCallback = 'deletion';
+        document.getElementById('rejectModalTitle').textContent = 'Từ chối yêu cầu xóa ảnh';
+        document.getElementById('rejectReason').value = '';
+        openModal('rejectModal');
     }
 
     // ── DETAIL MODAL ────────────────────────────────────────────────────────
@@ -624,20 +614,37 @@
     }
 
     function openRejectModal() {
+        rejectCallback = 'poi';
+        document.getElementById('rejectModalTitle').textContent = 'Lý do từ chối cập nhật';
         document.getElementById('rejectReason').value = '';
         openModal('rejectModal');
     }
 
     async function confirmReject() {
         const reason = document.getElementById('rejectReason').value.trim();
+
         try {
-            await rejectPendingUpdate(currentDetailId, reason);
-            showToast('✅ Đã từ chối');
+            if (rejectCallback === 'image') {
+                await rejectStagingImage(rejectImageId, reason);
+                showToast('✅ Đã từ chối ảnh');
+            } else if (rejectCallback === 'deletion') {
+                await rejectDeletionRequest(rejectDeletionId, reason);
+                showToast('✅ Đã từ chối yêu cầu xóa');
+            } else {
+                // POI update via detail modal
+                await rejectPendingUpdate(currentDetailId, reason);
+                showToast('✅ Đã từ chối');
+                closeModal('detailModal');
+            }
             closeModal('rejectModal');
-            closeModal('detailModal');
             await loadAll();
         } catch (e) {
             showToast('❌ Từ chối thất bại!', 'error');
+        } finally {
+            // Reset
+            rejectCallback = null;
+            rejectImageId = null;
+            rejectDeletionId = null;
         }
     }
 
@@ -645,12 +652,12 @@
 
     function getChangeTypeLabel(type) {
         const map = {
-            poi_created: `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Thêm POI`,
-            poi_updated: `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Cập nhật`,
-            script_added: `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Thêm script`,
-            script_updated: `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Sửa script`,
-            image_uploaded: `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Upload ảnh`,
-            poi_deleted: `<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Xóa POI`
+            poi_created: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> Thêm POI`,
+            poi_updated: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Cập nhật`,
+            script_added: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Thêm script`,
+            script_updated: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Sửa script`,
+            image_uploaded: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Upload ảnh`,
+            poi_deleted: `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Xóa POI`
         };
         return map[type] || `<span>${type}</span>`;
     }
@@ -659,15 +666,15 @@
         const s = (status || '').toLowerCase();
         if (s === 'pending')
             return `<span class="badge badge-warning">
-                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Chờ
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Chờ
             </span>`;
         if (s === 'approved')
             return `<span class="badge badge-success">
-                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Đã duyệt
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#065f46" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Đã duyệt
             </span>`;
         if (s === 'rejected')
             return `<span class="badge badge-danger">
-                <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Từ chối
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Từ chối
             </span>`;
         return `<span class="badge">${status}</span>`;
     }
@@ -730,6 +737,7 @@
   <symbol id="icon-smartphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
   <symbol id="icon-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></symbol>
   <symbol id="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="icon-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
 </svg>
 </body>
 </html>

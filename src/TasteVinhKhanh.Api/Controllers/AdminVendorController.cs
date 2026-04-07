@@ -748,33 +748,39 @@ public class AdminVendorController : ControllerBase
         var destPath = Path.Combine(destFolder, fileName);
         System.IO.File.Copy(sourcePath, destPath, overwrite: true);
 
+        // ✅ Xóa file staging sau khi đã copy sang /images/
+        if (System.IO.File.Exists(sourcePath))
+            System.IO.File.Delete(sourcePath);
+
         var relativeUrl = $"/images/poi_{poiId}/{fileName}";
         img.Status = "Approved";
         img.ApprovedUrl = relativeUrl;
         img.ReviewedBy = adminEmail;
         img.ReviewedAt = DateTime.UtcNow;
 
-        // Xóa ảnh cũ
-        var oldImages = await _db.RestaurantImages.Where(i => i.PoiPointId == poiId).ToListAsync();
-        _db.RestaurantImages.RemoveRange(oldImages);
-
+        // Thêm ảnh mới vào gallery (KHÔNG xóa ảnh cũ — giữ gallery nhiều ảnh)
         var existingCount = await _db.RestaurantImages.CountAsync(i => i.PoiPointId == poiId);
 
         _db.RestaurantImages.Add(new Shared.Models.RestaurantImage
         {
             PoiPointId = poiId,
             ImageUrl = relativeUrl,
-            IsPrimary = true,
+            IsPrimary = existingCount == 0,  // Chỉ ảnh đầu tiên mới làm ảnh chính
             SortOrder = existingCount + 1,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         });
 
-        var poi = await _db.PoiPoints.FindAsync(poiId);
-        if (poi != null)
+        // Cập nhật ImageUrl của PoiPoint nếu là ảnh đầu tiên
+        if (existingCount == 0)
         {
-            poi.UpdatedAt = DateTime.UtcNow;
-            _db.PoiPoints.Update(poi);
+            var poi = await _db.PoiPoints.FindAsync(poiId);
+            if (poi != null)
+            {
+                poi.ImageUrl = relativeUrl;
+                poi.UpdatedAt = DateTime.UtcNow;
+                _db.PoiPoints.Update(poi);
+            }
         }
 
         await _db.SaveChangesAsync();
@@ -871,6 +877,105 @@ public class AdminVendorController : ControllerBase
 
         await _db.SaveChangesAsync();
         return Ok(new { message = "Đã xóa ảnh." });
+    }
+
+    /// <summary>Thêm ảnh mới vào gallery của POI (admin thêm trực tiếp bằng URL)</summary>
+    [HttpPost("pois/{poiId}/images")]
+    public async Task<IActionResult> AddPoiImage(int poiId, [FromBody] UpsertImageRequest req)
+    {
+        var poi = await _db.PoiPoints.FindAsync(poiId);
+        if (poi == null) return NotFound(new { message = "POI không tồn tại." });
+
+        if (string.IsNullOrWhiteSpace(req.ImageUrl))
+            return BadRequest(new { message = "URL ảnh không được để trống." });
+
+        // Validate: không cho lưu URL rỗng hoặc chỉ có khoảng trắng
+        var cleanUrl = req.ImageUrl.Trim();
+        if (string.IsNullOrWhiteSpace(cleanUrl) || cleanUrl.Length < 5)
+            return BadRequest(new { message = "URL ảnh không hợp lệ." });
+
+        var existingCount = await _db.RestaurantImages
+            .CountAsync(i => i.PoiPointId == poiId);
+
+        // Nếu là ảnh đầu tiên → tự động đặt làm ảnh chính
+        var isFirst = existingCount == 0;
+        var isPrimary = req.IsPrimary || isFirst;
+
+        // Nếu đặt làm ảnh chính → bỏ IsPrimary của ảnh cũ
+        if (isPrimary)
+        {
+            var currentPrimary = await _db.RestaurantImages
+                .FirstOrDefaultAsync(i => i.PoiPointId == poiId && i.IsPrimary);
+            if (currentPrimary != null)
+            {
+                currentPrimary.IsPrimary = false;
+                _db.RestaurantImages.Update(currentPrimary);
+            }
+        }
+
+        var newImage = new Shared.Models.RestaurantImage
+        {
+            PoiPointId = poiId,
+            ImageUrl = cleanUrl,
+            IsPrimary = isPrimary,
+            SortOrder = req.SortOrder > 0 ? req.SortOrder : existingCount + 1,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _db.RestaurantImages.Add(newImage);
+
+        // Cập nhật ImageUrl của PoiPoint nếu là ảnh đầu tiên
+        if (isFirst)
+        {
+            poi.ImageUrl = cleanUrl;
+            poi.UpdatedAt = DateTime.UtcNow;
+            _db.PoiPoints.Update(poi);
+        }
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new RestaurantImageDto
+        {
+            Id = newImage.Id,
+            PoiPointId = newImage.PoiPointId,
+            ImageUrl = newImage.ImageUrl,
+            IsPrimary = newImage.IsPrimary,
+            SortOrder = newImage.SortOrder
+        });
+    }
+
+    /// <summary>Đặt ảnh chính cho POI</summary>
+    [HttpPut("pois/{poiId}/images/{imageId}/primary")]
+    public async Task<IActionResult> SetPrimaryImage(int poiId, int imageId)
+    {
+        var poi = await _db.PoiPoints.FindAsync(poiId);
+        if (poi == null) return NotFound(new { message = "POI không tồn tại." });
+
+        var target = await _db.RestaurantImages
+            .FirstOrDefaultAsync(i => i.Id == imageId && i.PoiPointId == poiId);
+        if (target == null) return NotFound(new { message = "Ảnh không tồn tại." });
+
+        // Bỏ IsPrimary của ảnh cũ
+        var oldPrimary = await _db.RestaurantImages
+            .FirstOrDefaultAsync(i => i.PoiPointId == poiId && i.IsPrimary && i.Id != imageId);
+        if (oldPrimary != null)
+        {
+            oldPrimary.IsPrimary = false;
+            _db.RestaurantImages.Update(oldPrimary);
+        }
+
+        // Đặt ảnh mới làm chính
+        target.IsPrimary = true;
+        _db.RestaurantImages.Update(target);
+
+        // Cập nhật ImageUrl của PoiPoint
+        poi.ImageUrl = target.ImageUrl;
+        poi.UpdatedAt = DateTime.UtcNow;
+        _db.PoiPoints.Update(poi);
+
+        await _db.SaveChangesAsync();
+        return Ok(new { message = "Đã đặt ảnh chính." });
     }
 
     // ═══════════════════════════════════════════════════════════════════════════

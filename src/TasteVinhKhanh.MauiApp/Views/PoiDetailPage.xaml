@@ -59,20 +59,20 @@
 
                     <!-- NÚT ← -->
                     <Button Grid.Row="0"
-                            Text="&#x276E;" FontSize="32" FontAttributes="Bold"
+                            Text="◀" FontSize="22" FontAttributes="Bold"
                             BackgroundColor="#80000000" TextColor="White"
                             WidthRequest="44" HeightRequest="44" CornerRadius="22"
                             HorizontalOptions="Start" VerticalOptions="Center"
-                            Margin="8,0,0,0"
+                            Margin="8,0,0,0" Padding="0"
                             Command="{Binding PreviousImageCommand}"/>
 
                     <!-- NÚT → -->
                     <Button Grid.Row="0"
-                            Text="&#x276F;" FontSize="32" FontAttributes="Bold"
+                            Text="▶" FontSize="22" FontAttributes="Bold"
                             BackgroundColor="#80000000" TextColor="White"
                             WidthRequest="44" HeightRequest="44" CornerRadius="22"
                             HorizontalOptions="End" VerticalOptions="Center"
-                            Margin="0,0,8,0"
+                            Margin="0,0,8,0" Padding="0"
                             Command="{Binding NextImageCommand}"/>
 
                     <!-- DOT INDICATOR -->

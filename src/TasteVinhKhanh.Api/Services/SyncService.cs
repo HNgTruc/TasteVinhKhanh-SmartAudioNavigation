@@ -62,6 +62,14 @@ public class SyncService : ISyncService
                     TtsScript = s.TtsScript,
                     AudioFileUrl = s.AudioFileUrl,
                     UpdatedAt = s.UpdatedAt
+                }).ToList(),
+                Images = p.Images.Select(i => new RestaurantImageDto
+                {
+                    Id = i.Id,
+                    PoiPointId = i.PoiPointId,
+                    ImageUrl = i.ImageUrl,
+                    IsPrimary = i.IsPrimary,
+                    SortOrder = i.SortOrder
                 }).ToList()
             }).ToList()
         };
