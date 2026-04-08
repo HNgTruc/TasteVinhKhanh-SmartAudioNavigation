@@ -22,22 +22,38 @@
         <member name="T:TasteVinhKhanh.MauiApp.Converters.TabTextConverter">
             <summary>Tab Text Color: active = cam, inactive = xám.</summary>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.Data.LocalAudioScript.LocalAudioPath">
+            <summary>Đường dẫn file audio đã tải về local (FileSystem.AppDataDirectory/audio/)</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.Data.LocalAudioScript.IsAudioDownloaded">
+            <summary>True = audio đã tải về local thành công và có sẵn offline</summary>
+        </member>
         <member name="M:TasteVinhKhanh.MauiApp.Data.AppDatabase.WasRecentlyPlayedAsync(System.Int32,System.TimeSpan)">
             <summary>Kiểm tra cooldown — tránh phát lại cùng POI quá nhanh</summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.AudioPlayerService">
             <summary>
-            Tải audio file từ server, lưu local, và phát audio.
+            Tải audio file từ protected endpoint /api/audio/{scriptId},
+            lưu local trong FileSystem.AppDataDirectory/audio/,
+            và phát audio. Hỗ trợ offline từ cache local.
             </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.PlayAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript)">
             <summary>
-            Đảm bảo audio đã được tải về, rồi phát nó.
+            Đảm bảo audio đã tải về local, rồi phát.
+            Priority: local file → download from protected endpoint → TTS fallback.
             </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.DownloadAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript)">
             <summary>
-            Tải audio từ URL về thư mục app và đánh dấu đã tải.
+            Tải audio từ protected endpoint về thư mục app.
+            Dùng device token để xác thực.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.RegisterDeviceAsync">
+            <summary>
+            Đăng ký device với server → lấy JWT token.
+            Gọi 1 lần khi app khởi động.
             </summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.GeofenceEngine">
@@ -65,6 +81,14 @@
             Theo dõi GPS liên tục — foreground.
             Background location (khi app không mở) cần cấu hình thêm Android Service
             trong AndroidManifest.xml và MainActivity.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.NarrationEngine.PlayAsync(TasteVinhKhanh.MauiApp.Data.LocalPoi,System.Double,Microsoft.Maui.Devices.Sensors.Location,System.String)">
+            <summary>
+            Phát audio cho POI — priority:
+            1. Audio file đã tải local → phát ngay (offline OK)
+            2. Audio file chưa tải → tải từ protected endpoint → phát
+            3. Không tải được → TTS fallback
             </summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.NotificationService">

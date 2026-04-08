@@ -80,7 +80,8 @@ public class DebugController : ControllerBase
                     s.PoiPointId,
                     s.LanguageCode,
                     s.TtsScript,
-                    s.AudioFileUrl,
+                    s.AudioFilePath,
+                    s.IsAudioUploaded,
                     s.UpdatedAt
                 })
             })

@@ -59,7 +59,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
             e.HasKey(a => a.Id);
             e.Property(a => a.LanguageCode).IsRequired().HasMaxLength(10);
             e.Property(a => a.TtsScript).HasMaxLength(2000);
-            e.Property(a => a.AudioFileUrl).HasMaxLength(500);
+            e.Property(a => a.AudioFilePath).HasMaxLength(500);
             e.HasIndex(a => new { a.PoiPointId, a.LanguageCode }).IsUnique();
         });
 

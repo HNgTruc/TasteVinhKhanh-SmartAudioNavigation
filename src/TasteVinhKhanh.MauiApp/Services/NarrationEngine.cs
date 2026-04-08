@@ -19,6 +19,12 @@ public class NarrationEngine
         _audioPlayer = audioPlayer;
     }
 
+    /// <summary>
+    /// Phát audio cho POI — priority:
+    /// 1. Audio file đã tải local → phát ngay (offline OK)
+    /// 2. Audio file chưa tải → tải từ protected endpoint → phát
+    /// 3. Không tải được → TTS fallback
+    /// </summary>
     public async Task PlayAsync(LocalPoi poi, double distanceMeters, Location userLocation,
         string triggerType = "geofence_proximity")
     {
@@ -48,36 +54,31 @@ public class NarrationEngine
                 IsSynced = false
             });
 
-            // Ưu tiên phát audio file đã tải
-            if (script.IsAudioDownloaded && File.Exists(script.LocalAudioPath))
+            // 1. Audio file đã tải local → phát ngay (offline OK)
+            if (script.IsAudioDownloaded && !string.IsNullOrEmpty(script.LocalAudioPath)
+                && File.Exists(script.LocalAudioPath))
             {
                 try
                 {
                     await _audioPlayer.PlayAudioAsync(script);
+                    return;
                 }
-                catch
-                {
-                    // Fallback sang TTS nếu audio lỗi
-                    await SpeakWithTtsAsync(script);
-                }
+                catch { /* File lỗi → xóa cache */ }
             }
-            // Chưa tải → thử tải audio rồi phát
-            else if (!string.IsNullOrWhiteSpace(script.AudioFileUrl))
+
+            // 2. Thử tải audio từ protected endpoint
+            if (!string.IsNullOrWhiteSpace(script.TtsScript))
             {
                 try
                 {
                     await _audioPlayer.PlayAudioAsync(script);
+                    return;
                 }
-                catch
-                {
-                    await SpeakWithTtsAsync(script);
-                }
+                catch { /* Tải lỗi → TTS fallback */ }
             }
-            // Không có audio → dùng TTS
-            else if (!string.IsNullOrWhiteSpace(script.TtsScript))
-            {
-                await SpeakWithTtsAsync(script);
-            }
+
+            // 3. TTS fallback — dùng device TTS
+            await SpeakWithTtsAsync(script);
         }
         finally
         {

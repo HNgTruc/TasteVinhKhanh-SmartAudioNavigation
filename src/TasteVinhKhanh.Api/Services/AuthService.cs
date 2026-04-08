@@ -14,6 +14,7 @@ public interface IAuthService
     Task<LoginResponse?> LoginAsync(LoginRequest request);
     Task<(bool Success, string Message)> VendorRegisterAsync(VendorRegisterRequest request);
     Task<bool> IsVendorApprovedAsync(string email);
+    Task<DeviceTokenResponse> GetOrCreateDeviceTokenAsync(string deviceId);
 }
 
 public class AuthService : IAuthService
@@ -139,5 +140,65 @@ public class AuthService : IAuthService
         if (user == null) return false;
         var vendor = _db.Vendors.FirstOrDefault(v => v.UserId == user.Id);
         return vendor?.Status == "Approved";
+    }
+
+    /// <summary>
+    /// Device tự động đăng ký để lấy JWT token.
+    /// Tạo tài khoản ảo "device_{deviceId}@system" không có password.
+    /// Token không có expiry (hoặc expiry rất dài).
+    /// </summary>
+    public async Task<DeviceTokenResponse> GetOrCreateDeviceTokenAsync(string deviceId)
+    {
+        // Tìm user device hoặc tạo mới
+        var deviceEmail = $"device_{deviceId}@tastevinhkhanh.local";
+        var user = await _userManager.FindByEmailAsync(deviceEmail);
+
+        if (user == null)
+        {
+            user = new AppUser
+            {
+                UserName = $"device_{deviceId}",
+                Email = deviceEmail,
+                EmailConfirmed = true,
+                FullName = $"Device {deviceId[..8]}"
+            };
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                // Thử tìm lại (có thể race condition)
+                user = await _userManager.FindByEmailAsync(deviceEmail);
+                if (user == null)
+                    throw new InvalidOperationException("Cannot create device user: " +
+                        string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+        }
+
+        // Tạo token với role = Device
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new(ClaimTypes.Email, user.Email!),
+            new(ClaimTypes.Role, "Device"),
+            new("DeviceId", deviceId)
+        };
+
+        var jwt = _config.GetSection("JwtSettings");
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["SecretKey"]!));
+        // Device token: expiry 1 năm
+        var expires = DateTime.UtcNow.AddDays(365);
+
+        var token = new JwtSecurityToken(
+            issuer: jwt["Issuer"],
+            audience: jwt["Audience"],
+            claims: claims,
+            expires: expires,
+            signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+        );
+
+        return new DeviceTokenResponse
+        {
+            AccessToken = new JwtSecurityTokenHandler().WriteToken(token),
+            ExpiresAt = expires
+        };
     }
 }

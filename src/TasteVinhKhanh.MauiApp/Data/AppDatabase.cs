@@ -33,8 +33,9 @@ public class LocalAudioScript
     public int PoiPointId { get; set; }
     public string LanguageCode { get; set; } = "vi";
     public string TtsScript { get; set; } = string.Empty;
-    public string? AudioFileUrl { get; set; }
+    /// <summary>Đường dẫn file audio đã tải về local (FileSystem.AppDataDirectory/audio/)</summary>
     public string? LocalAudioPath { get; set; }
+    /// <summary>True = audio đã tải về local thành công và có sẵn offline</summary>
     public bool IsAudioDownloaded { get; set; } = false;
     public DateTime UpdatedAt { get; set; }
 }
@@ -153,7 +154,8 @@ public class AppDatabase
                             PoiPointId = s.PoiPointId,
                             LanguageCode = s.LanguageCode,
                             TtsScript = s.TtsScript,
-                            AudioFileUrl = s.AudioFileUrl,
+                            // AudioFilePath server-side → IsAudioDownloaded flag
+                            IsAudioDownloaded = false,
                             UpdatedAt = s.UpdatedAt
                         });
                     }
@@ -161,8 +163,12 @@ public class AppDatabase
                     {
                         // Giữ nguyên LocalAudioPath nếu đã tải về
                         existScript.TtsScript = s.TtsScript;
-                        existScript.AudioFileUrl = s.AudioFileUrl;
                         existScript.UpdatedAt = s.UpdatedAt;
+                        // Server có audio mới → cần download lại
+                        if (s.AudioFilePath != null && !existScript.IsAudioDownloaded)
+                        {
+                            // Đánh dấu cần sync audio — AudioSyncService sẽ xử lý
+                        }
                         db.Update(existScript);
                     }
                 }
@@ -213,7 +219,7 @@ public class AppDatabase
               .OrderBy(i => i.SortOrder)
               .ToListAsync();
 
-    public async Task MarkAudioDownloadedAsync(int scriptId, string localPath)
+    public async Task UpdateAudioDownloadedAsync(int scriptId, string localPath)
     {
         var s = await _db.Table<LocalAudioScript>()
                          .Where(x => x.Id == scriptId).FirstOrDefaultAsync();

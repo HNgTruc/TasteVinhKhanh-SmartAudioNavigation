@@ -61,6 +61,19 @@ builder.Services.AddScoped<IPoiService, PoiService>();
 builder.Services.AddScoped<ITourService, TourService>();
 builder.Services.AddScoped<ISyncService, SyncService>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IAudioStorageService, AudioStorageService>();
+builder.Services.AddScoped<ITtsGenerationService, TtsGenerationService>();
+
+// TTS & audio HTTP clients
+builder.Services.AddHttpClient("tts").ConfigureHttpClient(c =>
+{
+    c.Timeout = TimeSpan.FromSeconds(15);
+    c.DefaultRequestHeaders.Add("User-Agent", "TasteVinhKhanh/1.0");
+});
+builder.Services.AddHttpClient("azure-tts").ConfigureHttpClient(c =>
+{
+    c.Timeout = TimeSpan.FromSeconds(20);
+});
 
 // ── CORS ───────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(opt => opt.AddPolicy("AllowAll",

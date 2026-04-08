@@ -61,7 +61,8 @@ public class SyncService : ISyncService
                     PoiPointId = s.PoiPointId,
                     LanguageCode = s.LanguageCode,
                     TtsScript = s.TtsScript,
-                    AudioFileUrl = s.AudioFileUrl,
+                    AudioFilePath = s.AudioFilePath,
+                    IsAudioUploaded = s.IsAudioUploaded,
                     UpdatedAt = s.UpdatedAt
                 }).ToList(),
                 Images = p.Images.Select(i => new RestaurantImageDto

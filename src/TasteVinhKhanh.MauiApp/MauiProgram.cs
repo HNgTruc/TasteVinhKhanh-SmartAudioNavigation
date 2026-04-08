@@ -40,10 +40,17 @@ public static class MauiProgram
             client.Timeout = TimeSpan.FromSeconds(10);
         });
 
+        // AudioPlayerService cũng cần HttpClient để tải audio từ protected endpoint
+        builder.Services.AddHttpClient<AudioPlayerService>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+
         // ── SERVICES ──────────────────────────────────────────
         builder.Services.AddSingleton<NotificationService>();
         builder.Services.AddSingleton<LocationService>();
-        builder.Services.AddSingleton<AudioPlayerService>();
+        // AudioPlayerService được đăng ký bởi AddHttpClient<AudioPlayerService> ở trên
         builder.Services.AddSingleton<NarrationEngine>();
         builder.Services.AddSingleton<GeofenceEngine>();
         builder.Services.AddSingleton<LocalizationService>();

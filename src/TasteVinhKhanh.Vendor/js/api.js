@@ -146,6 +146,11 @@ async function upsertMyScript(poiId, data) {
     return await apiCall('PUT', `/api/vendor/pois/${poiId}/scripts`, data);
 }
 
+/** GET /api/audio/:scriptId — lấy audio (cần token) */
+function getAudioUrl(scriptId) {
+    return `${API_BASE}/api/audio/${scriptId}`;
+}
+
 // ── IMAGE UPLOAD (DIRECT — upload thẳng lên, không qua duyệt) ─────────────
 
 async function uploadImage(file, poiId) {

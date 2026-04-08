@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TasteVinhKhanh.Api.Data;
 using TasteVinhKhanh.Api.Services;
 using TasteVinhKhanh.Shared.DTOs;
 
@@ -61,6 +62,20 @@ public class AuthController : ControllerBase
         if (!vendorApproved)
             return StatusCode(403, new { message = "Tài khoản của bạn đang chờ được duyệt. Vui lòng liên hệ quản trị viên." });
 
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Device đăng ký để lấy JWT token — dùng cho MAUI app tải audio.
+    /// Device tự gửi deviceId (GUID) → server trả token không expiry.
+    /// </summary>
+    [HttpPost("device-register")]
+    public async Task<IActionResult> DeviceRegister([FromBody] DeviceRegisterRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.DeviceId))
+            return BadRequest(new { message = "DeviceId is required." });
+
+        var result = await _auth.GetOrCreateDeviceTokenAsync(request.DeviceId);
         return Ok(result);
     }
 }

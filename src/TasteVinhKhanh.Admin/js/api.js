@@ -21,7 +21,15 @@ async function apiCall(method, endpoint, body = null) {
         return null;
     }
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    if (!res.ok) {
+        let msg = `HTTP ${res.status}`;
+        try {
+            const body = await res.json();
+            if (body.message) msg = body.message;
+            if (body.hint) msg += ` | ${body.hint}`;
+        } catch { /* ignore */ }
+        throw new Error(msg);
+    }
     if (res.status === 204) return true;
 
     return await res.json();
@@ -69,6 +77,48 @@ async function upsertScript(poiId, data) {
 
 async function deleteScript(poiId, lang) {
     return await apiCall('DELETE', `/api/poi/${poiId}/scripts/${lang}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUDIO APIs
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** POST /api/audio/admin/upload — upload audio file */
+async function uploadAudioFile(poiId, lang, file) {
+    const token = localStorage.getItem('token');
+    const formData = new FormData();
+    formData.append('poiId', poiId);
+    formData.append('lang', lang);
+    formData.append('file', file);
+    const res = await fetch(`${API_BASE}/api/audio/admin/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+    });
+    if (res.status === 401) { logout(); return null; }
+    if (!res.ok) throw new Error(`Upload failed: HTTP ${res.status}`);
+    return await res.json();
+}
+
+/** POST /api/audio/admin/generate — generate TTS audio */
+async function generateAudio(poiId, lang) {
+    return await apiCall('POST', '/api/audio/admin/generate', { poiId, languageCode: lang });
+}
+
+/** DELETE /api/audio/admin/:scriptId — xóa audio file */
+async function deleteAudioFile(scriptId) {
+    return await apiCall('DELETE', `/api/audio/admin/${scriptId}`);
+}
+
+/** GET /api/audio/:scriptId — lấy audio file (cần token) */
+function getAudioUrl(scriptId) {
+    return `${API_BASE}/api/audio/${scriptId}`;
+}
+
+/** Lấy audio preview URL (không cần token — serve trực tiếp) */
+function getAudioPreviewUrl(scriptId) {
+    // Dùng endpoint public để preview trong admin (không cần auth)
+    return `${API_BASE}/api/audio/preview/${scriptId}`;
 }
 
 async function getSummary() {

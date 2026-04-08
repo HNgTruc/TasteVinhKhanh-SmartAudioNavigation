@@ -241,7 +241,8 @@ public class VendorController : ControllerBase
                     PoiPointId = s.PoiPointId,
                     LanguageCode = s.LanguageCode,
                     TtsScript = s.TtsScript,
-                    AudioFileUrl = s.AudioFileUrl,
+                    AudioFilePath = s.AudioFilePath,
+                    IsAudioUploaded = s.IsAudioUploaded,
                     UpdatedAt = s.UpdatedAt
                 }).ToList(),
                 Images = poi.Images.Select(i => new RestaurantImageDto
@@ -297,7 +298,7 @@ public class VendorController : ControllerBase
             {
                 Id = s.Id, PoiPointId = s.PoiPointId,
                 LanguageCode = s.LanguageCode, TtsScript = s.TtsScript,
-                AudioFileUrl = s.AudioFileUrl, UpdatedAt = s.UpdatedAt
+                AudioFilePath = s.AudioFilePath, IsAudioUploaded = s.IsAudioUploaded, UpdatedAt = s.UpdatedAt
             }).ToList(),
             Images = poi.Images.Select(i => new RestaurantImageDto
             {
@@ -451,7 +452,6 @@ public class VendorController : ControllerBase
                     PoiPointId = poiId,
                     LanguageCode = req.LanguageCode,
                     TtsScript = req.TtsScript,
-                    AudioFileUrl = req.AudioFileUrl,
                     UpdatedAt = DateTime.UtcNow
                 };
                 _db.AudioScripts.Add(script);
@@ -460,7 +460,6 @@ public class VendorController : ControllerBase
             {
                 // Cập nhật
                 script.TtsScript = req.TtsScript;
-                script.AudioFileUrl = req.AudioFileUrl;
                 script.UpdatedAt = DateTime.UtcNow;
             }
 
@@ -472,7 +471,8 @@ public class VendorController : ControllerBase
                 PoiPointId = script.PoiPointId,
                 LanguageCode = script.LanguageCode,
                 TtsScript = script.TtsScript,
-                AudioFileUrl = script.AudioFileUrl,
+                AudioFilePath = script.AudioFilePath,
+                IsAudioUploaded = script.IsAudioUploaded,
                 UpdatedAt = script.UpdatedAt
             });
         }

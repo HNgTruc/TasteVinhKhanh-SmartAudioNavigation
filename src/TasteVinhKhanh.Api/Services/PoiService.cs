@@ -113,7 +113,6 @@ public class PoiService : IPoiService
         }
 
         script.TtsScript = r.TtsScript;
-        script.AudioFileUrl = r.AudioFileUrl;
         script.UpdatedAt = DateTime.UtcNow;
 
         await _db.SaveChangesAsync();
@@ -163,7 +162,8 @@ public class PoiService : IPoiService
         PoiPointId = s.PoiPointId,
         LanguageCode = s.LanguageCode,
         TtsScript = s.TtsScript,
-        AudioFileUrl = s.AudioFileUrl,
+        AudioFilePath = s.AudioFilePath,
+        IsAudioUploaded = s.IsAudioUploaded,
         UpdatedAt = s.UpdatedAt
     };
 }

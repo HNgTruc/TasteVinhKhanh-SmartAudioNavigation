@@ -260,7 +260,7 @@
             </div>
             <div class="modal-body">
                 <p style="font-size:12px; color:var(--gray-500); margin-bottom:14px">
-                    App ưu tiên phát file audio nếu có URL. Nếu không có thì dùng TTS.
+                    Viết nội dung TTS → nhấn <strong>Generate</strong> để tạo audio. Audio ưu tiên hơn TTS.
                 </p>
                 <input type="hidden" id="scriptPoiId">
 
@@ -280,9 +280,24 @@
                             <textarea id="tts-vi" class="form-control" rows="4"
                                       placeholder="Nhập nội dung thuyết minh bằng tiếng Việt..."></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>URL audio thu sẵn (tuỳ chọn)</label>
-                            <input type="text" id="audio-vi" class="form-control" placeholder="https://...">
+                        <!-- Audio control bar -->
+                        <div class="audio-control-bar" id="audio-bar-vi" style="margin-bottom:12px">
+                            <span id="audio-status-vi" class="audio-status audio-none">❌ Chưa có audio</span>
+                            <div class="audio-actions" id="audio-actions-vi" style="display:flex;gap:6px;flex-wrap:wrap">
+                                <button class="btn btn-outline btn-sm" onclick="previewAudio('vi')" id="btn-preview-vi" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-eye"/></svg> Nghe thử
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="doGenerateAudio('vi')" id="btn-generate-vi" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-music"/></svg> Generate TTS
+                                </button>
+                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> Upload
+                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="onAudioFileSelected(this, 'vi')">
+                                </label>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAudio('vi')" id="btn-delete-vi" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg> Xóa
+                                </button>
+                            </div>
                         </div>
                         <button class="btn btn-primary btn-sm" onclick="saveScript('vi')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-save"/></svg> Lưu VI</button>
                     </div>
@@ -294,9 +309,23 @@
                             <textarea id="tts-en" class="form-control" rows="4"
                                       placeholder="Enter narration in English..."></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>Audio URL (optional)</label>
-                            <input type="text" id="audio-en" class="form-control" placeholder="https://...">
+                        <div class="audio-control-bar" id="audio-bar-en" style="margin-bottom:12px">
+                            <span id="audio-status-en" class="audio-status audio-none">❌ Chưa có audio</span>
+                            <div class="audio-actions" id="audio-actions-en" style="display:flex;gap:6px;flex-wrap:wrap">
+                                <button class="btn btn-outline btn-sm" onclick="previewAudio('en')" id="btn-preview-en" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-eye"/></svg> Preview
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="doGenerateAudio('en')" id="btn-generate-en" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-music"/></svg> Generate TTS
+                                </button>
+                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> Upload
+                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="onAudioFileSelected(this, 'en')">
+                                </label>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAudio('en')" id="btn-delete-en" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg> Delete
+                                </button>
+                            </div>
                         </div>
                         <button class="btn btn-primary btn-sm" onclick="saveScript('en')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-save"/></svg> Save EN</button>
                     </div>
@@ -308,9 +337,23 @@
                             <textarea id="tts-zh" class="form-control" rows="4"
                                       placeholder="请输入中文讲解内容..."></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>音频 URL（可选）</label>
-                            <input type="text" id="audio-zh" class="form-control" placeholder="https://...">
+                        <div class="audio-control-bar" id="audio-bar-zh" style="margin-bottom:12px">
+                            <span id="audio-status-zh" class="audio-status audio-none">❌ Chưa có audio</span>
+                            <div class="audio-actions" id="audio-actions-zh" style="display:flex;gap:6px;flex-wrap:wrap">
+                                <button class="btn btn-outline btn-sm" onclick="previewAudio('zh')" id="btn-preview-zh" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-eye"/></svg> 预览
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="doGenerateAudio('zh')" id="btn-generate-zh" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-music"/></svg> Generate TTS
+                                </button>
+                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> 上传
+                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="onAudioFileSelected(this, 'zh')">
+                                </label>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAudio('zh')" id="btn-delete-zh" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg> 删除
+                                </button>
+                            </div>
                         </div>
                         <button class="btn btn-primary btn-sm" onclick="saveScript('zh')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-save"/></svg> 保存 ZH</button>
                     </div>
@@ -322,9 +365,23 @@
                             <textarea id="tts-ko" class="form-control" rows="4"
                                       placeholder="한국어 해설을 입력하세요..."></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>오디오 URL (선택사항)</label>
-                            <input type="text" id="audio-ko" class="form-control" placeholder="https://...">
+                        <div class="audio-control-bar" id="audio-bar-ko" style="margin-bottom:12px">
+                            <span id="audio-status-ko" class="audio-status audio-none">❌ Chưa có audio</span>
+                            <div class="audio-actions" id="audio-actions-ko" style="display:flex;gap:6px;flex-wrap:wrap">
+                                <button class="btn btn-outline btn-sm" onclick="previewAudio('ko')" id="btn-preview-ko" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-eye"/></svg> 미리보기
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="doGenerateAudio('ko')" id="btn-generate-ko" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-music"/></svg> Generate TTS
+                                </button>
+                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> 업로드
+                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="onAudioFileSelected(this, 'ko')">
+                                </label>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAudio('ko')" id="btn-delete-ko" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg> 삭제
+                                </button>
+                            </div>
                         </div>
                         <button class="btn btn-primary btn-sm" onclick="saveScript('ko')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-save"/></svg> 저장 KO</button>
                     </div>
@@ -336,9 +393,23 @@
                             <textarea id="tts-ja" class="form-control" rows="4"
                                       placeholder="日本語のナレーションを入力してください..."></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>音声URL（任意）</label>
-                            <input type="text" id="audio-ja" class="form-control" placeholder="https://...">
+                        <div class="audio-control-bar" id="audio-bar-ja" style="margin-bottom:12px">
+                            <span id="audio-status-ja" class="audio-status audio-none">❌ Chưa có audio</span>
+                            <div class="audio-actions" id="audio-actions-ja" style="display:flex;gap:6px;flex-wrap:wrap">
+                                <button class="btn btn-outline btn-sm" onclick="previewAudio('ja')" id="btn-preview-ja" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-eye"/></svg> プレビュー
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="doGenerateAudio('ja')" id="btn-generate-ja" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-music"/></svg> Generate TTS
+                                </button>
+                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> アップロード
+                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="onAudioFileSelected(this, 'ja')">
+                                </label>
+                                <button class="btn btn-danger btn-sm" onclick="deleteAudio('ja')" id="btn-delete-ja" disabled>
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg> 削除
+                                </button>
+                            </div>
                         </div>
                         <button class="btn btn-primary btn-sm" onclick="saveScript('ja')"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-save"/></svg> 保存 JA</button>
                     </div>
@@ -670,7 +741,9 @@
         ['vi', 'en', 'zh', 'ko', 'ja'].forEach(lang => {
             const script = (poi.audioScripts || []).find(s => s.languageCode === lang);
             document.getElementById(`tts-${lang}`).value = script?.ttsScript || '';
-            document.getElementById(`audio-${lang}`).value = script?.audioFileUrl || '';
+            // Lưu scriptId để dùng cho audio operations
+            document.getElementById(`tts-${lang}`).dataset.scriptId = script?.id || '';
+            updateAudioStatus(lang, !!script?.isAudioUploaded, !!script?.ttsScript);
         });
 
         // Init tabs
@@ -678,17 +751,150 @@
         openModal('scriptModal');
     }
 
+    // ── AUDIO STATUS UI ────────────────────────────────────────────────────
+
+    function updateAudioStatus(lang, hasAudio, hasText) {
+        const statusEl = document.getElementById(`audio-status-${lang}`);
+        const previewBtn = document.getElementById(`btn-preview-${lang}`);
+        const generateBtn = document.getElementById(`btn-generate-${lang}`);
+        const deleteBtn = document.getElementById(`btn-delete-${lang}`);
+
+        if (hasAudio) {
+            statusEl.className = 'audio-status audio-ready';
+            statusEl.textContent = '✅ Audio sẵn sàng';
+        } else if (hasText) {
+            statusEl.className = 'audio-status audio-tts';
+            statusEl.textContent = '🔊 Chỉ có TTS — nhấn Generate để tạo audio';
+        } else {
+            statusEl.className = 'audio-status audio-none';
+            statusEl.textContent = '❌ Chưa có audio';
+        }
+
+        previewBtn.disabled = !hasAudio;
+        generateBtn.disabled = !hasText || hasAudio;
+        deleteBtn.disabled = !hasAudio;
+    }
+
+    // ── AUDIO OPERATIONS ────────────────────────────────────────────────────
+
+    let pendingAudioFile = null; // file chờ upload
+    let pendingAudioLang = null;
+
+    function onAudioFileSelected(input, lang) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            showToast('File vượt quá 10MB!', 'error');
+            input.value = '';
+            return;
+        }
+        pendingAudioFile = file;
+        pendingAudioLang = lang;
+        document.getElementById(`audio-status-${lang}`).textContent = `📁 ${file.name}`;
+        document.getElementById(`audio-status-${lang}`).className = 'audio-status audio-tts';
+    }
+
+    async function doGenerateAudio(lang) {
+        const poiId = document.getElementById('scriptPoiId').value;
+        const btn = document.getElementById(`btn-generate-${lang}`);
+        btn.disabled = true;
+        btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin"><use href="#icon-loader"/></svg> Đang generate...';
+
+        try {
+            const result = await generateAudio(poiId, lang);
+            showToast(`✅ Audio ${lang.toUpperCase()} đã được tạo!`, 'success');
+            updateAudioStatus(lang, true, true);
+            await loadPois();
+        } catch (e) {
+            showToast('Generate thất bại: ' + (e.message || ''), 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-music"/></svg> Generate TTS';
+        }
+    }
+
+    async function previewAudio(lang) {
+        const scriptId = document.getElementById(`tts-${lang}`).dataset.scriptId;
+        if (!scriptId) {
+            showToast('Chưa có scriptId — vui lòng lưu script trước!', 'error');
+            return;
+        }
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showToast('Phiên đăng nhập hết hạn — vui lòng đăng nhập lại!', 'error');
+            return;
+        }
+        const url = getAudioUrl(parseInt(scriptId));
+        try {
+            const res = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) {
+                showToast(`Lỗi tải audio (HTTP ${res.status}) — vui lòng đăng nhập lại admin.`, 'error');
+                return;
+            }
+            const blob = await res.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const audio = new Audio(blobUrl);
+            audio.play();
+            audio.onended = () => URL.revokeObjectURL(blobUrl);
+        } catch (e) {
+            showToast('Không thể phát audio: ' + e.message, 'error');
+        }
+    }
+
+    async function deleteAudio(lang) {
+        if (!confirm(`Xóa audio ${lang.toUpperCase()}?`)) return;
+        const scriptId = document.getElementById(`tts-${lang}`).dataset.scriptId;
+        if (!scriptId) return;
+
+        try {
+            await deleteAudioFile(parseInt(scriptId));
+            showToast(`Đã xóa audio ${lang.toUpperCase()}`);
+            updateAudioStatus(lang, false, true);
+            await loadPois();
+        } catch (e) {
+            showToast('Xóa thất bại: ' + (e.message || ''), 'error');
+        }
+    }
+
     async function saveScript(lang) {
         const poiId = document.getElementById('scriptPoiId').value;
         const tts = document.getElementById(`tts-${lang}`).value;
-        const audioUrl = document.getElementById(`audio-${lang}`).value;
+        const ttsEl = document.getElementById(`tts-${lang}`);
 
         try {
-            await upsertScript(poiId, {
+            const result = await upsertScript(poiId, {
                 languageCode: lang,
-                ttsScript: tts,
-                audioFileUrl: audioUrl || null
+                ttsScript: tts
             });
+
+            // Sau khi lưu script → cập nhật scriptId
+            if (result && result.id) {
+                ttsEl.dataset.scriptId = result.id;
+                ttsEl.dataset.poiId = poiId;
+
+                // Upload file audio nếu có pending
+                if (pendingAudioFile && pendingAudioLang === lang) {
+                    const uploadBtn = document.getElementById(`btn-upload-${lang}`);
+                    if (uploadBtn) uploadBtn.disabled = true;
+                    const uploadResult = await uploadAudioFile(poiId, lang, pendingAudioFile);
+                    pendingAudioFile = null;
+                    pendingAudioLang = null;
+                    if (uploadResult && uploadResult.scriptId) {
+                        ttsEl.dataset.scriptId = uploadResult.scriptId;
+                        showToast(`✅ Audio đã upload!`, 'success');
+                        updateAudioStatus(lang, true, true);
+                        await loadPois();
+                        return;
+                    } else {
+                        showToast('⚠️ Script đã lưu nhưng upload audio thất bại.', 'error');
+                    }
+                }
+
+                updateAudioStatus(lang, result.isAudioUploaded, !!tts);
+            }
+
             showToast(`Đã lưu script ${lang.toUpperCase()}`);
             await loadPois();
         } catch (e) {
@@ -719,9 +925,13 @@
     }
 
     function renderGallery(images, poiId) {
-        // Lọc bỏ ảnh có URL rỗng/null
+        // Lọc bỏ ảnh có URL rỗng/null và id không hợp lệ
+        // Cũng loại bỏ URL đã là absolute (tránh ghép API_BASE sai)
         const validImages = (images || []).filter(img =>
-            img.imageUrl && img.imageUrl.trim().length > 0
+            img.id > 0 &&
+            img.imageUrl != null &&
+            img.imageUrl.trim().length > 0 &&
+            !img.imageUrl.toLowerCase().startsWith('http')
         );
 
         if (validImages.length === 0) {
@@ -737,7 +947,7 @@
                 ${img.isPrimary ? '<span style="position:absolute;top:6px;left:6px;font-size:10px;background:var(--primary);color:white;padding:2px 6px;border-radius:4px"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px"><use href="#icon-star"/></svg>Chính</span>' : ''}
                 <div style="display:flex;gap:4px;margin-top:4px">
                     ${!img.isPrimary ? `<button class="btn btn-outline btn-sm" onclick="setPrimaryImage(${poiId},${img.id})" style="flex:1;font-size:11px;padding:2px 4px"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:3px"><use href="#icon-star"/></svg>Chính</button>` : ''}
-                    <button class="btn btn-danger btn-sm" onclick="doDeletePoiImage(${poiId},${img.id})" style="flex:1;font-size:11px;padding:2px 4px"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg></button>
+                    <button class="btn btn-danger btn-sm" onclick="doDeletePoiImage(${poiId},${img.id})" style="flex:${img.isPrimary ? 'none' : '1'};font-size:11px;padding:2px 4px;${img.isPrimary ? 'min-width:32px' : ''}" title="Xóa ảnh"><svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg></button>
                 </div>
             </div>
         `).join('');

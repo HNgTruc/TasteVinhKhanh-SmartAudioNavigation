@@ -190,7 +190,7 @@ public class AdminVendorController : ControllerBase
                 Id = s.Id, PoiPointId = s.PoiPointId,
                 LanguageCode = s.LanguageCode,
                 TtsScript = s.TtsScript,
-                AudioFileUrl = s.AudioFileUrl, UpdatedAt = s.UpdatedAt
+                AudioFilePath = s.AudioFilePath, IsAudioUploaded = s.IsAudioUploaded, UpdatedAt = s.UpdatedAt
             }).ToList(),
             Images = p.Images.Select(i => new RestaurantImageDto
             {
@@ -634,7 +634,6 @@ public class AdminVendorController : ControllerBase
                         if (existing != null)
                         {
                             existing.TtsScript = sc.TtsScript;
-                            existing.AudioFileUrl = sc.AudioFileUrl;
                             existing.UpdatedAt = DateTime.UtcNow;
                         }
                         else
@@ -644,7 +643,6 @@ public class AdminVendorController : ControllerBase
                                 PoiPointId = poi.Id,
                                 LanguageCode = sc.LanguageCode,
                                 TtsScript = sc.TtsScript,
-                                AudioFileUrl = sc.AudioFileUrl,
                                 UpdatedAt = DateTime.UtcNow
                             });
                         }

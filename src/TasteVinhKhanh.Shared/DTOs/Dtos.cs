@@ -62,7 +62,9 @@ public class AudioScriptDto
     public int PoiPointId { get; set; }
     public string LanguageCode { get; set; } = "vi";
     public string TtsScript { get; set; } = string.Empty;
-    public string? AudioFileUrl { get; set; }
+    /// <summary>Chỉ dùng internal — app không dùng trực tiếp</summary>
+    public string? AudioFilePath { get; set; }
+    public bool IsAudioUploaded { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
 
@@ -71,7 +73,8 @@ public class UpsertAudioScriptRequest
 {
     public string LanguageCode { get; set; } = "vi";
     public string TtsScript { get; set; } = string.Empty;
-    public string? AudioFileUrl { get; set; }
+    /// <summary>Chỉ dùng internal</summary>
+    public string? AudioFilePath { get; set; }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -131,6 +134,23 @@ public class LoginResponse
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public int? VendorId { get; set; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DEVICE AUTH DTOs — MAUI app
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>Device đăng ký để lấy token — không cần password</summary>
+public class DeviceRegisterRequest
+{
+    public string DeviceId { get; set; } = string.Empty;
+}
+
+/// <summary>Device nhận về JWT token để tải audio</summary>
+public class DeviceTokenResponse
+{
+    public string AccessToken { get; set; } = string.Empty;
+    public DateTime ExpiresAt { get; set; }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
