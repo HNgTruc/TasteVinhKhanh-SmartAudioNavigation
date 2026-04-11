@@ -6,6 +6,7 @@
              xmlns:conv="clr-namespace:TasteVinhKhanh.MauiApp.Converters"
              xmlns:maps="clr-namespace:Microsoft.Maui.Controls.Maps;assembly=Microsoft.Maui.Controls.Maps"
              x:Class="TasteVinhKhanh.MauiApp.Views.MapPage"
+             x:Name="MapPageRoot"
              x:DataType="vm:MapViewModel"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#1A0A00">
@@ -200,7 +201,7 @@
                                     </Border.Shadow>
                                     <Border.GestureRecognizers>
                                         <TapGestureRecognizer
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=GoToDetailCommand}"
+                                            Command="{Binding Source={x:Reference MapPageRoot}, Path=BindingContext.GoToDetailCommand}"
                                             CommandParameter="{Binding Id}"/>
                                     </Border.GestureRecognizers>
                                     <Grid RowDefinitions="Auto,Auto,Auto">
@@ -270,7 +271,7 @@
                                                     WidthRequest="44">
                                                 <Border.GestureRecognizers>
                                                     <TapGestureRecognizer
-                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=ToggleFavoriteCommand}"
+                                                        Command="{Binding Source={x:Reference MapPageRoot}, Path=BindingContext.ToggleFavoriteCommand}"
                                                         CommandParameter="{Binding Id}"/>
                                                 </Border.GestureRecognizers>
                                                 <Label Text="{Binding Id, Converter={StaticResource FavoriteIconConverter}}"
@@ -311,7 +312,7 @@
                                                     <StackLayout Orientation="Horizontal" Spacing="4">
                                                         <Label Text="🎧" FontSize="11"
                                                                VerticalOptions="Center"/>
-                                                        <Label Text="{Binding Source={RelativeSource AncestorType={x:Type vm:MapViewModel}}, Path=THasNarration}"
+                                                        <Label Text="{Binding Source={x:Reference MapPageRoot}, Path=BindingContext.THasNarration}"
                                                                FontSize="12"
                                                                TextColor="#66CC66"/>
                                                     </StackLayout>

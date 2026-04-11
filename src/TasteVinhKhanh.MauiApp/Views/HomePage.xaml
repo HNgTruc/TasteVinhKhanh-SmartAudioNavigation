@@ -5,6 +5,7 @@
              xmlns:data="clr-namespace:TasteVinhKhanh.MauiApp.Data"
              xmlns:conv="clr-namespace:TasteVinhKhanh.MauiApp.Converters"
              x:Class="TasteVinhKhanh.MauiApp.Views.HomePage"
+             x:Name="HomePageRoot"
              x:DataType="vm:HomeViewModel"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#1A0A00">
@@ -139,7 +140,7 @@
                                             Margin="0,0,12,0">
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=GoToDetailCommand}"
+                                                Command="{Binding Source={x:Reference HomePageRoot}, Path=BindingContext.GoToDetailCommand}"
                                                 CommandParameter="{Binding Id}"/>
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="Auto,*" Padding="0">
