@@ -48,7 +48,8 @@ public class GeofenceEngine
         // Gửi notification để người dùng biết (dù điện thoại đang khóa)
         await _notif.ShowPoiNotificationAsync(inRange.Poi.Name, inRange.Distance);
 
-        // Kích hoạt thuyết minh
+        // Kích hoạt thuyết minh — dừng audio cũ trước khi phát quán mới
+        _narration.Stop();
         PoiTriggered?.Invoke(inRange.Poi, inRange.Distance);
         await _narration.PlayAsync(inRange.Poi, inRange.Distance, location);
     }

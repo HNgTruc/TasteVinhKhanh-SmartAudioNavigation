@@ -67,7 +67,25 @@
       "Bash(cmd //C \"taskkill /F /PID 23520\")",
       "Bash(cmd //C \"taskkill /F /PID 3128\")",
       "Bash(cmd //C \"taskkill /F /PID 22544\")",
-      "Bash(cmd //C \"taskkill /F /PID 18568\")"
+      "Bash(cmd //C \"taskkill /F /PID 18568\")",
+      "Bash(cmd /c \"dir /s /b c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.MauiApp\\\\obj\\\\*CommunityToolkit* 2>nul & echo ---DONE---\")",
+      "Bash(cmd /c \"rmdir /s /q c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.MauiApp\\\\obj & echo DELETED\")",
+      "Read(//home/**)",
+      "Read(//dev/**)",
+      "Bash(find /home -maxdepth 4 -type d -name \"TasteVinhKhanh*\")",
+      "Read(//c//**)",
+      "Read(//workspace/src/**)",
+      "Bash(xargs grep:*)",
+      "Read(//c/Users/**)",
+      "Bash(python -c \"import edge_tts; print\\('edge_tts OK'\\)\")",
+      "Bash(curl -s http://localhost:5000/api/poi)",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H \"Content-Type: application/json\" -d \"{\\\\\"email\\\\\":\\\\\"admin@vinhkhanh.com\\\\\",\\\\\"password\\\\\":\\\\\"Admin@12345\\\\\"}\")",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@vinhkhanh.com\",\"password\":\"Admin@12345\"}')",
+      "Bash(python -m json.tool)",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"vendor_aloquan@vinhkhanh.com\",\"password\":\"VinhKhanh123\"}')",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('count:', len\\(d\\)\\); [print\\(p['id'], p['name']\\) for p in d]\")",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"vendor_aloquan@vinhkhanh.com\",\"password\":\"VinhKhanh123\"}')",
+      "Read(//Users/ledinhhoangvu/Projects/**)"
     ]
   }
 }

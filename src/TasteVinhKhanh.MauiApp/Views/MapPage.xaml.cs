@@ -1,5 +1,6 @@
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Maps;
+using TasteVinhKhanh.MauiApp.Data;
 using TasteVinhKhanh.MauiApp.ViewModels;
 
 namespace TasteVinhKhanh.MauiApp.Views;
@@ -157,6 +158,12 @@ public partial class MapPage : ContentPage
             Math.Abs(p.Longitude - pin.Location.Longitude) < 0.0001);
 
         if (poi != null)
+            await _vm.GoToDetail(poi.Id);
+    }
+
+    private async void OnPoiCardTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Border border && border.BindingContext is LocalPoi poi)
             await _vm.GoToDetail(poi.Id);
     }
 

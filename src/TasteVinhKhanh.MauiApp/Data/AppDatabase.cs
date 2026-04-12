@@ -154,20 +154,19 @@ public class AppDatabase
                             PoiPointId = s.PoiPointId,
                             LanguageCode = s.LanguageCode,
                             TtsScript = s.TtsScript,
-                            // AudioFilePath server-side → IsAudioDownloaded flag
-                            IsAudioDownloaded = false,
+                            // Server có audio upload rồi → đánh dấu để AudioPlayerService download
+                            IsAudioDownloaded = s.IsAudioUploaded && !string.IsNullOrEmpty(s.AudioFilePath),
                             UpdatedAt = s.UpdatedAt
                         });
                     }
                     else
                     {
-                        // Giữ nguyên LocalAudioPath nếu đã tải về
                         existScript.TtsScript = s.TtsScript;
                         existScript.UpdatedAt = s.UpdatedAt;
-                        // Server có audio mới → cần download lại
-                        if (s.AudioFilePath != null && !existScript.IsAudioDownloaded)
+                        // Server có audio mới (IsAudioUploaded=true) nhưng local chưa tải → đánh dấu
+                        if (s.IsAudioUploaded && !string.IsNullOrEmpty(s.AudioFilePath) && !existScript.IsAudioDownloaded)
                         {
-                            // Đánh dấu cần sync audio — AudioSyncService sẽ xử lý
+                            existScript.IsAudioDownloaded = false; // đánh dấu cần download lại
                         }
                         db.Update(existScript);
                     }

@@ -1,3 +1,4 @@
+using System.Threading;
 using TasteVinhKhanh.MauiApp.Data;
 
 namespace TasteVinhKhanh.MauiApp.Services;
@@ -8,9 +9,12 @@ public class NarrationEngine
     private readonly AudioPlayerService _audioPlayer;
     private bool _isPlaying = false;
     private readonly SemaphoreSlim _lock = new(1, 1);
+    private CancellationTokenSource? _ttsCts;
+    private CancellationTokenSource? _playbackCts;
 
     public string CurrentLanguage { get; set; } = "vi";
-    public event Action<string>? NarrationStarted;
+    public event Action<string>? NarrationStarted;   // string = poi.Name (AudioViewModel dùng)
+    public event Action<string>? NarrationStartedWithLang; // string = langCode (PoiDetail dùng)
     public event Action? NarrationFinished;
 
     public NarrationEngine(AppDatabase db, AudioPlayerService audioPlayer)
@@ -29,6 +33,7 @@ public class NarrationEngine
         string triggerType = "geofence_proximity")
     {
         await _lock.WaitAsync();
+        _playbackCts = new CancellationTokenSource();
         try
         {
             if (_isPlaying) return;
@@ -39,7 +44,9 @@ public class NarrationEngine
 
             if (script == null) return;
 
+            var usedLang = script.LanguageCode;
             NarrationStarted?.Invoke(poi.Name);
+            NarrationStartedWithLang?.Invoke(usedLang);
 
             await _db.InsertLogAsync(new LocalPlaybackLog
             {
@@ -60,9 +67,10 @@ public class NarrationEngine
             {
                 try
                 {
-                    await _audioPlayer.PlayAudioAsync(script);
+                    await _audioPlayer.PlayAudioAsync(script, _playbackCts.Token);
                     return;
                 }
+                catch (OperationCanceledException) { return; }
                 catch { /* File lỗi → xóa cache */ }
             }
 
@@ -71,24 +79,38 @@ public class NarrationEngine
             {
                 try
                 {
-                    await _audioPlayer.PlayAudioAsync(script);
+                    await _audioPlayer.PlayAudioAsync(script, _playbackCts.Token);
                     return;
                 }
+                catch (OperationCanceledException) { return; }
                 catch { /* Tải lỗi → TTS fallback */ }
             }
 
             // 3. TTS fallback — dùng device TTS
-            await SpeakWithTtsAsync(script);
+            await SpeakWithTtsAsync(script, _playbackCts.Token);
         }
         finally
         {
+            _playbackCts = null;
             _isPlaying = false;
             _lock.Release();
             NarrationFinished?.Invoke();
         }
     }
 
-    private async Task SpeakWithTtsAsync(LocalAudioScript script)
+    /// <summary>
+    /// Dừng audio đang phát ngay lập tức (TTS hoặc file).
+    /// </summary>
+    public void Stop()
+    {
+        _ttsCts?.Cancel();
+        _playbackCts?.Cancel();
+        _audioPlayer.Stop();
+        _isPlaying = false;
+        try { NarrationFinished?.Invoke(); } catch { /* ignore */ }
+    }
+
+    private async Task SpeakWithTtsAsync(LocalAudioScript script, CancellationToken ct = default)
     {
         var locale = script.LanguageCode switch
         {
@@ -101,12 +123,25 @@ public class NarrationEngine
         };
 
         var mauiLocale = await GetLocaleAsync(locale);
-        await TextToSpeech.SpeakAsync(script.TtsScript, new SpeechOptions
+        using var localCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        _ttsCts = localCts;
+        try
         {
-            Locale = mauiLocale,
-            Volume = 1.0f,
-            Pitch = 1.0f
-        });
+            await TextToSpeech.SpeakAsync(script.TtsScript, new SpeechOptions
+            {
+                Locale = mauiLocale,
+                Volume = 1.0f,
+                Pitch = 1.0f
+            }, _ttsCts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Bị dừng — không throw
+        }
+        finally
+        {
+            _ttsCts = null;
+        }
     }
 
     private static async Task<Locale?> GetLocaleAsync(string localeStr)

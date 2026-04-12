@@ -73,7 +73,7 @@ public partial class HomeViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task GoToDetail(int poiId)
+    public async Task GoToDetail(string poiId)
         => await Shell.Current.GoToAsync($"PoiDetailPage?poiId={poiId}");
 
     [RelayCommand]

@@ -6,6 +6,7 @@
              xmlns:conv="clr-namespace:TasteVinhKhanh.MauiApp.Converters"
              x:Class="TasteVinhKhanh.MauiApp.Views.HomePage"
              x:DataType="vm:HomeViewModel"
+             x:Name="RootPage"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#1A0A00">
 
@@ -127,64 +128,57 @@
                 <ScrollView Orientation="Horizontal"
                             HorizontalScrollBarVisibility="Never"
                             Margin="0,0,0,28">
-                    <HorizontalStackLayout Padding="20,0" Spacing="14">
-                        <CollectionView ItemsSource="{Binding TopPois}"
-                                        ItemsLayout="HorizontalList"
-                                        HeightRequest="220">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="data:LocalPoi">
-                                    <Border WidthRequest="170" HeightRequest="210"
-                                            StrokeShape="RoundRectangle 16"
-                                            Stroke="#252525" BackgroundColor="#161616"
-                                            Margin="0,0,12,0">
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer
-                                                Command="{Binding Source={RelativeSource AncestorType={x:Type vm:HomeViewModel}}, Path=GoToDetailCommand}"
-                                                CommandParameter="{Binding Id}"/>
-                                        </Border.GestureRecognizers>
-                                        <Grid RowDefinitions="Auto,*" Padding="0">
-
-                                            <!-- Image area: logo nếu có, fallback 🍜 -->
-                                            <Border Grid.Row="0" HeightRequest="110"
-                                                    StrokeShape="RoundRectangle 16,16,0,0"
-                                                    Stroke="Transparent">
-                                                <Border.Background>
-                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                        <GradientStop Color="#2A1500" Offset="0"/>
-                                                        <GradientStop Color="#1A0D00" Offset="1"/>
-                                                    </LinearGradientBrush>
-                                                </Border.Background>
-                                                <Grid>
-                                                    <!-- Fallback emoji -->
-                                                    <Label Text="🍜" FontSize="48"
-                                                           HorizontalOptions="Center"
-                                                           VerticalOptions="Center" Opacity="0.8"
-                                                           IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBool}, ConverterParameter=Inverse}"/>
-                                                    <!-- Logo quán (hiển thị khi có LogoUrl) -->
-                                                    <Image Source="{Binding LogoUrl, Converter={StaticResource ImageUrlConverter}}"
-                                                           Aspect="AspectFill"
-                                                           HorizontalOptions="Fill"
-                                                           VerticalOptions="Fill"
-                                                           IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBool}}"/>
-                                                </Grid>
-                                            </Border>
-
-                                            <!-- Info -->
-                                            <StackLayout Grid.Row="1" Spacing="4" Padding="12,10">
-                                                <Label Text="{Binding Name}" FontSize="14"
-                                                       FontAttributes="Bold" TextColor="#FFFFFF"
-                                                       MaxLines="1" LineBreakMode="TailTruncation"/>
-                                                <Label Text="{Binding ShortDescription}"
-                                                       FontSize="11" TextColor="#666666"
-                                                       MaxLines="2" LineBreakMode="TailTruncation"/>
-                                            </StackLayout>
-
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </HorizontalStackLayout>
+                    <CollectionView ItemsSource="{Binding TopPois}"
+                                    ItemsLayout="HorizontalList"
+                                    HeightRequest="220">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="data:LocalPoi">
+                                <Border WidthRequest="170" HeightRequest="210"
+                                        StrokeShape="RoundRectangle 16"
+                                        Stroke="#252525" BackgroundColor="#161616"
+                                        Margin="0,0,14,0">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnPoiCardTapped"/>
+                                    </Border.GestureRecognizers>
+                                    <Grid RowDefinitions="Auto,*" Padding="0">
+                                        <!-- Image area: logo nếu có, fallback 🍜 -->
+                                        <Border Grid.Row="0" HeightRequest="110"
+                                                StrokeShape="RoundRectangle 16,16,0,0"
+                                                Stroke="Transparent">
+                                            <Border.Background>
+                                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                    <GradientStop Color="#2A1500" Offset="0"/>
+                                                    <GradientStop Color="#1A0D00" Offset="1"/>
+                                                </LinearGradientBrush>
+                                            </Border.Background>
+                                            <Grid>
+                                                <!-- Fallback emoji -->
+                                                <Label Text="🍜" FontSize="48"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center" Opacity="0.8"
+                                                       IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBool}, ConverterParameter=Inverse}"/>
+                                                <!-- Logo quán (hiển thị khi có LogoUrl) -->
+                                                <Image Source="{Binding LogoUrl, Converter={StaticResource ImageUrlConverter}}"
+                                                       Aspect="AspectFill"
+                                                       HorizontalOptions="Fill"
+                                                       VerticalOptions="Fill"
+                                                       IsVisible="{Binding LogoUrl, Converter={StaticResource NullToBool}}"/>
+                                            </Grid>
+                                        </Border>
+                                        <!-- Info -->
+                                        <StackLayout Grid.Row="1" Spacing="4" Padding="12,10">
+                                            <Label Text="{Binding Name}" FontSize="14"
+                                                   FontAttributes="Bold" TextColor="#FFFFFF"
+                                                   MaxLines="1" LineBreakMode="TailTruncation"/>
+                                            <Label Text="{Binding ShortDescription}"
+                                                   FontSize="11" TextColor="#666666"
+                                                   MaxLines="2" LineBreakMode="TailTruncation"/>
+                                        </StackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </ScrollView>
 
                 <!-- ══ EXPLORE BUTTON ══ -->

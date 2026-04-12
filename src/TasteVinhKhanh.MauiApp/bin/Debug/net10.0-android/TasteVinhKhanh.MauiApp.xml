@@ -10,10 +10,79 @@
         <member name="T:TasteVinhKhanh.MauiApp.Converters.InverseCountToVisibilityConverter">
             <summary>True nếu count == 0</summary>
         </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.InverseBoolToVisibilityConverter">
+            <summary>
+            True nếu value là false (bool). Dùng cho IsVisible ẩn khi true.
+            </summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.Converters.ImageUrlConverter">
             <summary>
             Chuyển "/images/poi_1/xxx.jpg" → full URL
             và giữ nguyên URL đầy đủ (https://, http://).
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.MultiLangBgConverter">
+            <summary>
+            MultiBinding converter cho BackgroundColor chip ngôn ngữ.
+            values[0] = LanguageCode item, values[1] = CurrentLangCode từ ViewModel.
+            Active → cam mờ, Inactive → trong suốt.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.MultiLangTextColorConverter">
+            <summary>
+            MultiBinding converter cho TextColor chip ngôn ngữ.
+            values[0] = LanguageCode item, values[1] = CurrentLangCode từ ViewModel.
+            Active → cam, Inactive → xám.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.MultiLangBadgeVisibleConverter">
+            <summary>
+            MultiBinding converter cho IsVisible badge ✓ ngôn ngữ.
+            values[0] = LanguageCode item, values[1] = CurrentLangCode từ ViewModel.
+            Hiện ✓ khi active.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.LangActiveConverter">
+            <summary>
+            Trả về Color cho BackgroundColor/TextColor chip ngôn ngữ.
+            Dùng với MultiBinding thay vì ConverterParameter.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.LangSelectedBgConverter">
+            <summary>
+            Trả về Color cho BackgroundColor card ngôn ngữ khi được chọn.
+            value = SelectedLanguage từ ViewModel
+            parameter = mã ngôn ngữ của card này (vi/en/zh/ko/ja)
+            Trả về nền cam mờ nếu match, trong suốt nếu không.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.LangSelectedStrokeConverter">
+            <summary>
+            Trả về Color cho Border Stroke khi card ngôn ngữ được chọn.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.LangBadgeVisibleConverter">
+            <summary>
+            Trả về bool IsVisible cho badge ✓ ngôn ngữ.
+            Dùng với MultiBinding thay vì ConverterParameter.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.MultiLangStrokeConverter">
+            <summary>
+            MultiBinding converter cho Border Stroke khi chip ngôn ngữ được chọn.
+            Active → cam viền, Inactive → trong suốt.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.MultiLangStrokeThicknessConverter">
+            <summary>
+            MultiBinding converter trả về double cho StrokeThickness khi chip được chọn.
+            Active → 1.5, Inactive → 0.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.MultiLangCardBgConverter">
+            <summary>
+            MultiBinding converter trả về nền đậm cho card ngôn ngữ khi được chọn.
+            Active → cam đậm, Inactive → nền tối thường.
             </summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Converters.TabBgConverter">
@@ -38,7 +107,19 @@
             và phát audio. Hỗ trợ offline từ cache local.
             </summary>
         </member>
-        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.PlayAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript)">
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.#ctor(System.Net.Http.HttpClient,TasteVinhKhanh.MauiApp.Data.AppDatabase)">
+            <summary>
+            Tải audio file từ protected endpoint /api/audio/{scriptId},
+            lưu local trong FileSystem.AppDataDirectory/audio/,
+            và phát audio. Hỗ trợ offline từ cache local.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.Stop">
+            <summary>
+            Dừng audio đang phát ngay lập tức.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.PlayAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript,System.Threading.CancellationToken)">
             <summary>
             Đảm bảo audio đã tải về local, rồi phát.
             Priority: local file → download from protected endpoint → TTS fallback.
@@ -48,12 +129,14 @@
             <summary>
             Tải audio từ protected endpoint về thư mục app.
             Dùng device token để xác thực.
+            BaseAddress đã được set trong MauiProgram.cs qua DI.
             </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.RegisterDeviceAsync">
             <summary>
             Đăng ký device với server → lấy JWT token.
             Gọi 1 lần khi app khởi động.
+            BaseAddress đã được set từ DI.
             </summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.GeofenceEngine">
@@ -89,6 +172,11 @@
             1. Audio file đã tải local → phát ngay (offline OK)
             2. Audio file chưa tải → tải từ protected endpoint → phát
             3. Không tải được → TTS fallback
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.NarrationEngine.Stop">
+            <summary>
+            Dừng audio đang phát ngay lập tức (TTS hoặc file).
             </summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.NotificationService">
@@ -192,7 +280,7 @@
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPauseCommand"/>.</summary>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPauseCommand">
-            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPause"/>.</summary>
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPause"/>.</summary>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.goToHomeCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToHomeCommand"/>.</summary>
@@ -285,7 +373,7 @@
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetailCommand"/>.</summary>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetailCommand">
-            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetail(System.Int32)"/>.</summary>
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToDetail(System.String)"/>.</summary>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToHomeCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToHomeCommand"/>.</summary>
@@ -450,6 +538,12 @@
             <inheritdoc/>
             <inheritdoc/>
         </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.SafeSetAudioLang(System.String)">
+            <summary>
+            Đổi ngôn ngữ AUDIO (cho chip trong POI tab).
+            KHÔNG thay đổi ngôn ngữ app.
+            </summary>
+        </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._poiId"/>
         </member>
@@ -474,6 +568,66 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.DebugInfo">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._debugInfo"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TLocation">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tLocation"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNarration">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNarration"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TFavorite">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tFavorite"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TLocationTitle">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tLocationTitle"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TOpenMap">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tOpenMap"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TPlayNarration">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tPlayNarration"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNarrationTitle">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNarrationTitle"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TAvailableLangs">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tAvailableLangs"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TFavoriteTitle">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tFavoriteTitle"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TFavoriteAdd">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tFavoriteAdd"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TLangLabel">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tLangLabel"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNavHome">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNavHome"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNavMap">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNavMap"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNavAudio">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNavAudio"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNavSettings">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNavSettings"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentLangDisplay">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._currentLangDisplay"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentLangCode">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._currentLangCode"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentAudioLangDisplay">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._currentAudioLangDisplay"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.IsPlayingNarration">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._isPlayingNarration"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PlayingLangCode">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._playingLangCode"/>
+        </member>
         <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnPoiIdChanged(System.Int32)">
             <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId"/> just changed.</summary>
             <param name="value">The new property value that was set.</param>
@@ -483,6 +637,11 @@
             <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentImageIndex"/> just changed.</summary>
             <param name="value">The new property value that was set.</param>
             <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentImageIndex"/> is changed.</remarks>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnCurrentLangCodeChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentLangCode"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentLangCode"/> is changed.</remarks>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.previousImageCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PreviousImageCommand"/>.</summary>
@@ -980,6 +1139,54 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.DebugInfo">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "DebugInfo" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TLocation">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TLocation" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TNarration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TNarration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TFavorite">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TFavorite" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TLocationTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TLocationTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TOpenMap">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TOpenMap" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TPlayNarration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TPlayNarration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TNarrationTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TNarrationTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TAvailableLangs">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TAvailableLangs" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TFavoriteTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TFavoriteTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TFavoriteAdd">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TFavoriteAdd" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TLangLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TLangLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentLangDisplay">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentLangDisplay" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentLangCode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentLangCode" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentAudioLangDisplay">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentAudioLangDisplay" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsPlayingNarration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsPlayingNarration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PlayingLangCode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PlayingLangCode" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.AutoPlayAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>
         </member>
@@ -1228,6 +1435,54 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.DebugInfo">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "DebugInfo" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TLocation">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TLocation" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TNarration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TNarration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TFavorite">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TFavorite" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TLocationTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TLocationTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TOpenMap">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TOpenMap" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TPlayNarration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TPlayNarration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TNarrationTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TNarrationTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TAvailableLangs">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TAvailableLangs" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TFavoriteTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TFavoriteTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TFavoriteAdd">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TFavoriteAdd" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TLangLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TLangLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentLangDisplay">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentLangDisplay" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentLangCode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentLangCode" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentAudioLangDisplay">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentAudioLangDisplay" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsPlayingNarration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsPlayingNarration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PlayingLangCode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PlayingLangCode" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.AutoPlayAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>

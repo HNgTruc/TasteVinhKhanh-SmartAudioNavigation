@@ -5,11 +5,14 @@
              xmlns:conv="clr-namespace:TasteVinhKhanh.MauiApp.Converters"
              x:Class="TasteVinhKhanh.MauiApp.Views.SettingsPage"
              x:DataType="vm:SettingsViewModel"
+             x:Name="RootPage"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#1A0A00">
 
     <ContentPage.Resources>
-        <conv:LangActiveConverter x:Key="LangActiveConverter"/>
+        <conv:MultiLangBadgeVisibleConverter x:Key="MultiLangBadgeVisibleConverter"/>
+        <conv:MultiLangStrokeConverter x:Key="MultiLangStrokeConverter"/>
+        <conv:MultiLangStrokeThicknessConverter x:Key="MultiLangStrokeThicknessConverter"/>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="*,Auto">
@@ -33,147 +36,237 @@
                 <StackLayout Padding="20,0,20,24" Spacing="10">
 
                     <!-- Tiếng Việt -->
-                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
-                            Padding="16" BackgroundColor="#1A1A1A">
+                    <Border StrokeShape="RoundRectangle 16" Padding="16">
+                        <Border.Background>
+                            <SolidColorBrush Color="#1A1A1A"/>
+                        </Border.Background>
+                        <Border.Stroke>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeConverter}">
+                                <Binding Source="vi"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.Stroke>
+                        <Border.StrokeThickness>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeThicknessConverter}">
+                                <Binding Source="vi"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.StrokeThickness>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
-                                                  CommandParameter="vi"/>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}" CommandParameter="vi"/>
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*,Auto">
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3"
+                                     Color="#20FF6B35" Margin="-16" ZIndex="-1">
+                                <BoxView.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="vi"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </BoxView.IsVisible>
+                            </BoxView>
                             <Label Grid.Column="0" Text="🇻🇳" FontSize="28"/>
                             <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
-                                <Label Text="Tiếng Việt" FontSize="16"
-                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
-                                <Label Text="{Binding TNative}"
-                                       FontSize="12" TextColor="#666666"/>
+                                <Label Text="Tiếng Việt" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="{Binding TNative}" FontSize="12" TextColor="#888888"/>
                             </StackLayout>
-                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
-                                    StrokeShape="RoundRectangle 12"
-                                    Stroke="Transparent"
-                                    WidthRequest="28" HeightRequest="28"
-                                    IsVisible="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangActiveConverter},
-                                        ConverterParameter=vi}">
-                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
-                                       TextColor="White" HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
-                            </Border>
+                            <Label Grid.Column="2" Text="✓" FontSize="20" FontAttributes="Bold"
+                                   TextColor="#FF6B35" VerticalOptions="Center">
+                                <Label.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="vi"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </Label.IsVisible>
+                            </Label>
                         </Grid>
                     </Border>
 
                     <!-- English -->
-                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
-                            Padding="16" BackgroundColor="#1A1A1A">
+                    <Border StrokeShape="RoundRectangle 16" Padding="16">
+                        <Border.Background>
+                            <SolidColorBrush Color="#1A1A1A"/>
+                        </Border.Background>
+                        <Border.Stroke>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeConverter}">
+                                <Binding Source="en"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.Stroke>
+                        <Border.StrokeThickness>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeThicknessConverter}">
+                                <Binding Source="en"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.StrokeThickness>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
-                                                  CommandParameter="en"/>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}" CommandParameter="en"/>
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*,Auto">
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3"
+                                     Color="#20FF6B35" Margin="-16" ZIndex="-1">
+                                <BoxView.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="en"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </BoxView.IsVisible>
+                            </BoxView>
                             <Label Grid.Column="0" Text="🇬🇧" FontSize="28"/>
                             <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
-                                <Label Text="English" FontSize="16"
-                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
-                                <Label Text="{Binding TInternational}"
-                                       FontSize="12" TextColor="#666666"/>
+                                <Label Text="English" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="{Binding TInternational}" FontSize="12" TextColor="#888888"/>
                             </StackLayout>
-                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
-                                    StrokeShape="RoundRectangle 12"
-                                    Stroke="Transparent"
-                                    WidthRequest="28" HeightRequest="28"
-                                    IsVisible="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangActiveConverter},
-                                        ConverterParameter=en}">
-                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
-                                       TextColor="White" HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
-                            </Border>
+                            <Label Grid.Column="2" Text="✓" FontSize="20" FontAttributes="Bold"
+                                   TextColor="#FF6B35" VerticalOptions="Center">
+                                <Label.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="en"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </Label.IsVisible>
+                            </Label>
                         </Grid>
                     </Border>
 
                     <!-- Chinese -->
-                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
-                            Padding="16" BackgroundColor="#1A1A1A">
+                    <Border StrokeShape="RoundRectangle 16" Padding="16">
+                        <Border.Background>
+                            <SolidColorBrush Color="#1A1A1A"/>
+                        </Border.Background>
+                        <Border.Stroke>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeConverter}">
+                                <Binding Source="zh"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.Stroke>
+                        <Border.StrokeThickness>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeThicknessConverter}">
+                                <Binding Source="zh"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.StrokeThickness>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
-                                                  CommandParameter="zh"/>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}" CommandParameter="zh"/>
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*,Auto">
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3"
+                                     Color="#20FF6B35" Margin="-16" ZIndex="-1">
+                                <BoxView.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="zh"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </BoxView.IsVisible>
+                            </BoxView>
                             <Label Grid.Column="0" Text="🇨🇳" FontSize="28"/>
                             <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
-                                <Label Text="中文" FontSize="16"
-                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
-                                <Label Text="{Binding TChineseSimplified}"
-                                       FontSize="12" TextColor="#666666"/>
+                                <Label Text="中文" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="{Binding TChineseSimplified}" FontSize="12" TextColor="#888888"/>
                             </StackLayout>
-                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
-                                    StrokeShape="RoundRectangle 12"
-                                    Stroke="Transparent"
-                                    WidthRequest="28" HeightRequest="28"
-                                    IsVisible="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangActiveConverter},
-                                        ConverterParameter=zh}">
-                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
-                                       TextColor="White" HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
-                            </Border>
+                            <Label Grid.Column="2" Text="✓" FontSize="20" FontAttributes="Bold"
+                                   TextColor="#FF6B35" VerticalOptions="Center">
+                                <Label.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="zh"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </Label.IsVisible>
+                            </Label>
                         </Grid>
                     </Border>
 
                     <!-- Korean -->
-                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
-                            Padding="16" BackgroundColor="#1A1A1A">
+                    <Border StrokeShape="RoundRectangle 16" Padding="16">
+                        <Border.Background>
+                            <SolidColorBrush Color="#1A1A1A"/>
+                        </Border.Background>
+                        <Border.Stroke>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeConverter}">
+                                <Binding Source="ko"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.Stroke>
+                        <Border.StrokeThickness>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeThicknessConverter}">
+                                <Binding Source="ko"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.StrokeThickness>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
-                                                  CommandParameter="ko"/>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}" CommandParameter="ko"/>
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*,Auto">
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3"
+                                     Color="#20FF6B35" Margin="-16" ZIndex="-1">
+                                <BoxView.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="ko"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </BoxView.IsVisible>
+                            </BoxView>
                             <Label Grid.Column="0" Text="🇰🇷" FontSize="28"/>
                             <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
-                                <Label Text="한국어" FontSize="16"
-                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
-                                <Label Text="{Binding TKorean}"
-                                       FontSize="12" TextColor="#666666"/>
+                                <Label Text="한국어" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="{Binding TKorean}" FontSize="12" TextColor="#888888"/>
                             </StackLayout>
-                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
-                                    StrokeShape="RoundRectangle 12"
-                                    Stroke="Transparent"
-                                    WidthRequest="28" HeightRequest="28"
-                                    IsVisible="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangActiveConverter},
-                                        ConverterParameter=ko}">
-                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
-                                       TextColor="White" HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
-                            </Border>
+                            <Label Grid.Column="2" Text="✓" FontSize="20" FontAttributes="Bold"
+                                   TextColor="#FF6B35" VerticalOptions="Center">
+                                <Label.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="ko"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </Label.IsVisible>
+                            </Label>
                         </Grid>
                     </Border>
 
                     <!-- Japanese -->
-                    <Border StrokeShape="RoundRectangle 16" Stroke="#252525"
-                            Padding="16" BackgroundColor="#1A1A1A">
+                    <Border StrokeShape="RoundRectangle 16" Padding="16">
+                        <Border.Background>
+                            <SolidColorBrush Color="#1A1A1A"/>
+                        </Border.Background>
+                        <Border.Stroke>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeConverter}">
+                                <Binding Source="ja"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.Stroke>
+                        <Border.StrokeThickness>
+                            <MultiBinding Converter="{StaticResource MultiLangStrokeThicknessConverter}">
+                                <Binding Source="ja"/>
+                                <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                            </MultiBinding>
+                        </Border.StrokeThickness>
                         <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}"
-                                                  CommandParameter="ja"/>
+                            <TapGestureRecognizer Command="{Binding SelectLanguageCommand}" CommandParameter="ja"/>
                         </Border.GestureRecognizers>
                         <Grid ColumnDefinitions="Auto,*,Auto">
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3"
+                                     Color="#20FF6B35" Margin="-16" ZIndex="-1">
+                                <BoxView.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="ja"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </BoxView.IsVisible>
+                            </BoxView>
                             <Label Grid.Column="0" Text="🇯🇵" FontSize="28"/>
                             <StackLayout Grid.Column="1" Spacing="2" Margin="14,0">
-                                <Label Text="日本語" FontSize="16"
-                                       FontAttributes="Bold" TextColor="#FFFFFF"/>
-                                <Label Text="{Binding TJapanese}"
-                                       FontSize="12" TextColor="#666666"/>
+                                <Label Text="日本語" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Text="{Binding TJapanese}" FontSize="12" TextColor="#888888"/>
                             </StackLayout>
-                            <Border Grid.Column="2" BackgroundColor="#FF6B35"
-                                    StrokeShape="RoundRectangle 12"
-                                    Stroke="Transparent"
-                                    WidthRequest="28" HeightRequest="28"
-                                    IsVisible="{Binding SelectedLanguage,
-                                        Converter={StaticResource LangActiveConverter},
-                                        ConverterParameter=ja}">
-                                <Label Text="✓" FontSize="14" FontAttributes="Bold"
-                                       TextColor="White" HorizontalOptions="Center"
-                                       VerticalOptions="Center"/>
-                            </Border>
+                            <Label Grid.Column="2" Text="✓" FontSize="20" FontAttributes="Bold"
+                                   TextColor="#FF6B35" VerticalOptions="Center">
+                                <Label.IsVisible>
+                                    <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                        <Binding Source="ja"/>
+                                        <Binding Source="{x:Reference RootPage}" Path="BindingContext.SelectedLanguage"/>
+                                    </MultiBinding>
+                                </Label.IsVisible>
+                            </Label>
                         </Grid>
                     </Border>
 
@@ -190,8 +283,7 @@
                             <Label Text="{Binding TAutoPlay}" FontSize="15"
                                    FontAttributes="Bold" TextColor="#FFFFFF"/>
                             <Label Text="{Binding TAutoPlayHint}"
-                                   FontSize="12" TextColor="#666666"
-                                   LineBreakMode="WordWrap"/>
+                                   FontSize="12" TextColor="#666666" LineBreakMode="WordWrap"/>
                         </StackLayout>
                         <Switch Grid.Column="1" IsToggled="{Binding AutoPlayAudio}"
                                 OnColor="#FF6B35" VerticalOptions="Center"/>
@@ -207,8 +299,7 @@
                     <StackLayout Spacing="12">
                         <Grid ColumnDefinitions="Auto,*,Auto">
                             <Label Grid.Column="0" Text="{Binding TTextSizeSmall}"
-                                   FontSize="12" TextColor="#666666"
-                                   VerticalOptions="Center"/>
+                                   FontSize="12" TextColor="#666666" VerticalOptions="Center"/>
                             <Slider Grid.Column="1" Minimum="1" Maximum="3"
                                     Value="{Binding TextSize}" Margin="10,0"
                                     ThumbColor="#FF6B35"
@@ -262,8 +353,7 @@
                 </Border>
 
                 <!-- Version -->
-                <StackLayout Padding="0,0,0,20" Spacing="4"
-                             HorizontalOptions="Center">
+                <StackLayout Padding="0,0,0,20" Spacing="4" HorizontalOptions="Center">
                     <Label Text="{Binding TVersion}"
                            FontSize="11" TextColor="#333333"
                            FontAttributes="Bold" HorizontalOptions="Center"/>
@@ -290,8 +380,7 @@
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
                     </StackLayout.GestureRecognizers>
-                    <Label Text="⊞" FontSize="24" TextColor="#444444"
-                           HorizontalOptions="Center"/>
+                    <Label Text="⊞" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="{Binding TNavHome}" FontSize="10" TextColor="#444444"
                            HorizontalOptions="Center"/>
                 </StackLayout>
@@ -301,8 +390,7 @@
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToMapCommand}"/>
                     </StackLayout.GestureRecognizers>
-                    <Label Text="🗺" FontSize="24" TextColor="#444444"
-                           HorizontalOptions="Center"/>
+                    <Label Text="🗺" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
                     <Label Text="{Binding TNavMap}" FontSize="10" TextColor="#444444"
                            HorizontalOptions="Center"/>
                 </StackLayout>
@@ -322,16 +410,14 @@
                             </LinearGradientBrush>
                         </Border.Background>
                         <Label Text="🎵" FontSize="24"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
+                               HorizontalOptions="Center" VerticalOptions="Center"/>
                     </Border>
                 </Grid>
 
                 <!-- Settings — active -->
                 <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
                     <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 10"
-                            Stroke="Transparent" Padding="10,6"
-                            HorizontalOptions="Center">
+                            Stroke="Transparent" Padding="10,6" HorizontalOptions="Center">
                         <Label Text="⚙" FontSize="20" TextColor="#FF6B35"
                                HorizontalOptions="Center"/>
                     </Border>

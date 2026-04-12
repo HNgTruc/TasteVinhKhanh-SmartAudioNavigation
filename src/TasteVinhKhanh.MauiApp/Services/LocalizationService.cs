@@ -143,5 +143,18 @@ public partial class LocalizationService : ObservableObject
         ["Nav_Map"]      = new[] { "Bản đồ",   "Map",   "地图",    "지도",   "マップ" },
         ["Nav_Audio"]    = new[] { "Âm thanh",  "Audio", "音频",    "오디오", "オーディオ" },
         ["Nav_Settings"]  = new[] { "Cài đặt",   "Settings","设置",  "설정",   "設定" },
+
+        // ── POI DETAIL ──
+        ["Poi_Location"]      = new[] { "Địa điểm",         "Location",            "地点",               "위치",              "所在地" },
+        ["Poi_Narration"]     = new[] { "Thuyết minh",       "Narration",          "解说",               "해설",              "ナレーション" },
+        ["Poi_Favorite"]      = new[] { "Yêu thích",         "Favorite",           "收藏",               "즐겨찾기",           "お気に入り" },
+        ["Poi_LocationTitle"] = new[] { "📍 Địa điểm",      "📍 Location",        "📍 地点",            "📍 위치",           "📍 所在地" },
+        ["Poi_OpenMap"]       = new[] { "🗺  Mở Google Maps",   "🗺  Open Google Maps",    "🗺  打开Google地图",  "🗺  Google지도 열기",  "🗺  Googleマップを開く" },
+        ["Poi_PlayNarration"] = new[] { "🎙  Nghe thuyết minh", "🎙  Listen to narration", "🎙  收听解说",        "🎙  해설 듣기",        "🎙  ナレーションを聴く" },
+        ["Poi_NarrationTitle"]= new[] { "🎵  Kịch bản thuyết minh", "🎵  Narration script", "🎵  解说脚本",   "🎵  해설 스크립트",     "🎵  ナレーションスクリプト" },
+        ["Poi_AvailableLangs"]= new[] { "Ngôn ngữ có sẵn:",   "Available languages:", "可用语言：",         "사용 가능한 언어：",    "利用可能な言語：" },
+        ["Poi_FavoriteTitle"] = new[] { "⭐  Yêu thích",      "⭐  Favorite",       "⭐  收藏",            "⭐  즐겨찾기",         "⭐  お気に入り" },
+        ["Poi_FavoriteAdd"]   = new[] { "❤️  Thêm vào yêu thích", "❤️  Add to favorites", "❤️  添加到收藏",  "❤️  즐겨찾기에 추가",    "❤️  お気に入りに追加" },
+        ["Poi_LangLabel"]     = new[] { "Ngôn ngữ thuyết minh","Narration language", "解说语言",             "해설 언어",            "ナレーション言語" },
     };
 }

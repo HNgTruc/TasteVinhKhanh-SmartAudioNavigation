@@ -1,3 +1,4 @@
+using TasteVinhKhanh.MauiApp.Data;
 using TasteVinhKhanh.MauiApp.Services;
 using TasteVinhKhanh.MauiApp.ViewModels;
 
@@ -19,11 +20,14 @@ public partial class HomePage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        // Init DB + load local data trước
         await _vm.InitAsync();
-        // Sync với server để lấy dữ liệu POI + audio script mới nhất
         await _sync.SyncPoisAsync();
-        // Reload lại sau sync
         await _vm.InitAsync();
+    }
+
+    private async void OnPoiCardTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is Border border && border.BindingContext is LocalPoi poi)
+            await _vm.GoToDetail(poi.Id.ToString());
     }
 }

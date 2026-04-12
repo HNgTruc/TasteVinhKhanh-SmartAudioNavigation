@@ -6,6 +6,7 @@
              xmlns:conv="clr-namespace:TasteVinhKhanh.MauiApp.Converters"
              x:Class="TasteVinhKhanh.MauiApp.Views.PoiDetailPage"
              x:DataType="vm:PoiDetailViewModel"
+             x:Name="RootPage"
              Title="{Binding Poi.Name}"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#1A0A00">
@@ -17,6 +18,10 @@
         <conv:ImageUrlConverter x:Key="ImageUrlConverter"/>
         <conv:TabBgConverter x:Key="TabBgConverter"/>
         <conv:TabTextConverter x:Key="TabTextConverter"/>
+        <conv:MultiLangBgConverter x:Key="MultiLangBgConverter"/>
+        <conv:MultiLangTextColorConverter x:Key="MultiLangTextColorConverter"/>
+        <conv:MultiLangBadgeVisibleConverter x:Key="MultiLangBadgeVisibleConverter"/>
+        <conv:MultiLangStrokeConverter x:Key="MultiLangStrokeConverter"/>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto">
@@ -117,13 +122,13 @@
                         <!-- Địa điểm -->
                         <StackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="8">
                             <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="0"/>
+                                <TapGestureRecognizer Tapped="OnTabLocationTapped"/>
                             </StackLayout.GestureRecognizers>
                             <Border StrokeShape="RoundRectangle 12" Stroke="Transparent"
                                     Padding="10" BackgroundColor="{Binding IsTabLocation, Converter={StaticResource TabBgConverter}}">
                                 <Label Text="&#x1F4CD;" FontSize="22" HorizontalOptions="Center"/>
                             </Border>
-                            <Label Text="Địa điểm" FontSize="11"
+                            <Label Text="{Binding TLocation}" FontSize="11"
                                    TextColor="{Binding IsTabLocation, Converter={StaticResource TabTextConverter}}"
                                    HorizontalOptions="Center"/>
                         </StackLayout>
@@ -131,67 +136,182 @@
                         <!-- Thuyết minh -->
                         <StackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="8">
                             <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectTabCommand}" CommandParameter="1"/>
+                                <TapGestureRecognizer Tapped="OnTabNarrationTapped"/>
                             </StackLayout.GestureRecognizers>
                             <Border StrokeShape="RoundRectangle 12" Stroke="Transparent"
-                                    Padding="10">
-                                <Label Text="&#x1F3B5;" FontSize="22" HorizontalOptions="Center"/>
+                                    Padding="10"
+                                    BackgroundColor="{Binding IsTabNarration, Converter={StaticResource TabBgConverter}}">
+                                <Label Text="&#x1F3B5;" FontSize="22" HorizontalOptions="Center"
+                                       TextColor="{Binding IsTabNarration, Converter={StaticResource TabTextConverter}}"/>
                             </Border>
-                            <Label Text="Thuyết minh" FontSize="11" TextColor="#666666"
+                            <Label Text="{Binding TNarration}" FontSize="11"
+                                   TextColor="{Binding IsTabNarration, Converter={StaticResource TabTextConverter}}"
                                    HorizontalOptions="Center"/>
                         </StackLayout>
 
                         <!-- Yêu thích -->
                         <StackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="8">
                             <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding ToggleFavoriteCommand}"/>
+                                <TapGestureRecognizer Tapped="OnTabFavoriteTapped"/>
                             </StackLayout.GestureRecognizers>
                             <Border StrokeShape="RoundRectangle 12" Stroke="Transparent"
                                     Padding="10">
                                 <Label Text="&#x2B50;" FontSize="22" HorizontalOptions="Center"/>
                             </Border>
-                            <Label Text="Yêu thích" FontSize="11" TextColor="#666666"
+                            <Label Text="{Binding TFavorite}" FontSize="11" TextColor="#666666"
                                    HorizontalOptions="Center"/>
                         </StackLayout>
                     </Grid>
                 </Border>
 
-                <!-- NÚT PHÁT THUYẾT MINH -->
-                <Border StrokeShape="RoundRectangle 16" Stroke="Transparent">
-                    <Border.Background>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                            <GradientStop Color="#FF6B35" Offset="0"/>
-                            <GradientStop Color="#FF4500" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Border.Background>
-                    <Button Text="&#x1F50A;  Nghe thuyết minh"
-                            Command="{Binding PlayNarrationCommand}"
-                            BackgroundColor="Transparent" TextColor="White"
-                            FontSize="16" FontAttributes="Bold" CornerRadius="0" HeightRequest="54"/>
+                <!-- ── TAB 0: NỘI DUNG ĐỊA ĐIỂM ── -->
+                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16"
+                        IsVisible="{Binding IsTabLocation}">
+                    <StackLayout Spacing="12">
+                        <Label Text="{Binding TLocationTitle}" FontSize="13" FontAttributes="Bold" TextColor="#FF6B35"/>
+                        <Button Text="{Binding TOpenMap}"
+                                Command="{Binding OpenMapCommand}"
+                                BackgroundColor="#252525" TextColor="#FF6B35"
+                                FontSize="14" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="48"/>
+                        <Button Text="{Binding TPlayNarration}"
+                                Command="{Binding PlayNarrationCommand}"
+                                BackgroundColor="#252525" TextColor="#FF6B35"
+                                FontSize="14" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="48"/>
+                    </StackLayout>
                 </Border>
 
-                <!-- NÚT XEM BẢN ĐỒ -->
-                <Border StrokeShape="RoundRectangle 16" Stroke="#FF6B3540" Padding="1"
-                        IsVisible="{Binding Poi.MapUrl, Converter={StaticResource NullToBoolConverter}}">
-                    <Button Text="&#x1F5FA;  Xem trên Google Maps"
-                            Command="{Binding OpenMapCommand}"
-                            BackgroundColor="#1A1A1A" TextColor="#FF6B35"
-                            FontSize="15" FontAttributes="Bold" CornerRadius="15" HeightRequest="50"/>
-                </Border>
-
-                <!-- NGÔN NGỮ CÓ SẴN -->
-                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16">
-                    <StackLayout Spacing="10">
-                        <Label Text="Ngôn ngữ thuyết minh" FontAttributes="Bold" FontSize="14" TextColor="#FFFFFF"/>
+                <!-- ── TAB 1: NỘI DUNG THUYẾT MINH ── -->
+                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16"
+                        IsVisible="{Binding IsTabNarration}">
+                    <StackLayout Spacing="12">
+                        <Label Text="{Binding TNarrationTitle}" FontSize="13" FontAttributes="Bold" TextColor="#FF6B35"/>
+                        <!-- Danh sách ngôn ngữ có sẵn -->
+                        <Label Text="{Binding TAvailableLangs}" FontSize="11" TextColor="#666666"/>
                         <FlexLayout BindableLayout.ItemsSource="{Binding Scripts}"
                                     Wrap="Wrap" Direction="Row" JustifyContent="Start">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate x:DataType="data:LocalAudioScript">
-                                    <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 20"
-                                            Stroke="Transparent" Padding="12,6" Margin="4,2">
-                                        <Label Text="{Binding LanguageCode}" FontSize="12"
-                                               FontAttributes="Bold" TextColor="#FF6B35"/>
-                                    </Border>
+                                    <Grid Margin="4,2" Padding="12,6">
+                                        <Border StrokeShape="RoundRectangle 20" Stroke="Transparent">
+                                            <Border.Background>
+                                                <MultiBinding Converter="{StaticResource MultiLangBgConverter}">
+                                                    <Binding Path="LanguageCode"/>
+                                                    <Binding Path="DataContext.CurrentLangCode" Source="{x:Reference RootPage}"/>
+                                                </MultiBinding>
+                                            </Border.Background>
+                                        </Border>
+                                        <Label FontSize="12" FontAttributes="Bold"
+                                               Text="{Binding LanguageCode}"
+                                               VerticalOptions="Center">
+                                            <Label.TextColor>
+                                                <MultiBinding Converter="{StaticResource MultiLangTextColorConverter}">
+                                                    <Binding Path="LanguageCode"/>
+                                                    <Binding Path="DataContext.CurrentLangCode" Source="{x:Reference RootPage}"/>
+                                                </MultiBinding>
+                                            </Label.TextColor>
+                                        </Label>
+                                        <Label Text=" ✓" FontSize="10" FontAttributes="Bold"
+                                               TextColor="White"
+                                               VerticalOptions="Center" HorizontalOptions="End"
+                                               Margin="0,0,4,0">
+                                            <Label.IsVisible>
+                                                <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                                    <Binding Path="LanguageCode"/>
+                                                    <Binding Path="DataContext.CurrentLangCode" Source="{x:Reference RootPage}"/>
+                                                </MultiBinding>
+                                            </Label.IsVisible>
+                                        </Label>
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </FlexLayout>
+                        <!-- Nút phát -->
+                        <Button Text="{Binding TPlayNarration}"
+                                Command="{Binding PlayNarrationCommand}"
+                                BackgroundColor="#252525" TextColor="#FF6B35"
+                                FontSize="14" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="44"/>
+                    </StackLayout>
+                </Border>
+
+                <!-- ── TAB 2: NỘI DUNG YÊU THÍCH ── -->
+                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16"
+                        IsVisible="{Binding IsTabFavorite}">
+                    <StackLayout Spacing="10" HorizontalOptions="Center">
+                        <Label Text="{Binding TFavoriteTitle}" FontSize="15" FontAttributes="Bold" TextColor="#FF6B35"
+                               HorizontalOptions="Center"/>
+                        <Label Text="{Binding Poi.Name}" FontSize="13" TextColor="#AAAAAA"
+                               HorizontalOptions="Center" LineBreakMode="TailTruncation"/>
+                        <Button Text="{Binding TFavoriteAdd}"
+                                Command="{Binding ToggleFavoriteCommand}"
+                                BackgroundColor="#252525" TextColor="#FF6B35"
+                                FontSize="14" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="44"
+                                HorizontalOptions="Center"/>
+                    </StackLayout>
+                </Border>
+
+                <!-- NGÔN NGỮ ĐANG CHỌN + CHỌN NGÔN NGỮ -->
+                <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16">
+                    <StackLayout Spacing="10">
+                        <StackLayout Spacing="4">
+                            <Label Text="{Binding TLangLabel}" FontSize="11" TextColor="#666666"/>
+                            <Label Text="{Binding CurrentAudioLangDisplay}" FontSize="18"
+                                   FontAttributes="Bold" TextColor="#FF6B35"/>
+                            <Label IsVisible="{Binding IsPlayingNarration}"
+                                   Text="🔊 Đang phát..." FontSize="12" TextColor="#FF6B35"
+                                   FontAttributes="Bold"/>
+                        </StackLayout>
+                        <Label Text="{Binding TAvailableLangs}" FontSize="11" TextColor="#555555"/>
+                        <FlexLayout BindableLayout.ItemsSource="{Binding Scripts}"
+                                    Wrap="Wrap" Direction="Row" JustifyContent="Start">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="data:LocalAudioScript">
+                                    <Grid Margin="4,2" Padding="12,5">
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnLangChipTapped"/>
+                                        </Grid.GestureRecognizers>
+                                        <Border StrokeShape="RoundRectangle 20" Stroke="Transparent">
+                                            <Border.Background>
+                                                <MultiBinding Converter="{StaticResource MultiLangBgConverter}">
+                                                    <Binding Path="LanguageCode"/>
+                                                    <Binding Path="DataContext.CurrentLangCode" Source="{x:Reference RootPage}"/>
+                                                </MultiBinding>
+                                            </Border.Background>
+                                        </Border>
+                                        <Border StrokeShape="RoundRectangle 20"
+                                                StrokeThickness="1.5">
+                                            <Border.Stroke>
+                                                <MultiBinding Converter="{StaticResource MultiLangStrokeConverter}">
+                                                    <Binding Path="LanguageCode"/>
+                                                    <Binding Path="DataContext.CurrentLangCode" Source="{x:Reference RootPage}"/>
+                                                </MultiBinding>
+                                            </Border.Stroke>
+                                        </Border>
+                                        <Label FontSize="12" FontAttributes="Bold"
+                                               Text="{Binding LanguageCode}"
+                                               VerticalOptions="Center">
+                                            <Label.TextColor>
+                                                <MultiBinding Converter="{StaticResource MultiLangTextColorConverter}">
+                                                    <Binding Path="LanguageCode"/>
+                                                    <Binding Path="DataContext.CurrentLangCode" Source="{x:Reference RootPage}"/>
+                                                </MultiBinding>
+                                            </Label.TextColor>
+                                        </Label>
+                                        <Label Text=" ✓" FontSize="10" FontAttributes="Bold"
+                                               TextColor="White"
+                                               VerticalOptions="Center" HorizontalOptions="End"
+                                               Margin="0,0,4,0">
+                                            <Label.IsVisible>
+                                                <MultiBinding Converter="{StaticResource MultiLangBadgeVisibleConverter}">
+                                                    <Binding Path="LanguageCode"/>
+                                                    <Binding Path="DataContext.CurrentLangCode" Source="{x:Reference RootPage}"/>
+                                                </MultiBinding>
+                                            </Label.IsVisible>
+                                        </Label>
+                                    </Grid>
                                 </DataTemplate>
                             </BindableLayout.ItemTemplate>
                         </FlexLayout>
@@ -221,7 +341,7 @@
                                  VerticalOptions="Center">
                         <Label Text="⊞" FontSize="24" TextColor="#444444"
                                HorizontalOptions="Center"/>
-                        <Label Text="Home" FontSize="10" TextColor="#444444"
+                        <Label Text="{Binding TNavHome}" FontSize="10" TextColor="#444444"
                                HorizontalOptions="Center"/>
                     </StackLayout>
                 </Grid>
@@ -235,7 +355,7 @@
                                  VerticalOptions="Center">
                         <Label Text="🗺" FontSize="24" TextColor="#444444"
                                HorizontalOptions="Center"/>
-                        <Label Text="Map" FontSize="10" TextColor="#444444"
+                        <Label Text="{Binding TNavMap}" FontSize="10" TextColor="#444444"
                                HorizontalOptions="Center"/>
                     </StackLayout>
                 </Grid>
@@ -269,7 +389,7 @@
                                  VerticalOptions="Center">
                         <Label Text="⚙" FontSize="24" TextColor="#444444"
                                HorizontalOptions="Center"/>
-                        <Label Text="Settings" FontSize="10" TextColor="#444444"
+                        <Label Text="{Binding TNavSettings}" FontSize="10" TextColor="#444444"
                                HorizontalOptions="Center"/>
                     </StackLayout>
                 </Grid>

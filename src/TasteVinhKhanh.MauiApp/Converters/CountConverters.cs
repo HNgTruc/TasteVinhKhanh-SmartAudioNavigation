@@ -25,3 +25,17 @@ public class InverseCountToVisibilityConverter : IValueConverter
         object? parameter, CultureInfo culture)
         => throw new NotImplementedException();
 }
+
+/// <summary>
+/// True nếu value là false (bool). Dùng cho IsVisible ẩn khi true.
+/// </summary>
+public class InverseBoolToVisibilityConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType,
+        object? parameter, CultureInfo culture)
+        => value is bool b && !b;
+
+    public object? ConvertBack(object? value, Type targetType,
+        object? parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}

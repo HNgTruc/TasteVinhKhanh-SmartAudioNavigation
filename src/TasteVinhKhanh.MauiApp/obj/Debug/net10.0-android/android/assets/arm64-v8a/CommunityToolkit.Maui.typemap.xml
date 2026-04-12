@@ -1,8 +1,0 @@
-<api type="debug" assembly-name="CommunityToolkit.Maui" mvid="c6b76715bceb4acd8a52d542e9016429">
-  <java-to-managed>
-    <entry java-name="crc648fc34c62be8fbbff/Snackbar_SnackbarCallback" managed-name="CommunityToolkit.Maui.Alerts.Snackbar+SnackbarCallback, CommunityToolkit.Maui" managed-type-token-id="33554623" />
-  </java-to-managed>
-  <managed-to-java>
-    <entry java-name="crc648fc34c62be8fbbff/Snackbar_SnackbarCallback" managed-name="CommunityToolkit.Maui.Alerts.Snackbar+SnackbarCallback, CommunityToolkit.Maui" managed-type-token-id="33554623" />
-  </managed-to-java>
-</api>
