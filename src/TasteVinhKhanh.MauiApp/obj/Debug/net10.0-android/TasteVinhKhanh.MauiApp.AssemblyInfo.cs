@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TasteVinhKhanh.MauiApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+6c2ea8e065feaa60b955d0ebd9e19c798a1a68bb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+fdb061dc5486d1fc8874090e930da3b18ee72188")]
 [assembly: System.Reflection.AssemblyProductAttribute("TasteVinhKhanh.MauiApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TasteVinhKhanh.MauiApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

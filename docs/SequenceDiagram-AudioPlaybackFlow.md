@@ -9,50 +9,50 @@
 ```
 ┌──────────────┐     ┌──────────────┐     ┌───────────────────────┐     ┌────────────┐
 │  MauiApp     │     │  Geofence    │     │  NarrationEngine      │     │  Server    │
-│  (User)       │     │  Engine      │     │  (Audio Player)       │     │  (API)     │
+│  (User)      │     │  Engine      │     │  (Audio Player)       │     │  (API)     │
 └──────┬───────┘     └──────┬───────┘     └───────────┬───────────┘     └──────┬─────┘
-       │                    │                       │                        │
-       │ [App Launch]        │                       │                        │
-       │────────────────────>│                       │                        │
-       │                    │ Init (load POIs from   │                        │
-       │                    │  local SQLite)         │                        │
-       │                    │                       │                        │
-       │ [GPS: every 5s]    │                       │                        │
-       │───────────────────>│                       │                        │
-       │                    │ CheckLocationAsync(loc)│                        │
-       │                    │                       │                        │
-       │                    │──HaversineMeters()──>  │                        │
-       │                    │                       │                        │
-       │                    │ [distance <= TriggerRadius]                     │
-       │                    │                       │                        │
-       │                    │ WasRecentlyPlayedAsync()                       │
-       │                    │                       │                        │
-       │                    │ [5-min cooldown OK]    │                        │
-       │                    │                       │                        │
-       │                    │──PoiTriggered event──> │                        │
-       │                    │                       │                        │
-       │                    │                       │ ShowPoiNotification()   │
-       │                    │                       │ PlayAsync(poi,dist,loc)  │
-       │                    │                       │                        │
-       │                    │                       │ InsertLogAsync()  ─────>│ POST /analytics/logs
-       │                    │                       │                        │
-       │                    │                       │ [IsAudioDownloaded ?]   │
-       │                    │                       │                        │
-       │                    │                       │ [YES → play local]      │
-       │                    │                       │ PlayLocalFile()         │
-       │                    │                       │                        │
-       │                    │                       │ [NO → download first]   │
-       │                    │                       │ DownloadAudioAsync() ──>│ GET /api/audio/{id}
-       │                    │                       │                        │
-       │                    │                       │ PlayLocalFile()         │
-       │                    │                       │                        │
-       │                    │                       │ [download fail → TTS]   │
-       │                    │                       │ SpeakWithTtsAsync()     │
-       │                    │                       │ (TextToSpeech)         │
-       │                    │                       │                        │
-       │                    │                       │ NarrationFinished event│
-       │                    │                       │                        │
-       │                    │                       │ UploadPendingLogsAsync()│──>│
+       │                    │                         │                        │
+       │ [App Launch]       │                         │                        │
+       │────────────────────>│                        │                        │
+       │                    │ Init (load POIs from    │                        │
+       │                    │  local SQLite)          │                        │
+       │                    │                         │                        │
+       │ [GPS: every 5s]    │                         │                        │
+       │───────────────────>│                         │                        │
+       │                    │ CheckLocationAsync(loc) │                        │
+       │                    │                         │                        │
+       │                    │──HaversineMeters()──>   │                        │
+       │                    │                         │                        │
+       │                    │ [distance <= TriggerRadius]                      │
+       │                    │                         │                        │
+       │                    │ WasRecentlyPlayedAsync()                         │
+       │                    │                         │                        │
+       │                    │ [5-min cooldown OK]     │                        │
+       │                    │                         │                        │
+       │                    │──PoiTriggered event──>  │                        │
+       │                    │                         │                        │
+       │                    │                         │ ShowPoiNotification()  │
+       │                    │                         │ PlayAsync(poi,dist,loc)│ 
+       │                    │                         │                        │
+       │                    │                         │ InsertLogAsync() ─────>│ POST /analytics/logs
+       │                    │                         │                        │
+       │                    │                         │ [IsAudioDownloaded ?]  │
+       │                    │                         │                        │
+       │                    │                         │ [YES → play local]     │
+       │                    │                         │ PlayLocalFile()        │
+       │                    │                         │                        │
+       │                    │                         │ [NO → download first]  │
+       │                    │                         │ DownloadAudioAsync()──>│ GET /api/audio/{id}
+       │                    │                         │                        │
+       │                    │                         │ PlayLocalFile()        │
+       │                    │                         │                        │
+       │                    │                         │ [download fail → TTS]  │
+       │                    │                         │ SpeakWithTtsAsync()    │
+       │                    │                         │ (TextToSpeech)         │
+       │                    │                         │                        │
+       │                    │                         │ NarrationFinished event│
+       │                    │                         │                        │
+       │                    │                         │UploadPendingLogsAsync()──>│
 ```
 
 ---
@@ -76,28 +76,28 @@ MauiApp              SyncService(MAUI)        AppDatabase           SyncControll
    │                       │──────────────────────>│                       │
    │                       │                       │                       │
    │                       │                       │ Return lastSyncAt     │
-   │                       │<───────────────────────│                       │
+   │                       │<──────────────────────│                       │
    │                       │                       │                       │
    │                       │ SyncPoisAsync(lastSyncAt)                     │
-   │                       │───────────────────────────────────────────────>│
+   │                       │──────────────────────────────────────────────>│
    │                       │                       │                       │
-   │                       │                       │        GET /api/sync    │
-   │                       │                       │        ?lastSyncAt=...  │
+   │                       │                       │        GET /api/sync  │
+   │                       │                       │        ?lastSyncAt=...│
    │                       │                       │                       │
-   │                       │<───────────────────────────────────────────────│
+   │                       │<──────────────────────────────────────────────│
    │                       │         200 OK: {Pois[], SyncedAt}            │
    │                       │                       │                       │
    │                       │                       │                       │
    │                       │ UpsertPoisFromServer(Pois)                    │
    │                       │──────────────────────>│                       │
    │                       │                       │                       │
-   │                       │                       │ Insert/Update POIs     │
+   │                       │                       │ Insert/Update POIs    │
    │                       │                       │ Insert/Update AudioScripts
    │                       │                       │                       │
-   │                       │ SetLastSyncTime(SyncedAt)                    │
+   │                       │ SetLastSyncTime(SyncedAt)                     │
    │                       │──────────────────────>│                       │
    │                       │                       │                       │
-   │ [App ready — GPS starts]                     │                       │
+   │ [App ready — GPS starts]                      │                       │
    │                       │                       │                       │
 ```
 
@@ -112,35 +112,35 @@ LocationService      GeofenceEngine          AppDatabase
       │ [GPS poll 5s]     │                     │
       │ StartAsync()      │                     │
       │                   │                     │
-      │ OnLocationUpdated(loc)                   │
-      │─────────────────>│                     │
+      │ OnLocationUpdated(loc)                  │
+      │──────────────────>│                     │
       │                   │                     │
       │                   │ CheckLocationAsync(loc)
       │                   │                     │
       │                   │ GetAllPoisAsync()   │
-      │                   │───────────────────>│ │
-      │                   │                     │ │
-      │                   │<───────────────────│ │
+      │                   │────────────────────>│
+      │                   │                     │
+      │                   │<────────────────────│
       │                   │ List<LocalPoi>      │
       │                   │                     │
       │                   │ [for each POI]      │
-      │                   │──HaversineMeters()─>│ │
-      │                   │ distance = X meters  │
-      │                   │<─────────────────────│ │
+      │                   │──HaversineMeters()─>│ 
+      │                   │ distance = X meters │
+      │                   │<────────────────────│ 
       │                   │                     │
       │                   │ [distance <= poi.TriggerRadius]
       │                   │                     │
       │                   │ WasRecentlyPlayedAsync(poiId, 5min)
-      │                   │───────────────────>│ │
-      │                   │                     │ │
-      │                   │<───────────────────│ │
+      │                   │────────────────────>│ 
+      │                   │                     │
+      │                   │<────────────────────│
       │                   │ true/false (cooldown)
       │                   │                     │
       │                   │ [cooldown active → skip]
       │                   │                     │
-      │                   │ [cooldown OK]        │
+      │                   │ [cooldown OK]       │
       │                   │                     │
-      │                   │──PoiTriggered event  │
+      │                   │──PoiTriggered event │
       │                   │ (poi, distance, location)
       │                   │                     │
 ```
@@ -155,52 +155,52 @@ GeofenceEngine       NarrationEngine          AppDatabase        AudioPlayerServ
      │                     │                     │                    │                     │                   │
      │                     │ PlayAsync(poi)      │                    │                     │                   │
      │                     │                     │                    │                     │                   │
-     │                     │ InsertLogAsync()──────>                 │                     │                   │
-     │                     │                     │ Insert playback log (IsSynced=false)      │                   │
+     │                     │ InsertLogAsync()──────>                  │                     │                   │
+     │                     │                     │ Insert playback log (IsSynced=false)     │                   │
      │                     │                     │                    │                     │                   │
-     │                     │ GetAudioScript(poiId, lang)             │                     │                   │
-     │                     │───────────────────>│                    │                     │                   │
+     │                     │ GetAudioScript(poiId, lang)              │                     │                   │
+     │                     │───────────────────>│                     │                     │                   │
      │                     │                     │                    │                     │                   │
-     │                     │<───────────────────│                    │                     │                   │
+     │                     │<────────────────────│                    │                     │                   │
      │                     │ LocalAudioScript    │                    │                     │                   │
      │                     │                     │                    │                     │                   │
-     │                     │ [IsAudioDownloaded && local file exists?]                       │                   │
+     │                     │ [IsAudioDownloaded && local file exists?]│                     │                   │
      │                     │                     │                    │                     │                   │
-     │                     │ [YES: Tier 1]        │                    │                     │                   │
+     │                     │ [YES: Tier 1]       │                    │                     │                   │
      │                     │                     │                    │                     │                   │
      │                     │ PlayLocalFile(localPath)                 │                     │                   │
-     │                     │────────────────────────────────────────>│                     │                   │
+     │                     │─────────────────────────────────────────>│                     │                   │
      │                     │                     │                    │ Read bytes          │                   │
      │                     │                     │                    │ Play                │                   │
      │                     │<─────────────────────────────────────────│                     │                   │
-     │                     │ PlaybackEnded        │                    │                     │                   │
+     │                     │ PlaybackEnded       │                    │                     │                   │
      │                     │                     │                    │                     │                   │
      │                     │ [NO: Tier 2]        │                    │                     │                   │
      │                     │                     │                    │                     │                   │
      │                     │ DownloadAudioAsync(scriptId)             │                     │                   │
-     │                     │───────────────────────────────────────────────────────────────>│                  │
+     │                     │───────────────────────────────────────────────────────────────>│                   │
      │                     │                     │                    │                     │ GET /api/audio/{id}
      │                     │                     │                    │                     │                   │
-     │                     │                     │                    │<───────────────────────────────────────────│
+     │                     │                     │                    │<────────────────────────────────────────│
      │                     │                     │                    │ 200 OK: audio bytes │                   │
      │                     │                     │                    │                     │                   │
      │                     │ Save to cache       │                    │                     │                   │
      │                     │────────────────────>│                    │                     │                   │
-     │                     │                     │ UpdateLocalAudioPath()                    │                   │
+     │                     │                     │ UpdateLocalAudioPath()                   │                   │
      │                     │                     │                    │                     │                   │
      │                     │ PlayLocalFile()     │                    │                     │                   │
-     │                     │────────────────────────────────────────>│                     │                   │
+     │                     │─────────────────────────────────────────>│                     │                   │
      │                     │                     │                    │ Play                │                   │
      │                     │<─────────────────────────────────────────│                     │                   │
-     │                     │ PlaybackEnded        │                    │                     │                   │
+     │                     │ PlaybackEnded       │                    │                     │                   │
      │                     │                     │                    │                     │                   │
-     │                     │ [Tier 2 failed: Tier 3]                   │                     │                   │
+     │                     │ [Tier 2 failed: Tier 3]                  │                     │                   │
      │                     │                     │                    │                     │                   │
      │                     │ SpeakWithTtsAsync(ttsScript, lang)       │                     │                   │
-     │                     │────────────────────────────────────────────────────────────────────────────>│       │
+     │                     │───────────────────────────────────────────────────────────────────────────────────>│
      │                     │                     │                    │                     │                   │
      │                     │                     │                    │                     │                   │
-     │                     │ NarrationFinished    │                    │                     │                   │
+     │                     │ NarrationFinished   │                    │                     │                   │
      │                     │                     │                    │                     │                   │
 ```
 
@@ -215,23 +215,23 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
        │                    │                     │
        │ UploadPendingLogsAsync()                 │
        │                    │                     │
-       │ GetUnsyncedLogsAsync()                    │
+       │ GetUnsyncedLogsAsync()                   │
        │───────────────────>│                     │
        │                    │                     │
        │<───────────────────│                     │
-       │ List<LocalPlaybackLog>                    │
+       │ List<LocalPlaybackLog>                   │
        │                    │                     │
-       │ [batch upload]      │                     │
-       │ POST /api/analytics/logs                  │
-       │──────────────────────────────────────────>│
+       │ [batch upload]     │                     │
+       │ POST /api/analytics/logs                 │
+       │─────────────────────────────────────────>│
        │                    │                     │
-       │                    │        SaveLogsAsync()│
-       │                    │        → PlaybackLogs DB│
+       │                    │     SaveLogsAsync() │
+       │                    │    → PlaybackLogs DB│
        │                    │                     │
-       │<───────────────────────────────────────────│
-       │         200 OK       │                     │
+       │<─────────────────────────────────────────│
+       │         200 OK     │                     │
        │                    │                     │
-       │ MarkLogsSyncedAsync(logs)                 │
+       │ MarkLogsSyncedAsync(logs)                │
        │───────────────────>│                     │
        │                    │ Update IsSynced=true│
        │                    │                     │
@@ -243,80 +243,80 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
 ## 3. Sequence Diagram tổng hợp (single view)
 
 ```
-┌──────────────┐  ┌────────────────┐  ┌──────────────────┐  ┌────────────┐  ┌──────────────────┐  ┌─────────────┐
-│   User/App    │  │ LocationService│  │  GeofenceEngine  │  │ AppDatabase│  │ NarrationEngine  │  │  Server API  │
-└───────┬──────┘  └───────┬────────┘  └────────┬─────────┘  └─────┬──────┘  └────────┬─────────┘  └──────┬──────┘
-        │                  │                    │                 │                  │                    │
-        │ App Launch       │                    │                 │                  │                    │
-        │─────────────────>│                    │                 │                  │                    │
-        │                  │ StartAsync()       │                 │                  │                    │
-        │                  │───────────────────>│                 │                  │                    │
-        │                  │                    │ Load POIs from  │                 │                    │
-        │                  │                    │────────────────>│                  │                    │
-        │                  │                    │                 │                  │                    │
-        │ [GPS 5s poll]    │                    │                 │                  │                    │
-        │<─────────────────│                    │                 │                  │                    │
-        │                  │                    │                 │                  │                    │
-        │ LocationUpdated  │                    │                 │                  │                    │
-        │─────────────────>│                    │                 │                  │                    │
-        │                  │ OnLocationUpdated  │                 │                  │                    │
-        │                  │──────────────────>│                 │                  │                    │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │ CheckLocationAsync(lat/lng)            │                  │
-        │                  │                    │──HaversineMeters()──>│                  │                   │
-        │                  │                    │<──distance(m)──────│                  │                   │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │ WasRecentlyPlayedAsync(poiId, 5min)    │                  │
-        │                  │                    │────────────────>│                  │                    │
-        │                  │                    │<────────────────│                  │                    │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │ [cooldown OK]   │                  │                    │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │──PoiTriggered──>│                  │                    │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ ShowNotification()                  │
-        │                  │                    │                 │──────────────────>│                   │
-        │                  │                    │                 │                  │ Notify user        │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ PlayAsync(poi, dist, loc)            │
-        │                  │                    │                 │<─────────────────│                   │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ InsertLogAsync() │                   │
-        │                  │                    │                 │────────────────>│                   │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ GetAudioScript() │                   │
-        │                  │                    │                 │────────────────>│                   │
-        │                  │                    │                 │<────────────────│                   │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ [IsAudioDownloaded?]               │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ [YES] PlayLocalFile()               │
-        │                  │                    │                 │                  │      ─────────────┘
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ [NO] DownloadAudioAsync(scriptId)   │
-        │                  │                    │                 │────────────────────────────────────────>│
-        │                  │                    │                 │                  │ GET /api/audio/{id} │
-        │                  │                    │                 │<────────────────────────────────────────│
-        │                  │                    │                 │                  │ 200 OK (audio bytes) │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ SaveCache(localPath)                  │
-        │                  │                    │                 │────────────────>│                   │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ PlayLocalFile()  │                   │
-        │                  │                    │                 │─────────────────│                   │
-        │                  │                    │                 │                  │ Audio plays         │
-        │                  │                    │                 │<─────────────────│                   │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ NarrationFinished │                   │
-        │                  │                    │                 │                  │                    │
-        │                  │                    │                 │ UploadPendingLogsAsync()               │
-        │                  │                    │                 │────────────────>│                   │
-        │                  │                    │                 │                  │ POST /api/analytics/logs│
-        │                  │                    │                 │<─────────────────────────────────────────────────│
-        │                  │                    │                 │                  │ 200 OK              │
-        │                  │                    │                 │ MarkLogsSynced()  │                   │
-        │                  │                    │                 │────────────────>│                   │
-        │                  │                    │                 │                  │                    │
+┌──────────────┐   ┌────────────────┐  ┌──────────────────┐  ┌────────────┐  ┌──────────────────┐  ┌─────────────┐
+│   User/App   │   │ LocationService│  │  GeofenceEngine  │  │ AppDatabase│  │ NarrationEngine  │  │  Server API │
+└───────┬──────┘   └───────┬────────┘  └────────┬─────────┘  └─────┬──────┘  └────────┬─────────┘  └──────┬──────┘
+        │                  │                    │                  │                  │                   │
+        │ App Launch       │                    │                  │                  │                   │
+        │─────────────────>│                    │                  │                  │                   │
+        │                  │ StartAsync()       │                  │                  │                   │
+        │                  │───────────────────>│                  │                  │                   │
+        │                  │                    │ Load POIs from   │                  │                   │
+        │                  │                    │────────────────> │                  │                   │
+        │                  │                    │                  │                  │                   │
+        │ [GPS 5s poll]    │                    │                  │                  │                   │
+        │<─────────────────│                    │                  │                  │                   │
+        │                  │                    │                  │                  │                   │
+        │ LocationUpdated  │                    │                  │                  │                   │
+        │─────────────────>│                    │                  │                  │                   │
+        │                  │ OnLocationUpdated  │                  │                  │                   │
+        │                  │──────────────────> │                  │                  │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │ CheckLocationAsync(lat/lng)         │                   │
+        │                  │                    │──HaversineMeters()──>               │                   │
+        │                  │                    │<──distance(m)────│                  │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │ WasRecentlyPlayedAsync(poiId, 5min) │                   │
+        │                  │                    │────────────────> │                  │                   │
+        │                  │                    │<──────────────── │                  │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │ [cooldown OK]    │                  │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │──PoiTriggered──> │                  │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ ShowNotification()                   │
+        │                  │                    │                  │─────────────────>│                   │
+        │                  │                    │                  │                  │ Notify user       │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │PlayAsync(poi, dist, loc)             │
+        │                  │                    │                  │<──────────────── │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ InsertLogAsync() │                   │
+        │                  │                    │                  │─────────────────>│                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ GetAudioScript() │                   │
+        │                  │                    │                  │─────────────────>│                   │
+        │                  │                    │                  │<─────────────────│                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ IsAudioDownloaded?                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ [YES] PlayLocalFile()                │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ [NO] DownloadAudioAsync(scriptId)    │
+        │                  │                    │                  │─────────────────────────────────────>│
+        │                  │                    │                  │                  │ GET /api/audio/{id} 
+        │                  │                    │                  │<─────────────────────────────────────│
+        │                  │                    │                  │                  │ 200 OK (audio bytes)
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ SaveCache(localPath)                 │
+        │                  │                    │                  │────────────────> │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ PlayLocalFile()  │                   │
+        │                  │                    │                  │──────────────────│                   │
+        │                  │                    │                  │                  │ Audio plays       │
+        │                  │                    │                  │<──────────────── │                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ NarrationFinished│                   │
+        │                  │                    │                  │                  │                   │
+        │                  │                    │                  │ UploadPendingLogsAsync()             │
+        │                  │                    │                  │────────────────> │                   │
+        │                  │                    │                  │                  │ POST /api/analytics/logs
+        │                  │                    │                  │<─────────────────────────────────────│
+        │                  │                    │                  │                   │ 200 OK           │
+        │                  │                    │                  │ MarkLogsSynced()  │                  │
+        │                  │                    │                  │──────────────────>│                  │
+        │                  │                    │                  │                   │                  │
 ```
 
 ---
@@ -351,9 +351,9 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
 
 ```
 ┌──────────────┐   vendor uploads    ┌─────────────┐  admin approves   ┌──────────┐
-│  (not exist) │ ─────────────────>  │   Staging   │ ───────────────>  │ Approved │
-└──────────────┘                    │  (Pending)  │                   │ (visible)│
-                                    └──────────────┘                   └──────────┘
+│  (not exist) │ ─────────────────>  │   Staging   │───────────────>   │ Approved │
+└──────────────┘                     │  (Pending)  │                   │ (visible)│
+                                     └─────────────┘                   └──────────┘
                                             │
                                             │ admin rejects
                                             ↓
@@ -365,8 +365,8 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
 
 ┌──────────┐  vendor requests   ┌───────────────┐  admin approves  ┌────────┐
 │ Approved │ ────────────────>  │ DeletionQueue │ ──────────────>  │Deleted │
-└──────────┘                     │   (Pending)   │                  └────────┘
-                                 └───────────────┘
+└──────────┘                    │   (Pending)   │                  └────────┘
+                                └───────────────┘
                                          │
                                          │ admin rejects
                                          ↓
@@ -389,51 +389,44 @@ Vendor           VendorController         AppDbContext          Admin           
    │                    │                     │                  │                      │                   │
    │ POST /api/vendor/images/staging          │                  │                      │                   │
    │ {poiId, file}      │                     │                  │                      │                   │
-   │──────────────────>│                     │                  │                      │                   │
-   │                    │ ValidateVendorPoi(poiId, vendorId)     │                  │                      │
-   │                    │──────────────────>│ │                  │                      │                   │
-   │                    │<──────────────────│ │                  │                      │                   │
-   │                    │ [not owner → 403] │                  │                      │                   │
+   │───────────────────>│                     │                  │                      │                   │
+   │                    │ ValidateVendorPoi(poiId, vendorId)     │                      │                   │
+   │                    │────────────────────>│                  │                      │                   │
+   │                    │<────────────────────│                  │                      │                   │
+   │                    │ [not owner → 403]   │                  │                      │                   │
    │                    │                     │                  │                      │                   │
    │                    │ [Save to staging]   │                  │                      │                   │
    │                    │                     │                  │                      │                   │
-   │                    │ SaveFileAsync(file, staging/poi_{poiId}/{guid}.{ext})          │
-   │                    │───────────────────────────────────────────────────────────────>│
+   │                    │ SaveFileAsync(file, staging/poi_{poiId}/{guid}.{ext})         │                   │
+   │                    │──────────────────────────────────────────────────────────────>│                   │ 
    │                    │                     │                  │                      │                   │
-   │                    │<───────────────────────────────────────────────────────────────│
+   │                    │<──────────────────────────────────────────────────────────────│                   │
    │                    │      file path      │                  │                      │                   │
    │                    │                     │                  │                      │                   │
-   │                    │ AddStagingImage(StagingType=Upload, Status=Pending, ...)      │
-   │                    │───────────────────>│                  │                      │                   │
-   │                    │                     │ Insert StagingImage record               │
-   │                    │<───────────────────│                  │                      │                   │
+   │                    │ AddStagingImage(StagingType=Upload, Status=Pending, ...)      │                   │
+   │                    │────────────────────>│                  │                      │                   │
+   │                    │                     │ Insert StagingImage record              │                   │
+   │                    │<────────────────────│                  │                      │                   │
    │                    │                     │                  │                      │                   │
-   │<──────────────────│ 200: {stagingId, tempUrl} │           │                      │                   │
-   │ [Upload success — "Pending approval"]   │          │                      │                   │
+   │<────────────────── │ 200: {stagingId, tempUrl}              │                      │                   │
+   │ [Upload success — "Pending approval"]    │                  │                      │                   │
    │                    │                     │                  │                      │                   │
-
-
-   ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
-
-
    │                    │                     │                  │                      │                   │
-   │                    │                     │         GET /api/admin/staging-images    │
-   │                    │                     │                  │<─────────────────────│
+   │                    │                     │         GET /api/admin/staging-images   │                   │
+   │                    │                     │                  │<─────────────────────│                   │
    │                    │                     │                  │                      │                   │
-   │                    │                     │                  │ List pending upload  │
+   │                    │                     │                  │ List pending upload  │                   │
    │                    │                     │<─────────────────│                      │                   │
    │                    │                     │                  │                      │                   │
-   │                    │                     │         200: [StagingImage, ...]         │
-   │                    │                     │                  │─────────────────────>│
-   │                    │                     │                  │ [Admin sees pending] │
-   │                    │                     │                  │                      │
-
-
+   │                    │                     │         200: [StagingImage, ...]        │                   │
+   │                    │                     │                  │─────────────────────>│                   │
+   │                    │                     │                  │ [Admin sees pending] │                   │ 
+   │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ [Admin clicks "Approve"]
-   │                    │                     │                  │                      │─────────────────>│
+   │                    │                     │                  │                      │─────────────────> │
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ POST /api/admin/staging-images/{id}/approve
-   │                    │                     │                  │                      │<─────────────────│
+   │                    │                     │                  │                      │<───────────────── │
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ GetStagingImage(id)
    │                    │                     │                  │                      │──────────────────>│
@@ -442,10 +435,10 @@ Vendor           VendorController         AppDbContext          Admin           
    │                    │                     │                  │                      │ stagingImg        │
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ CopyFile(staging/..., images/poi_{poiId}/)
-   │                    │                     │                  │                      │─────────────────────────────────────>│
+   │                    │                     │                  │                      │──────────────────>│
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ DeleteFile(staging/poi_{poiId}/...) │
-   │                    │                     │                  │                      │─────────────────────────────────────>│
+   │                    │                     │                  │                      │──────────────────>│
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ AddRestaurantImage(PoiPointId, ImageUrl, IsPrimary, SortOrder)
    │                    │                     │                  │                      │──────────────────>│
@@ -464,9 +457,9 @@ Vendor           VendorController         AppDbContext          Admin           
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │<──────────────────│
    │                    │                     │                  │                      │                   │
-   │                    │                     │                  │         200 OK        │                   │
+   │                    │                     │                  │         200 OK       │                   │
    │                    │                     │                  │<─────────────────────│                   │
-   │                    │                     │                  │ [Image visible on app]│                   │
+   │                    │                     │                  │ [Image visible on app]                   │
    │                    │                     │                  │                      │                   │
 ```
 
@@ -476,7 +469,7 @@ Vendor           VendorController         AppDbContext          Admin           
 Vendor           VendorController         AdminVendorController    FileSystem
    │                    │                      │                   │
    │                    │                      │ POST /api/admin/staging-images/{id}/reject
-   │                    │                      │<─────────────────│
+   │                    │                      │<───────────────── │
    │                    │                      │                   │
    │                    │                      │ GetStagingImage(id)
    │                    │                      │──────────────────>│
@@ -489,7 +482,7 @@ Vendor           VendorController         AdminVendorController    FileSystem
    │                    │                      │──────────────────>│
    │                    │                      │<──────────────────│
    │                    │                      │                   │
-   │                    │                      │         200 OK     │
+   │                    │                      │         200 OK    │
    │                    │                      │──────────────────>│
    │                    │                      │                   │
 ```
@@ -504,42 +497,40 @@ Participant: VendorController | AdminVendorController | AppDbContext | FileSyste
 
 Vendor           VendorController         AppDbContext          Admin            AdminVendorController    FileSystem
    │                    │                     │                  │                      │                   │
-   │ POST /api/vendor/images/delete-request  │                  │                      │                   │
+   │ POST /api/vendor/images/delete-request   │                  │                      │                   │
    │ {imageId, poiPointId}                    │                  │                      │                   │
-   │──────────────────>│                     │                  │                      │                   │
-   │                    │ ValidateVendorOwnsImage(imageId, vendorId)│                  │                   │
-   │                    │──────────────────>│ │                  │                      │                   │
-   │                    │<──────────────────│ │                  │                      │                   │
+   │───────────────────>│                     │                  │                      │                   │
+   │                    │ ValidateVendorOwnsImage(imageId, vendorId)│                   │                   │
+   │                    │────────────────────>│                  │                      │                   │
+   │                    │<────────────────────│                  │                      │                   │
    │                    │                     │                  │                      │                   │
-   │                    │ AddStagingImage(   │                  │                      │                   │
-   │                    │   StagingType=Deletion,             │                  │                      │                   │
-   │                    │   Status=Pending,                  │                  │                      │                   │
-   │                    │   OriginalImageId=imageId            │                  │                      │                   │
-   │                    │ )                                    │                  │                      │                   │
-   │                    │───────────────────>│                  │                      │                   │
-   │                    │                     │ Insert StagingImage record               │
-   │                    │<───────────────────│                  │                      │                   │
+   │                    │ AddStagingImage(    │                  │                      │                   │
+   │                    │   StagingType=Deletion,                │                      │                   │                   
+   │                    │   Status=Pending,                      │                      │                   │                   
+   │                    │   OriginalImageId=imageId              │                      │                   │                   
+   │                    │ )                                      │                      │                   │                   
+   │                    │────────────────────>│                  │                      │                   │
+   │                    │                     │ Insert StagingImage record              │                   │
+   │                    │<────────────────────│                  │                      │                   │
    │                    │                     │                  │                      │                   │
-   │<──────────────────│ 200: {stagingId, requestId}          │                      │                   │
+   │<───────────────────│ 200: {stagingId, requestId}            │                      │                   │
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │                   │
-   │                    │                     │         GET /api/admin/staging-images/deletion   │
-   │                    │                     │                  │<─────────────────────│
+   │                    │                     │         GET /api/admin/staging-images/deletion              │
+   │                    │                     │                  │<─────────────────────│                   │
    │                    │                     │                  │                      │                   │
-   │                    │                     │                  │ List Deletion requests│
+   │                    │                     │                  │List Deletion requests│                   │
    │                    │                     │<─────────────────│                      │                   │
    │                    │                     │                  │                      │                   │
-   │                    │                     │         200: [StagingImage, ...]       │
-   │                    │                     │                  │─────────────────────>│
-   │                    │                     │                  │ [Admin sees deletion request]
-   │                    │                     │                  │                      │
-
-
+   │                    │                     │         200: [StagingImage, ...]        │                   │
+   │                    │                     │                  │─────────────────────>│                   │
+   │                    │                     │                  │ [Admin sees deletion request]            │
+   │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ [Admin clicks "Approve"]
-   │                    │                     │                  │                      │─────────────────>│
+   │                    │                     │                  │                      │──────────────────>│
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ POST /api/admin/staging-images/{id}/approve-deletion
-   │                    │                     │                  │                      │<─────────────────│
+   │                    │                     │                  │                      │<──────────────────│
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ GetStagingImage(id)
    │                    │                     │                  │                      │──────────────────>│
@@ -564,9 +555,9 @@ Vendor           VendorController         AppDbContext          Admin           
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │<──────────────────│
    │                    │                     │                  │                      │                   │
-   │                    │                     │                  │         200 OK        │                   │
+   │                    │                     │                  │         200 OK       │                   │
    │                    │                     │                  │<─────────────────────│                   │
-   │                    │                     │                  │ [Image removed from app]│                   │
+   │                    │                     │                  │ [Image removed from app]│                │
    │                    │                     │                  │                      │                   │
 ```
 
@@ -577,11 +568,11 @@ Admin            AdminVendorController    AppDbContext
   │                      │                   │
   │ POST /api/admin/staging-images/{id}/reject-deletion
   │<─────────────────────│                   │
-  │                      │                    │
+  │                      │                   │
   │                      │ UpdateStagingImage(Status=Rejected)
   │                      │──────────────────>│
   │                      │<──────────────────│
-  │                      │                    │
+  │                      │                   │
   │         200 OK       │                   │
   │─────────────────────>│                   │
   │ [Image stays visible on app]             │
@@ -592,74 +583,74 @@ Admin            AdminVendorController    AppDbContext
 ## 4. Tổng hợp — Full Vendor Upload Flow (single view)
 
 ```
-┌──────────┐  ┌───────────────────┐  ┌─────────────┐  ┌──────────┐  ┌─────────────────────┐  ┌──────────┐  ┌──────────┐
-│  Vendor  │  │  VendorController │  │  AppDbContext │  │  Admin   │  │ AdminVendorController │  │ FileSystem│  │  PoiPoint  │
-└────┬─────┘  └────────┬──────────┘  └──────┬──────┘  └────┬─────┘  └──────────┬──────────┘  └────┬─────┘  └────┬─────┘
-     │                  │                   │              │                   │                  │             │
+┌──────────┐   ┌───────────────────┐  ┌─────────────┐  ┌──────────┐  ┌─────────────────────┐  ┌──────────┐  ┌──────────┐
+│  Vendor  │   │  VendorController │  │AppDbContext │  │  Admin   │  │AdminVendorController│  │FileSystem│  │ PoiPoint │
+└────┬─────┘   └────────┬──────────┘  └──────┬──────┘  └────┬─────┘  └──────────┬──────────┘  └────┬─────┘  └────┬─────┘
+     │                  │                    │              │                   │                  │             │
      │ POST /api/vendor/images/staging       │              │                   │                  │             │
-     │ {poiId, file}   │                   │              │                   │                  │             │
-     │────────────────>│                   │              │                   │                  │             │
-     │                  │ ValidateOwner     │              │                   │                  │             │
-     │                  │──────────────────>│              │                   │                  │             │
-     │                  │<──────────────────│              │                   │                  │             │
-     │                  │                   │              │                   │                  │             │
-     │                  │ SaveFile(staging/poi_{id}/{guid}.{ext})             │                  │             │
-     │                  │────────────────────────────────────────────────────────>│             │
-     │                  │<────────────────────────────────────────────────────────│             │
-     │                  │   filePath      │              │                   │                  │             │
-     │                  │                   │              │                   │                  │             │
-     │                  │ AddStagingImage(Upload, Pending)                     │                  │             │
-     │                  │──────────────────>│              │                   │                  │             │
-     │                  │                   │ Insert       │                   │                  │             │
-     │                  │<──────────────────│              │                   │                  │             │
-     │                  │                   │              │                   │                  │             │
-     │ 200: stagingId   │                   │              │                   │                  │             │
-     │<────────────────│                   │              │                   │                  │             │
-     │                  │                   │              │                   │                  │             │
-     │                  │                   │    GET /api/admin/staging-images │                  │             │
-     │                  │                   │              │<───────────────────│                  │             │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │ List pending       │                  │             │
-     │                  │                   │<─────────────│                    │                  │             │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │   200: [items]                   │                  │             │
-     │                  │                   │              │───────────────────>│                  │             │
-     │                  │                   │              │ [Admin reviews]    │                  │             │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ [Approve click] │             │
-     │                  │                   │              │                    │────────────────>│             │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ POST /api/admin/staging-images/{id}/approve
-     │                  │                   │              │                    │<────────────────│             │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ GetStagingImage │             │
-     │                  │                   │              │                    │────────────────>│             │
-     │                  │                   │              │                    │<────────────────│             │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ CopyFile(staging → images/poi_{id}/)│
-     │                  │                   │              │                    │──────────────────────────────────────>│
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ DeleteFile(staging/)│
-     │                  │                   │              │                    │──────────────────────────────────────>│
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ AddRestaurantImage()│             │
-     │                  │                   │              │                    │────────────────>│              │
-     │                  │                   │              │                    │                 │              │
-     │                  │                   │              │                    │<────────────────│              │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ UpdateStatus(Approved)            │
-     │                  │                   │              │                    │────────────────>│              │
-     │                  │                   │              │                    │<────────────────│              │
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │                    │ [First image?]  │             │
-     │                  │                   │              │                    │ SetImageUrl(primaryUrl)           │
-     │                  │                   │              │                    │──────────────────────────────>│   │
-     │                  │                   │              │                    │                 │              │
-     │                  │                   │              │                    │<──────────────────────────────────────│
-     │                  │                   │              │                    │                  │             │
-     │                  │                   │              │         200 OK     │                  │             │
-     │                  │                   │              │<──────────────────│                  │             │
-     │                  │                   │              │ [Image live on app]                   │             │
+     │ {poiId, file}   │                     │              │                   │                  │             │
+     │────────────────>│                     │              │                   │                  │             │
+     │                  │ ValidateOwner      │              │                   │                  │             │
+     │                  │───────────────────>│              │                   │                  │             │
+     │                  │<───────────────────│              │                   │                  │             │
+     │                  │                    │              │                   │                  │             │
+     │                  │ SaveFile(staging/poi_{id}/{guid}.{ext})               │                  │             │
+     │                  │──────────────────────────────────────────────────────>│                  │             │
+     │                  │<──────────────────────────────────────────────────────│                  │             │
+     │                  │   filePath         │              │                   │                  │             │
+     │                  │                    │              │                   │                  │             │
+     │                  │ AddStagingImage(Upload, Pending)  │                   │                  │             │
+     │                  │───────────────────>│              │                   │                  │             │
+     │                  │                    │ Insert       │                   │                  │             │
+     │                  │<───────────────────│              │                   │                  │             │
+     │                  │                    │              │                   │                  │             │
+     │ 200: stagingId   │                    │              │                   │                  │             │
+     │<──────────────── │                    │              │                   │                  │             │
+     │                  │                    │              │                   │                  │             │
+     │                  │                    │    GET /api/admin/staging-images │                  │             │
+     │                  │                    │              │<───────────────────│                 │             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │ List pending       │                 │             │
+     │                  │                    │<─────────────│                    │                 │             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │   200: [items]                   │                  │             │
+     │                  │                    │              │───────────────────>│                 │             │
+     │                  │                    │              │ [Admin reviews]    │                 │             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ [Approve click] │             │
+     │                  │                    │              │                    │────────────────>│             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ POST /api/admin/staging-images/{id}/approve
+     │                  │                    │              │                    │<────────────────│             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ GetStagingImage │             │
+     │                  │                    │              │                    │────────────────>│             │
+     │                  │                    │              │                    │<────────────────│             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ CopyFile(staging → images/poi_{id}/)
+     │                  │                    │              │                    │──────────────────────────────>│
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ DeleteFile(staging/)│         │
+     │                  │                    │              │                    │──────────────────────────────>│
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ AddRestaurantImage()          │
+     │                  │                    │              │                    │────────────────>│             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │<────────────────│             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ UpdateStatus(Approved)        │
+     │                  │                    │              │                    │────────────────>│             │
+     │                  │                    │              │                    │<────────────────│             │
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │ [First image?]  │             │
+     │                  │                    │              │                    │ SetImageUrl(primaryUrl)       │
+     │                  │                    │              │                    │──────────────────────────────>│
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │                    │<──────────────────────────────│
+     │                  │                    │              │                    │                 │             │
+     │                  │                    │              │         200 OK     │                 │             │
+     │                  │                    │              │<───────────────────│                 │             │
+     │                  │                    │              │ [Image live on app]│                 │             │
 ```
 
 ---
@@ -704,26 +695,26 @@ Admin            AdminVendorController    AppDbContext
 
 ```
 ┌─────────┐   POST /api/auth/login      ┌─────────────────┐   Validate   ┌──────────────┐
-│ Browser │ ──────────────────────────>  │  AuthController  │ ──────────>  │  UserManager  │
+│ Browser │ ──────────────────────────> │  AuthController │ ──────────>  │  UserManager │
 │  (Admin/│   {email, password}         │                 │  FindByEmail │  (ASP.NET    │
-│  Vendor)│                              │                 │  + CheckPwd  │   Identity)   │
-└────┬────┘                              └────────┬────────┘              └───────┬───────┘
+│  Vendor)│                             │                 │  + CheckPwd  │   Identity)  │
+└────┬────┘                             └────────┬────────┘              └───────┬──────┘
      │                                           │                               │
-     │                                           │        Claims: NameId, Email,  │
-     │                                           │        Role, (VendorId)        │
+     │                                           │        Claims: NameId, Email, │
+     │                                           │        Role, (VendorId)       │
      │                                           │<──────────────────────────────│
-     │                                           │                                │
-     │   200: { accessToken, expiresAt,         │                                │
-     │         userName, email, role,           │                                │
-     │         vendorId? }                      │                                │
-     |<──────────────────────────────────────────│                                │
-     │                                           │                                │
-     │  [Store JWT in localStorage/session]     │                                │
-     │                                           │                                │
-     │  Authorization: Bearer {token}           │                                │
-     │ ───────────────────────────────────────> │                                │
-     │  [Role-gated endpoint]                   │                                │
-     │                                           │                                │
+     │                                           │                               │
+     │   200: { accessToken, expiresAt,          │                               │
+     │         userName, email, role,            │                               │
+     │         vendorId? }                       │                               │
+     |<──────────────────────────────────────────│                               │
+     │                                           │                               │
+     │  [Store JWT in localStorage/session]      │                               │
+     │                                           │                               │
+     │  Authorization: Bearer {token}            │                               │
+     │ ─────────────────────────────────────────>│                               │
+     │  [Role-gated endpoint]                    │                               │
+     │                                           │                               │
 ```
 
 ---
@@ -736,40 +727,40 @@ Participant: AuthController (API) | AuthService | UserManager (ASP.NET Identity)
 
 Browser            AuthController         AuthService           UserManager          Vendors table       JwtSecurityTokenHandler
    │                     │                     │                    │                     │                      │
-   │ POST /api/auth/login │                    │                    │                     │                      │
-   │ {email, password}    │                    │                    │                     │                      │
+   │ POST /api/auth/login│                     │                    │                     │                      │
+   │ {email, password}   │                     │                    │                     │                      │
    │────────────────────>│                     │                    │                     │                      │
    │                     │                     │                    │                     │                      │
    │                     │ LoginAsync(email, password)              │                     │                      │
-   │                     │───────────────────>│                    │                     │                      │
+   │                     │────────────────────>│                    │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ FindByEmailAsync(email)                │
-   │                     │                     │──────────────────>│                     │                      │
-   │                     │                     │<──────────────────│                     │                      │
+   │                     │                     │ FindByEmailAsync(email)                  │                      │
+   │                     │                     │──────────────────> │                     │                      │
+   │                     │                     │<────────────────── │                     │                      │
    │                     │                     │ AppUser?           │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ CheckPasswordAsync(user, password)    │
-   │                     │                     │──────────────────>│                     │                      │
-   │                     │                     │<──────────────────│                     │                      │
+   │                     │                     │ CheckPasswordAsync(user, password)       │                      │
+   │                     │                     │──────────────────> │                     │                      │
+   │                     │                     │<────────────────── │                     │                      │
    │                     │                     │ true/false         │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ [invalid → 401]   │                     │                      │
+   │                     │                     │ [invalid → 401]    │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ GetRolesAsync(user)                    │
-   │                     │                     │──────────────────>│                     │                      │
-   │                     │                     │<──────────────────│                     │                      │
-   │                     │                     │ ["Admin"] or ["Vendor"]                │
+   │                     │                     │ GetRolesAsync(user)                      │                      │
+   │                     │                     │──────────────────> │                     │                      │
+   │                     │                     │<────────────────── │                     │                      │
+   │                     │                     │ ["Admin"] or ["Vendor"]                  │                      │
    │                     │                     │                    │                     │                      │
    │                     │                     │ [role == "Vendor"] │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ GetVendorByUserIdAsync(user.Id)      │
-   │                     │                     │───────────────────────────────────>│
-   │                     │                     │<───────────────────────────────────│
-   │                     │                     │ Vendor {Status, PoiPointId}?        │
+   │                     │                     │ GetVendorByUserIdAsync(user.Id)          │                      │ 
+   │                     │                     │─────────────────────────────────────────>│                      │ 
+   │                     │                     │<─────────────────────────────────────────│                      │ 
+   │                     │                     │ Vendor {Status, PoiPointId}?             │                      │ 
    │                     │                     │                    │                     │                      │
-   │                     │                     │ [Vendor + Status != "Approved"]     │
+   │                     │                     │ [Vendor + Status != "Approved"]          │                      │ 
    │                     │                     │                    │                     │                      │
-   │                     │                     │ 403: "Tài khoản đang chờ được duyệt"│
+   │                     │                     │ 403: "Tài khoản đang chờ được duyệt"     │                      │
    │                     │                     │                    │                     │                      │
    │                     │<────────────────────│                    │                     │                      │
    │                     │                     │                    │                     │                      │
@@ -777,16 +768,16 @@ Browser            AuthController         AuthService           UserManager     
    │                     │                     │                    │                     │                      │
    │                     │  claims = {         │                    │                     │                      │
    │                     │    sub: user.Id,    │                    │                     │                      │
-   │                     │    email: email,   │                    │                     │                      │
-   │                     │    name: user.Name,│                    │                     │                      │
-   │                     │    role: "Admin"/"Vendor",│             │                      │                      │
-   │                     │    (vendorId: vendor.Id) IF Vendor│       │                      │                      │
-   │                     │  }                 │                    │                     │                      │
+   │                     │    email: email,    │                    │                     │                      │
+   │                     │    name: user.Name, │                    │                     │                      │
+   │                     │    role: "Admin"/"Vendor",               │                     │                      │
+   │                     │    (vendorId: vendor.Id) IF Vendor}      │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ GenerateJwtToken(claims)            │
-   │                     │                     │──────────────────────────────────────────────>│
-   │                     │                     │<──────────────────────────────────────────────│
-   │                     │                     │  { token: "jwt...", expiresAt: datetime }  │
+   │                     │                     │                    │                     │                      │
+   │                     │                     │ GenerateJwtToken(claims)                 │                      │ 
+   │                     │                     │─────────────────────────────────────────>│                      │     
+   │                     │                     │<─────────────────────────────────────────│                      │ 
+   │                     │                     │  { token: "jwt...", expiresAt: datetime }│                      │ 
    │                     │                     │                    │                     │                      │
    │                     │                     │                    │                     │                      │
    │  200 OK             │                     │                    │                     │                      │
@@ -813,34 +804,34 @@ Browser            AuthController         AuthService           UserManager     
    │ {email, password, businessName, ...}      │                    │                     │
    │────────────────────>│                     │                    │                     │
    │                     │                     │                    │                     │
-   │                     │ VendorRegisterAsync(dto)               │                     │
-   │                     │───────────────────>│                    │                     │
+   │                     │ VendorRegisterAsync(dto)                 │                     │
+   │                     │───────────────────> │                    │                     │
    │                     │                     │                    │                     │
-   │                     │                     │ CreateAsync(AppUser)                 │
-   │                     │                     │──────────────────>│                     │
-   │                     │                     │<──────────────────│                     │
-   │                     │                     │ IdentityResult    │                     │
+   │                     │                     │ CreateAsync(AppUser)                     │
+   │                     │                     │──────────────────> │                     │
+   │                     │                     │<────────────────── │                     │
+   │                     │                     │ IdentityResult     │                     │
    │                     │                     │                    │                     │
-   │                     │                     │ [failed → 400]    │                     │
+   │                     │                     │ [failed → 400]     │                     │
    │                     │                     │                    │                     │
-   │                     │                     │ AddToRoleAsync(user, "Vendor")        │
-   │                     │                     │──────────────────>│                     │
-   │                     │                     │<──────────────────│                     │
+   │                     │                     │ AddToRoleAsync(user, "Vendor")           │
+   │                     │                     │───────────────────>│                     │
+   │                     │                     │<───────────────────│                     │
    │                     │                     │                    │                     │
-   │                     │                     │ CreateVendor(Vendor {               │
-   │                     │                     │   UserId = user.Id,                │
-   │                     │                     │   Status = "Pending",  ← KEY      │
-   │                     │                     │   PoiPointId = null,              │
-   │                     │                     │   BusinessName, ...                │
-   │                     │                     │ })                                  │
-   │                     │                     │───────────────────────────────────>│
-   │                     │                     │<───────────────────────────────────│
-   │                     │                     │  Vendor created                   │
+   │                     │                     │ CreateVendor(Vendor {                    │
+   │                     │                     │   UserId = user.Id,                      │
+   │                     │                     │   Status = "Pending",  ← KEY             │
+   │                     │                     │   PoiPointId = null,                     │
+   │                     │                     │   BusinessName, ...                      │
+   │                     │                     │ })                                       │
+   │                     │                     │─────────────────────────────────────────>│
+   │                     │                     │<─────────────────────────────────────────│
+   │                     │                     │  Vendor created                          │
    │                     │                     │                    │                     │
    │                     │                     │                    │                     │
-   │  200 OK: "Tài khoản đang chờ được duyệt" │
+   │  200 OK: "Tài khoản đang chờ được duyệt"  │                    │                     │ 
    │<────────────────────│                     │                    │                     │
-   │ [Vendor CANNOT login until Admin approves]│                     │                     │
+   │ [Vendor CANNOT login until Admin approves]│                    │                     │
    │                     │                     │                    │                     │
 ```
 
@@ -856,50 +847,50 @@ MauiApp              AuthController         Preferences          AppUser
    │                       │                     │                 │
    │ [Get deviceId]        │                     │                 │
    │                       │                     │                 │
-   │ Preferences.Get("device_id")               │
-   │────────────────────────────────>│            │                 │
-   │                     │        deviceId?      │                 │
-   │<────────────────────────────────│            │                 │
-   │                     │                     │                 │
-   │ [No deviceId → generate] │                 │                 │
-   │ Guid.NewGuid()          │                 │                 │
-   │                     │                     │                 │
-   │ Preferences.Set("device_id", deviceId)     │
-   │────────────────────────────────>│            │                 │
-   │                     │                     │                 │
-   │                     │                     │                 │
-   │ POST /api/auth/device-register             │
-   │ {deviceId}          │                     │                 │
-   │────────────────────>│                     │                 │
-   │                     │                     │                 │
-   │                     │ DeviceRegisterAsync(deviceId)         │
-   │                     │───────────────────>│                 │
-   │                     │                     │                 │
-   │                     │                     │ FindOrCreateUser(              │
-   │                     │                     │   email: "device_{deviceId}     │
-   │                     │                     │    @tastevinhkhanh.local",     │
-   │                     │                     │   role: "Device"               │
-   │                     │                     │ )                               │
-   │                     │                     │────────────────────────────────>│
-   │                     │                     │<────────────────────────────────│
-   │                     │                     │  AppUser created/found         │
-   │                     │                     │                 │
-   │                     │                     │ GenerateJwtToken(               │
-   │                     │                     │   claims: { role: "Device",    │
-   │                     │                     │   deviceId: "..." }             │
-   │                     │                     │────────────────────────────────>│
-   │                     │                     │<────────────────────────────────│
-   │                     │                     │  token (expires 1 year)       │
-   │                     │                     │                 │
-   │                     │                     │                 │
-   │  200 OK: { accessToken, expiresIn }        │
-   │<────────────────────│                     │                 │
-   │                     │                     │                 │
-   │ SaveAccessToken(token)                     │
-   │────────────────────────────────>│            │                 │
-   │                     │                     │                 │
-   │ [Now use Bearer token for /api/audio/{id}] │
-   │                     │                     │                 │
+   │ Preferences.Get("device_id")                │                 │
+   │──────────────────────>│                     │                 │
+   │                       │        deviceId?    │                 │
+   │<──────────────────────│                     │                 │
+   │                       │                     │                 │
+   │ [No deviceId → generate]                    │                 │
+   │ Guid.NewGuid()        │                     │                 │
+   │                       │                     │                 │
+   │ Preferences.Set("device_id", deviceId)      │                 │
+   │──────────────────────>│                     │                 │
+   │                       │                     │                 │
+   │                       │                     │                 │
+   │ POST /api/auth/device-register              │                 │
+   │ {deviceId}            │                     │                 │
+   │──────────────────────>│                     │                 │
+   │                       │                     │                 │
+   │                       │ DeviceRegisterAsync(deviceId)         │
+   │                       │────────────────────>│                 │
+   │                       │                     │                 │
+   │                       │                     │ FindOrCreateUser(              
+   │                       │                     │   email: "device_{deviceId}     
+   │                       │                     │    @tastevinhkhanh.local",     
+   │                       │                     │   role: "Device"           
+   │                       │                     │ )               │              
+   │                       │                     │────────────────>│
+   │                       │                     │<────────────────│
+   │                       │                     │  AppUser created/found         
+   │                       │                     │                 │
+   │                       │                     │ GenerateJwtToken()             
+   │                       │                     │   claims: { role: "Device",    
+   │                       │                     │   deviceId: "..." }             
+   │                       │                     │────────────────>│
+   │                       │                     │<────────────────│
+   │                       │                     │  token (expires 1 year)   
+   │                       │                     │                 │
+   │                       │                     │                 │
+   │  200 OK: { accessToken, expiresIn }         │                 │
+   │<────────────────────  │                     │                 │
+   │                       │                     │                 │
+   │ SaveAccessToken(token)│                     │                 │
+   │──────────────────────>│                     │                 │
+   │                       │                     │                 │
+   │ [Now use Bearer token for /api/audio/{id}]  │                 │
+   │                       │                     │                 │
 ```
 
 ---
@@ -1012,29 +1003,29 @@ Participant: PoiController | PoiService | AppDbContext | PoiPoint entity
 
 Admin           PoiController           PoiService             AppDbContext        PoiPoint
    │                   │                      │                     │                  │
-   │ POST /api/poi      │                      │                     │                  │
-   │ {name, lat, lng,   │                      │                     │                  │
-   │  triggerRadius,    │                      │                     │                  │
-   │  priority, ...}    │                      │                     │                  │
+   │ POST /api/poi     │                      │                     │                  │
+   │ {name, lat, lng,  │                      │                     │                  │
+   │  triggerRadius,   │                      │                     │                  │
+   │  priority, ...}   │                      │                     │                  │
    │──────────────────>│                      │                     │                  │
    │                   │                      │                     │                  │
-   │                   │ CreateAsync(CreatePoiRequest)             │                  │
+   │                   │ CreateAsync(CreatePoiRequest)              │                  │
    │                   │─────────────────────>│                     │                  │
    │                   │                      │                     │                  │
-   │                   │                      │ new PoiPoint {       │                  │
-   │                   │                      │   Name, Latitude,    │                  │
-   │                   │                      │   Longitude,         │                  │
-   │                   │                      │   TriggerRadiusMeters│                 │
-   │                   │                      │   Priority,          │                  │
-   │                   │                      │   IsActive = true    │                  │
+   │                   │                      │ new PoiPoint {      │                  │
+   │                   │                      │   Name, Latitude,   │                  │
+   │                   │                      │   Longitude,        │                  │
+   │                   │                      │  TriggerRadiusMeters│                  │
+   │                   │                      │  Priority,          │                  │
+   │                   │                      │  IsActive = true    │                  │
    │                   │                      │ }                   │                  │
    │                   │                      │────────────────────>│                  │
    │                   │                      │                     │ Insert           │
    │                   │                      │<────────────────────│                  │
    │                   │                      │                     │                  │
    │  201 Created      │                      │                     │                  │
-   │ { poiId, ... }   │                      │                     │                  │
-   |<─────────────────│                      │                     │                  │
+   │ { poiId, ... }    │                      │                     │                  │
+   |<───────────────── │                      │                     │                  │
    │                   │                      │                     │                  │
 ```
 
@@ -1055,14 +1046,14 @@ Admin           PoiController           PoiService             AppDbContext
    │                   │                      │ GetPoiPoint(id)     │
    │                   │                      │────────────────────>│
    │                   │                      │<────────────────────│
-   │                   │                      │ poi?                 │
+   │                   │                      │ poi?                │
    │                   │                      │                     │
    │                   │                      │ [not found → 404]   │
    │                   │                      │                     │
    │                   │                      │ Apply changes:      │
    │                   │                      │ poi.Name = ...,     │
-   │                   │                      │ poi.Latitude = ... │
-   │                   │                      │ poi.TriggerRadius = ││
+   │                   │                      │ poi.Latitude = ...  │
+   │                   │                      │ poi.TriggerRadius = │
    │                   │                      │ poi.Priority = ...  │
    │                   │                      │────────────────────>│
    │                   │                      │<────────────────────│
@@ -1070,7 +1061,7 @@ Admin           PoiController           PoiService             AppDbContext
    │                   │                      │                     │
    │                   │                      │                     │
    │  200 OK           │                      │                     │
-   |<─────────────────│                      │                     │
+   |<──────────────────│                      │                     │
    │                   │                      │                     │
 ```
 
@@ -1079,7 +1070,7 @@ Admin           PoiController           PoiService             AppDbContext
 ```
 Admin           PoiController           PoiService             AppDbContext
    │                   │                      │                     │
-   │ DELETE /api/poi/{id}                    │                     │
+   │ DELETE /api/poi/{id}                     │                     │
    │──────────────────>│                      │                     │
    │                   │                      │                     │
    │                   │ DeleteAsync(id)      │                     │
@@ -1088,7 +1079,7 @@ Admin           PoiController           PoiService             AppDbContext
    │                   │                      │ GetPoiPoint(id)     │
    │                   │                      │────────────────────>│
    │                   │                      │<────────────────────│
-   │                   │                      │ poi?                 │
+   │                   │                      │ poi?                │
    │                   │                      │                     │
    │                   │                      │ [soft delete]       │
    │                   │                      │ poi.IsActive = false││
@@ -1097,7 +1088,7 @@ Admin           PoiController           PoiService             AppDbContext
    │                   │                      │<────────────────────│
    │                   │                      │                     │
    │  204 No Content   │                      │                     │
-   |<─────────────────│                      │                     │
+   |<──────────────────│                      │                     │
    │                   │                      │                     │
 ```
 
@@ -1112,17 +1103,17 @@ Participant: PoiController | AppDbContext | AudioScript entity
 Admin           PoiController           AppDbContext        AudioScript
    │                   │                      │                  │
    │ PUT /api/poi/{poiId}/scripts             │                  │
-   │ {languageCode, ttsScript, audioFilePath}│                  │
+   │ {languageCode, ttsScript, audioFilePath} │                  │
    │──────────────────>│                      │                  │
    │                   │                      │                  │
-   │                   │ GetAudioScript(poiId, langCode)        │
+   │                   │ GetAudioScript(poiId, langCode)         │
    │                   │─────────────────────>│                  │
    │                   │<─────────────────────│                  │
-   │                   │ existing?             │                  │
+   │                   │ existing?            │                  │
    │                   │                      │                  │
    │                   │ [exists → UPDATE]    │                  │
-   │                   │ script.TtsScript = ...,│                │
-   │                   │ script.AudioFilePath = ...│             │
+   │                   │ script.TtsScript = ...,                 │
+   │                   │ script.AudioFilePath = ...              │
    │                   │                      │                  │
    │                   │ [not exists → INSERT]│                  │
    │                   │ new AudioScript {    │                  │
@@ -1131,12 +1122,12 @@ Admin           PoiController           AppDbContext        AudioScript
    │                   │   TtsScript,         │                  │
    │                   │   AudioFilePath      │                  │
    │                   │ }                    │                  │
-   │                   │────────────────────>│                  │
+   │                   │─────────────────────>│                  │
    │                   │                      │ Insert/Update    │
-   │                   │<────────────────────│                  │
+   │                   │<─────────────────────│                  │
    │                   │                      │                  │
    │  200 OK           │                      │                  │
-   |<─────────────────│                      │                  │
+   |<──────────────────│                      │                  │
    │                   │                      │                  │
 ```
 
@@ -1155,45 +1146,45 @@ Participant: VendorController | AppDbContext | PendingPOIUpdate entity | Vendors
 
 Vendor            VendorController          AppDbContext          Vendors table
    │                    │                     │                    │
-   │ PUT /api/vendor/pois/{id}               │                    │
-   │ { payload (JSON),                       │                    │
-   │   imagesPayload (JSON),                 │
-   │   scriptsPayload (JSON) }              │                    │
-   │──────────────────>│                     │                    │
-   │                   │                     │                    │
-   │                   │ GetVendorByUserId(userId)                │
-   │                   │──────────────────────────────────────>│
-   │                   │<───────────────────────────────────────│
-   │                   │ vendor {Status, PoiPointId}?           │
-   │                   │                     │                    │
-   │                   │ [Status != "Approved"] │                │
-   │                   │ 403: "Tài khoản chưa được duyệt"        │
-   │                   │                     │                    │
-   │                   │ [PoiPointId != requestedId] │           │
-   │                   │ 403: "Không có quyền"                   │
-   │                   │                     │                    │
-   │                   │ [Get existing PoiPoint] │               │
-   │                   │─────────────────────>│ │                │
-   │                   │<─────────────────────│ │                │
-   │                   │ poi?                  │ │                │
-   │                   │                     │                    │
-   │                   │ UpsertPendingUpdate( │ │                │
-   │                   │   VendorId = vendor.Id,│               │
-   │                   │   PoiPointId = poiId,  │               │
-   │                   │   Payload = JSON,       │               │
-   │                   │   ImagesPayload = JSON,│               │
-   │                   │   ScriptsPayload = JSON,│              │
-   │                   │   Status = "Pending",  │               │
-   │                   │   RequestedAt = now    │               │
-   │                   │ )                     │ │                │
-   │                   │─────────────────────>│ │                │
-   │                   │                     │ Insert/Update PendingPOIUpdate│
-   │                   │<─────────────────────│ │                │
-   │                   │                     │                    │
-   │  200: { pendingUpdateId }              │                    │
-   |<──────────────────│                     │                    │
-   │ [Update submitted — pending Admin review]                   │
-   │                   │                     │                    │
+   │ PUT /api/vendor/pois/{id}                │                    │
+   │ { payload (JSON),                        │                    │
+   │   imagesPayload (JSON),                  │                    │
+   │   scriptsPayload (JSON) }                │                    │
+   │──────────────────>│                      │                    │
+   │                   │                      │                    │
+   │                   │ GetVendorByUserId(userId)                 │
+   │                   │──────────────────────────────────────────>│
+   │                   │<──────────────────────────────────────────│
+   │                   │ vendor {Status, PoiPointId}?              │
+   │                   │                      │                    │
+   │                   │[Status != "Approved"]│                    │
+   │                   │ 403: "Tài khoản chưa được duyệt"          │
+   │                   │                      │                    │
+   │                   │ [PoiPointId != requestedId] │             │
+   │                   │ 403: "Không có quyền"                     │
+   │                   │                      │                    │
+   │                   │ [Get existing PoiPoint] │                 │
+   │                   │─────────────────────>│                    │
+   │                   │<─────────────────────│                    │
+   │                   │ poi?                 │                    │
+   │                   │                      │                    │
+   │                   │ UpsertPendingUpdate( │                    │
+   │                   │   VendorId = vendor.Id,                   │
+   │                   │   PoiPointId = poiId,│                    │
+   │                   │   Payload = JSON,    │                    │
+   │                   │   ImagesPayload = JSON,                   │
+   │                   │   ScriptsPayload = JSON,                  │
+   │                   │   Status = "Pending",│                    │
+   │                   │   RequestedAt = now  │                    │
+   │                   │ )                    │                    │
+   │                   │─────────────────────>│                    │
+   │                   │                      │ Insert/Update PendingPOIUpdate
+   │                   │<─────────────────────│                    │
+   │                   │                      │                    │
+   │  200: { pendingUpdateId }                │                    │
+   |<──────────────────│                      │                    │
+   │ [Update submitted — pending Admin review]│                    │
+   │                   │                      │                    │
 ```
 
 ### Step 2: Admin Review — Approve (Update existing POI)
@@ -1204,73 +1195,73 @@ Participant: AdminVendorController | AppDbContext | PoiPoint | RestaurantImage |
 
 Admin             AdminVendorController       AppDbContext         PoiPoint        RestaurantImage      AudioScript
    │                      │                       │                   │                  │                  │
-   │ GET /api/admin/pending-updates             │                   │                  │                  │
+   │ GET /api/admin/pending-updates               │                   │                  │                  │
    │─────────────────────>│                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
    │                      │ List pending updates  │                   │                  │                  │
    │                      │<──────────────────────│                   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │ 200: [PendingPOIUpdate, ...]               │
-   │<────────────────────│                       │                   │                  │                  │
+   │ 200: [PendingPOIUpdate, ...]                 │                   │                  │                  │
+   │<──────────────────── │                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │ GET /api/admin/pending-updates/{id}        │                   │                  │                  │
+   │ GET /api/admin/pending-updates/{id}          │                   │                  │                  │
    │─────────────────────>│                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
    │                      │ GetDetail(id)         │                   │                  │                  │
-   │                      │ Parse(Payload, ImagesPayload, ScriptsPayload)│              │                  │
-   │                      │ DetermineChangeType: │                   │                  │                  │
-   │                      │   PoiPointId == 0 → "poi_created"       │                  │                  │
-   │                      │   ImagesPayload ≠ {} → "image_uploaded" │                  │                  │
-   │                      │   ScriptsPayload ≠ {} → "script_updated"│                 │                  │
-   │                      │   Payload ≠ {} → "poi_updated"         │                  │                  │
+   │                      │ Parse(Payload, ImagesPayload, ScriptsPayload)                │                  │
+   │                      │ DetermineChangeType:  │                   │                  │                  │
+   │                      │   PoiPointId == 0 → "poi_created"         │                  │                  │
+   │                      │   ImagesPayload ≠ {} → "image_uploaded"   │                  │                  │
+   │                      │   ScriptsPayload ≠ {} → "script_updated"  │                  │                  │
+   │                      │   Payload ≠ {} → "poi_updated"            │                  │                  │
    │                      │                       │                   │                  │                  │
-   │ 200: full detail    │                       │                   │                  │                  │
-   |<────────────────────│                       │                   │                  │                  │
+   │ 200: full detail     │                       │                   │                  │                  │
+   |<──────────────────── │                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │ POST /api/admin/pending-updates/{id}/approve│                  │                  │                  │
+   │ POST /api/admin/pending-updates/{id}/approve │                   │                  │                  │
    │─────────────────────>│                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │                      │ [PoiPointId != 0 — UPDATE existing POI] │                 │                  │
+   │                      │ [PoiPointId != 0 — UPDATE existing POI]   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │                      │ GetPoiPoint(PoiPointId)│                  │                  │                  │
+   │                      │ GetPoiPoint(PoiPointId)                   │                  │                  │
    │                      │──────────────────────>│                   │                  │                  │
    │                      │<──────────────────────│                   │                  │                  │
    │                      │ poi                   │                   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │                      │ ApplyPayload(poi, Payload JSON)        │
-   │                      │ poi.Name = ..., poi.Latitude = ..., etc.││
+   │                      │ ApplyPayload(poi, Payload JSON)           │                  │                  │
+   │                      │ poi.Name = ..., poi.Latitude = ..., etc.  │                  │                  │
    │                      │──────────────────────>│                   │                  │                  │
    │                      │<──────────────────────│                   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │                      │ [ImagesPayload not empty]              │                  │                  │
+   │                      │ [ImagesPayload not empty]                 │                  │                  │
    │                      │                       │                   │                  │                  │
-   │                      │ DeleteExistingImages(PoiPointId)      │                  │
+   │                      │ DeleteExistingImages(PoiPointId)          │                  │                  │
    │                      │──────────────────────>│                   │                  │                  │
    │                      │<──────────────────────│                   │                  │                  │
    │                      │                       │                   │                  │                  │
-   │                      │ [for each img in ImagesPayload]        │                  │
-   │                      │ InsertRestaurantImage(                │                  │
-   │                      │   PoiPointId, ImageUrl,               │                  │
-   │                      │   IsPrimary, SortOrder)               │                  │
-   │                      │──────────────────────>│                   │═══════════════════════════>│
-   │                      │<──────────────────────│                   │═══════════════════════════│
+   │                      │ [for each img in ImagesPayload]           │                  │                  │
+   │                      │ InsertRestaurantImage(                    │                  │                  │
+   │                      │   PoiPointId, ImageUrl,                   │                  │                  │
+   │                      │   IsPrimary, SortOrder)                   │                  │                  │
+   │                      │──────────────────────>│                   │═════════════════>│                  │
+   │                      │<──────────────────────│                   │══════════════════│                  │
    │                      │                       │                   │                  │                  │
-   │                      │ [ScriptsPayload not empty]             │                  │                  │
+   │                      │ [ScriptsPayload not empty]                │                  │                  │
    │                      │                       │                   │                  │                  │
-   │                      │ UpsertAudioScripts(PoiPointId, ScriptsPayload)│          │                  │
-   │                      │──────────────────────>│                   │                  │──────────────>│
-   │                      │<──────────────────────│                   │                  │<──────────────│
+   │                      │ UpsertAudioScripts(PoiPointId, ScriptsPayload)               │                  │
+   │                      │──────────────────────>│                   │                  │─────────────────>│
+   │                      │<──────────────────────│                   │                  │<─────────────────│
    │                      │                       │                   │                  │                  │
-   │                      │ UpdatePendingUpdate(Status="Approved")│                  │                  │
+   │                      │ UpdatePendingUpdate(Status="Approved")    │                  │                  │
    │                      │──────────────────────>│                   │                  │                  │
    │                      │<──────────────────────│                   │                  │                  │
    │                      │                       │                   │                  │                  │
    │ 200 OK               │                       │                   │                  │                  │
-   |<────────────────────│                       │                   │                  │                  │
+   |<──────────────────── │                       │                   │                  │                  │
    │                      │                       │                   │                  │                  │
 ```
 
@@ -1282,41 +1273,41 @@ Participant: AdminVendorController | AppDbContext | PoiPoint | Vendors table
 
 Admin             AdminVendorController       AppDbContext         PoiPoint         Vendors
    │                      │                       │                   │                  │
-   │ POST /api/admin/pending-updates/{id}/approve (PoiPointId == 0) │
+   │ POST /api/admin/pending-updates/{id}/approve (PoiPointId == 0)   │                  │     
    │─────────────────────>│                       │                   │                  │
    │                      │                       │                   │                  │
-   │                      │ [PoiPointId == 0 — CREATE new POI]       │                  │
+   │                      │ [PoiPointId == 0 — CREATE new POI]        │                  │
    │                      │                       │                   │                  │
-   │                      │ new PoiPoint {         │                   │                  │
-   │                      │   ApplyPayload(pendingUpdate.Payload),  │                  │
-   │                      │   IsActive = true,     │                  │
-   │                      │   CreatedAt = now     │                  │
+   │                      │ new PoiPoint {        │                   │                  │
+   │                      │   ApplyPayload(pendingUpdate.Payload),    │                  │
+   │                      │   IsActive = true,    │                   │                  │
+   │                      │   CreatedAt = now     │                   │                  │
    │                      │ }                     │                   │                  │
    │                      │──────────────────────>│                   │ Insert           │
    │                      │<──────────────────────│                   │ newPoi.Id        │
    │                      │ newPoi.Id             │                   │                  │
    │                      │                       │                   │                  │
-   │                      │ [ImagesPayload]        │                   │                  │
-   │                      │ InsertRestaurantImages(...)              │                  │
+   │                      │ [ImagesPayload]       │                   │                  │
+   │                      │ InsertRestaurantImages(...)               │                  │
    │                      │──────────────────────>│                   │                  │
    │                      │<──────────────────────│                   │                  │
    │                      │                       │                   │                  │
-   │                      │ [ScriptsPayload]       │                   │                  │
-   │                      │ UpsertAudioScripts(newPoi.Id, ...)       │                  │
+   │                      │ [ScriptsPayload]      │                   │                  │
+   │                      │ UpsertAudioScripts(newPoi.Id, ...)        │                  │
    │                      │──────────────────────>│                   │                  │
    │                      │<──────────────────────│                   │                  │
    │                      │                       │                   │                  │
-   │                      │ AssignVendorToPoi(pendingUpdate.VendorId, newPoi.Id)│
+   │                      │ AssignVendorToPoi(pendingUpdate.VendorId, newPoi.Id)         │
    │                      │──────────────────────>│                   │                  │
-   │                      │                                              │ ──────────────>│
-   │                      │<──────────────────────│                   │<────────────────│
+   │                      │                                           │─────────────────>│
+   │                      │<──────────────────────│                   │<─────────────────│
    │                      │                       │                   │                  │
-   │                      │ UpdatePendingUpdate(Status="Approved")│                  │
+   │                      │ UpdatePendingUpdate(Status="Approved")    │                  │
    │                      │──────────────────────>│                   │                  │
    │                      │<──────────────────────│                   │                  │
    │                      │                       │                   │                  │
    │ 200 OK: { newPoiId } │                       │                   │                  │
-   |<────────────────────│                       │                   │                  │
+   |<─────────────────────│                       │                   │                  │
    │                      │                       │                   │                  │
 ```
 
@@ -1325,7 +1316,7 @@ Admin             AdminVendorController       AppDbContext         PoiPoint     
 ```
 Admin             AdminVendorController       AppDbContext
    │                      │                       │
-   │ POST /api/admin/pending-updates/{id}/reject │
+   │ POST /api/admin/pending-updates/{id}/reject  │
    │─────────────────────>│                       │
    │                      │                       │
    │                      │ UpdatePendingUpdate(Status="Rejected", RejectedReason)
@@ -1333,8 +1324,8 @@ Admin             AdminVendorController       AppDbContext
    │                      │<──────────────────────│
    │                      │                       │
    │ 200 OK               │                       │
-   |<────────────────────│                       │
-   │ [No changes applied to POI]  │                │
+   |<──────────────────── │                       │
+   │ [No changes applied to POI]                  │
 ```
 
 ---
@@ -1342,60 +1333,60 @@ Admin             AdminVendorController       AppDbContext
 ## 5. Tổng hợp — Vendor 2-Step Update Flow (single view)
 
 ```
-┌──────────┐  ┌───────────────────┐  ┌─────────────┐  ┌──────────┐  ┌─────────────────────┐  ┌──────────────┐
-│  Vendor  │  │  VendorController  │  │  AppDbContext │  │  Admin   │  │ AdminVendorController │  │  PoiPoint  │
-└────┬─────┘  └────────┬──────────┘  └──────┬──────┘  └────┬─────┐  └──────────┬──────────┘  └────┬───────┘
-     │                  │                   │              │           │                  │              │
-     │ PUT /api/vendor/pois/{id}             │              │           │                  │              │
-     │ {Payload, ImagesPayload, ScriptsPayload}              │           │                  │              │
-     │────────────────>│                   │              │           │                  │              │
-     │                  │ ValidateVendorApproved()          │           │                  │              │
-     │                  │─────────────────────────────────>│           │                  │              │
-     │                  │<─────────────────────────────────│           │                  │              │
-     │                  │                   │              │           │                  │              │
-     │                  │ UpsertPendingPOIUpdate(          │           │                  │              │
-     │                  │   VendorId, PoiPointId,          │           │                  │              │
-     │                  │   Payload/Images/Scripts JSON,    │           │                  │              │
-     │                  │   Status=Pending)                │           │                  │              │
-     │                  │────────────────────>│           │           │                  │              │
-     │                  │                   │ Insert     │           │                  │              │
-     │                  │<────────────────────│           │           │                  │              │
-     │                  │                   │              │           │                  │              │
-     │ 200: {pendingId} │                   │              │           │                  │              │
-     |<────────────────│                   │              │           │                  │              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │    GET /api/admin/pending-updates/{id}        │
-     │                  │                   │              │<──────────│                  │              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │  200: full detail (changeType) │
-     │                  │                   │              │───────────>│                  │              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │           │ [Approve click] │              │
-     │                  │                   │              │           │────────────────>│              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │           │ GetPoiPoint(PoiPointId)│           │
-     │                  │                   │              │           │────────────────>│              │
-     │                  │                   │              │           │<────────────────│              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │           │ ApplyPayload(PoiPoint, JSON)│     │
-     │                  │                   │              │           │────────────────>│              │
-     │                  │                   │              │           │<────────────────│              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │           │ ReplaceRestaurantImages(PoiPointId)││
-     │                  │                   │              │           │────────────────>│              │
-     │                  │                   │              │           │<────────────────│              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │           │ UpsertAudioScripts(PoiPointId)│  │
-     │                  │                   │              │           │────────────────>│              │
-     │                  │                   │              │           │<────────────────│              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │           │ UpdatePending(Status=Approved)││
-     │                  │                   │              │           │────────────────>│              │
-     │                  │                   │              │           │<────────────────│              │
-     │                  │                   │              │           │                  │              │
-     │                  │                   │              │  200 OK   │                  │              │
-     │                  │                   │              │<──────────│                  │              │
-     │                  │                   │              │ [Changes applied to POI]│              │
+┌──────────┐   ┌───────────────────┐  ┌─────────────┐  ┌──────────┐  ┌─────────────────────┐  ┌────────────┐
+│  Vendor  │   │  VendorController │  │AppDbContext │  │  Admin   │  │AdminVendorController│  │  PoiPoint  │
+└────┬─────┘   └────────┬──────────┘  └──────┬──────┘  └────┬─────┘  └──────────┬──────────┘  └────┬───────┘
+     │                  │                    │              │                   │                  │              │
+     │ PUT /api/vendor/pois/{id}             │              │                   │                  │              │
+     │ {Payload, ImagesPayload, ScriptsPayload}             │                   │                  │              │
+     │────────────────> │                    │              │                   │                  │              │
+     │                  │ ValidateVendorApproved()          │                   │                  │              │
+     │                  │──────────────────────────────────>│                   │                  │              │
+     │                  │<──────────────────────────────────│                   │                  │              │
+     │                  │                    │              │                   │                  │              │
+     │                  │ UpsertPendingPOIUpdate(           │                   │                  │              │
+     │                  │   VendorId, PoiPointId,           │                   │                  │              │
+     │                  │   Payload/Images/Scripts JSON,    │                   │                  │              │
+     │                  │   Status=Pending)                 │                   │                  │              │
+     │                  │───────────────────>│              │                   │                  │              │
+     │                  │                    │ Insert       │                   │                  │              │
+     │                  │<───────────────────│              │                   │                  │              │
+     │                  │                    │              │                   │                  │              │
+     │ 200: {pendingId} │                    │              │                   │                  │              │
+     |<──────────────── │                    │              │                   │                  │              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │    GET /api/admin/pending-updates/{id}              │              │
+     │                  │                    │              │<──────────────────│                  │              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │  200: full detail (changeType)       │              │
+     │                  │                    │              │──────────────────>│                  │              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │                   │ [Approve click]  │              │
+     │                  │                    │              │                   │─────────────────>│              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │                   │ GetPoiPoint(PoiPointId)│        │
+     │                  │                    │              │                   │─────────────────>│              │
+     │                  │                    │              │                   │<─────────────────│              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │                   │ ApplyPayload(PoiPoint, JSON)│   │
+     │                  │                    │              │                   │─────────────────>│              │
+     │                  │                    │              │                   │<─────────────────│              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │                   │ ReplaceRestaurantImages(PoiPointId)
+     │                  │                    │              │                   │─────────────────>│              │
+     │                  │                    │              │                   │<─────────────────│              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │                   │ UpsertAudioScripts(PoiPointId)│ │
+     │                  │                    │              │                   │─────────────────>│              │
+     │                  │                    │              │                   │<─────────────────│              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │                   │ UpdatePending(Status=Approved)│││
+     │                  │                    │              │                   │─────────────────>│              │
+     │                  │                    │              │                   │<─────────────────│              │
+     │                  │                    │              │                   │                  │              │
+     │                  │                    │              │  200 OK           │                  │              │
+     │                  │                    │              │<──────────────────│                  │              │
+     │                  │                    │              │ [Changes applied to POI]             │
 ```
 
 ---
@@ -1445,37 +1436,37 @@ Admin             AdminVendorController       AppDbContext
 ## 1. Tổng quan — Device Auth Lifecycle
 
 ```
-┌────────────┐   First launch     ┌────────────────┐   device_id not found   ┌─────────────────────┐
-│  MauiApp    │ ─────────────────>  │ AudioPlayerService │ ─────────────────────>  │  Preferences        │
-│             │                     │                 │                          │  (device_id,         │
-│             │                     │                 │                          │   device_token)      │
-└──────┬──────┘                     └────────┬────────┘                          └──────────┬──────────┘
-       │                                   │                                        │
-       │                                   │ GUID.NewGuid()                         │
-       │                                   │───────────────────────────────────────> │
-       │                                   │                                        │
-       │                                   │                                        │
-       │  POST /api/auth/device-register   │                                        │
-       │  {deviceId}                       │                                        │
-       │────────────────────────────────> │                                        │
-       │                                   │                                        │
-       │                                   │ [FindOrCreate AppUser                  │
-       │                                   │  email=device_{id}                     │
-       │                                   │  @tastevinhkhanh.local,                │
-       │                                   │  Role="Device"]                        │
-       │                                   │                                        │
-       │                                   │  Generate JWT (1 year)                 │
-       │                                   │                                        │
-       │  { accessToken, expiresIn }        │                                        │
-       │<──────────────────────────────── │                                        │
-       │                                   │                                        │
-       │  Save to Preferences              │                                        │
-       │ ─────────────────────────────────>│                                        │
-       │                                   │                                        │
-       │  [Every audio download from now on] │                                    │
-       │  Authorization: Bearer {device_token} │                                    │
-       │ ────────────────────────────────────────> AudioController                  │
-       │                                        [GET /api/audio/{scriptId}]          │
+┌─────────────┐   First launch      ┌──────────────────┐   device_id not found  ┌─────────────────────┐
+│  MauiApp    │ ─────────────────>  │AudioPlayerService│ ─────────────────────> │  Preferences        │
+│             │                     │                  │                        │  (device_id,        │
+│             │                     │                  │                        │   device_token)     │
+└──────┬──────┘                     └────────┬─────────┘                        └──────────┬──────────┘
+       │                                     │                                        │
+       │                                     │ GUID.NewGuid()                         │
+       │                                     │───────────────────────────────────────>│
+       │                                     │                                        │
+       │                                     │                                        │
+       │  POST /api/auth/device-register     │                                        │
+       │  {deviceId}                         │                                        │
+       │────────────────────────────────────>│                                        │
+       │                                     │                                        │
+       │                                     │ [FindOrCreate AppUser                  │
+       │                                     │  email=device_{id}                     │
+       │                                     │  @tastevinhkhanh.local,                │
+       │                                     │  Role="Device"]                        │
+       │                                     │                                        │
+       │                                     │  Generate JWT (1 year)                 │
+       │                                     │                                        │
+       │  { accessToken, expiresIn }         │                                        │
+       │<────────────────────────────────────│                                        │
+       │                                     │                                        │
+       │  Save to Preferences                │                                        │
+       │ ───────────────────────────────────>│                                        │
+       │                                     │                                        │
+       │  [Every audio download from now on] │                                        │
+       │  Authorization: Bearer {device_token}                                        │
+       │ ───────────────────────────────────>│ AudioController                        │
+       │                                     │  [GET /api/audio/{scriptId}]           │
 ```
 
 ---
@@ -1489,19 +1480,19 @@ Actor: MauiApp
 Participant: AudioPlayerService | Preferences
 
 AudioPlayerService    Preferences
-       │                    │
-       │ GetDeviceId()     │
-       │─────────────────>│
        │                   │
-       │ [device_id exists?] │
-       │<─────────────────│
+       │ GetDeviceId()     │
+       │──────────────────>│
+       │                   │
+       │ [device_id exists?] 
+       │<──────────────────│
        │ YES ──> use existing
        │                   │
        │ NO ──> generate new
        │ Guid.NewGuid()    │
        │                   │
        │ Set("device_id", guid)
-       │─────────────────>│
+       │──────────────────>│
        │                   │
 ```
 
@@ -1516,23 +1507,23 @@ AudioPlayerService    AuthController(API)       AppDbContext          AppUser
        │ RegisterDeviceAsync(deviceId)             │                   │
        │────────────────────>│                     │                   │
        │                     │                     │                   │
-       │                     │ DeviceRegisterAsync(deviceId)         │
+       │                     │ DeviceRegisterAsync(deviceId)           │
        │                     │────────────────────>│                   │
        │                     │                     │                   │
        │                     │ FindByNameAsync(    │                   │
-       │                     │   "device_{id}@      │                   │
-       │                     │    tastevinhkhanh.local")             │
+       │                     │   "device_{id}@     │                   │
+       │                     │    tastevinhkhanh.local")               │
        │                     │────────────────────>│                   │
        │                     │<────────────────────│                   │
-       │                     │ appUser?              │                   │
-       │                     │                      │                   │
-       │                     │ [user not found]     │                   │
-       │                     │                      │                   │
-       │                     │ CreateAsync(AppUser {│                   │
-       │                     │   UserName = ...,    │                   │
-       │                     │   Email = ...,       │                   │
+       │                     │ appUser?            │                   │
+       │                     │                     │                   │
+       │                     │ [user not found]    │                   │
+       │                     │                     │                   │
+       │                     │ CreateAsync(AppUser {                   │
+       │                     │   UserName = ...,   │                   │
+       │                     │   Email = ...,      │                   │
        │                     │   // no password    │                   │
-       │                     │ })                   │                   │
+       │                     │ })                  │                   │
        │                     │────────────────────>│                   │
        │                     │<────────────────────│                   │
        │                     │                     │                   │
@@ -1540,28 +1531,28 @@ AudioPlayerService    AuthController(API)       AppDbContext          AppUser
        │                     │────────────────────>│                   │
        │                     │<────────────────────│                   │
        │                     │                     │                   │
-       │                     │ [Build claims]       │                   │
-       │                     │ claims = {           │                   │
-       │                     │   sub: user.Id,      │                   │
+       │                     │ [Build claims]      │                   │
+       │                     │ claims = {          │                   │
+       │                     │   sub: user.Id,     │                   │
        │                     │   role: "Device",   │                   │
        │                     │   deviceId: deviceId│                   │
        │                     │ }                   │                   │
        │                     │                     │                   │
-       │                     │ GenerateJwtToken(    │                   │
-       │                     │   claims,            │                   │
-       │                     │   expiresIn: 365 days│                  │
+       │                     │ GenerateJwtToken(   │                   │
+       │                     │   claims,           │                   │
+       │                     │   expiresIn: 365 days                   │
        │                     │ )                   │                   │
        │                     │────────────────────>│                   │
        │                     │<────────────────────│                   │
-       │                     │  token (1 year)      │                   │
+       │                     │  token (1 year)     │                   │
        │                     │                     │                   │
-       │  200: { accessToken, │                     │                   │
+       │  200: { accessToken,│                     │                   │
        │        expiresIn: 31536000 }              │                   │
        │<────────────────────│                     │                   │
        │                     │                     │                   │
-       │ SaveAccessToken(token)                    │
-       │────────────────────>│                     │
-       │                     │                     │
+       │ SaveAccessToken(token)                    │                   │
+       │────────────────────>│                     │                   │
+       │                     │                     │                   │
 ```
 
 ### Bước 3: Download audio với Bearer token
@@ -1570,40 +1561,40 @@ AudioPlayerService    AuthController(API)       AppDbContext          AppUser
 Actor: MauiApp
 Participant: AudioPlayerService | AudioController (API) | FileSystem (wwwroot/audio)
 
-AudioPlayerService    AudioController(API)       AppDbContext          FileSystem
+AudioPlayerService    AudioController(API)    AppDbContext         FileSystem
        │                     │                     │                   │
-       │ DownloadAudioAsync(scriptId)             │                   │
+       │ DownloadAudioAsync(scriptId)              │                   │
        │                     │                     │                   │
-       │ GET /api/audio/{scriptId}                │                   │
-       │ Authorization: Bearer {device_token}     │
+       │ GET /api/audio/{scriptId}                 │                   │
+       │ Authorization: Bearer {device_token}      │                   │
        │────────────────────>│                     │                   │
-       │                     │ [JwtBearer validates token]            │
+       │                     │ [JwtBearer validates token]             │
        │                     │                     │                   │
-       │                     │ GetAudioScript(scriptId)              │
+       │                     │ GetAudioScript(scriptId)                │
        │                     │────────────────────>│                   │
        │                     │<────────────────────│                   │
-       │                     │ audioScript?         │                   │
+       │                     │ audioScript?        │                   │
        │                     │                     │                   │
        │                     │ [not found → 404]   │                   │
        │                     │                     │                   │
-       │                     │ [audioScript.AudioFilePath is empty?]│
-       │                     │ 404: "Audio file not set"             │
+       │                     │ [audioScript.AudioFilePath is empty?]   │
+       │                     │ 404: "Audio file not set"               │
        │                     │                     │                   │
-       │                     │ ReadFileAsync(audioFilePath)         │
-       │                     │───────────────────────────────>│     │
-       │                     │<───────────────────────────────│     │
-       │                     │  file bytes (mp3/wav)          │     │
+       │                     │ ReadFileAsync(audioFilePath)            │
+       │                     │────────────────────>│                   │
+       │                     │<────────────────────│                   │
+       │                     │  file bytes (mp3/wav)                   │
        │                     │                     │                   │
-       │                     │  200 OK (audio/mp3)            │
+       │                     │  200 OK (audio/mp3) │                   │
        │<────────────────────│                     │                   │
        │ audio bytes         │                     │                   │
        │                     │                     │                   │
        │ Save to cache:      │                     │                   │
-       │ FileSystem/AppDataDirectory/              │
-       │ audio/{poiId}_{lang}.mp3                  │
+       │ FileSystem/AppDataDirectory/              │                   │
+       │ audio/{poiId}_{lang}.mp3                  │                   │
        │────────────────────>│                     │                   │
        │                     │                     │                   │
-       │ UpdateLocalAudioPath(scriptId, localPath) │
+       │ UpdateLocalAudioPath(scriptId, localPath) │                   │
        │                     │                     │                   │
 ```
 
@@ -1617,21 +1608,21 @@ AudioPlayerService    Preferences          AuthController(API)
        │                    │                     │
        │ [on 401 response]  │                     │
        │                    │                     │
-       │ GetAccessToken()    │                     │
+       │ GetAccessToken()   │                     │
        │───────────────────>│                     │
        │                    │                     │
        │ RegisterDeviceAsync(deviceId) [re-use existing device]│
-       │──────────────────────────────────────────>│
+       │─────────────────────────────────────────>│
        │                    │                     │
        │                    │  [user already exists — refresh JWT]│
        │                    │                     │
-       │                    │  Generate new JWT    │
-       │                    │<──────────────────────────────────│
+       │                    │  Generate new JWT   │
+       │                    │<────────────────────│
        │                    │                     │
        │ SaveAccessToken(newToken)                │
        │───────────────────>│                     │
        │                    │                     │
-       │ Retry original request with new token   │
+       │ Retry original request with new token    │
        │                    │                     │
 ```
 
@@ -1640,57 +1631,57 @@ AudioPlayerService    Preferences          AuthController(API)
 ## 3. Tổng hợp — Full Device Registration Lifecycle (single view)
 
 ```
-┌──────────────┐  ┌─────────────────────┐  ┌────────────────┐  ┌───────────────┐  ┌──────────────────────┐  ┌───────────────────┐
-│   MauiApp     │  │  AudioPlayerService │  │  Preferences   │  │  AuthController │  │     AppDbContext     │  │  AudioController   │
-└───────┬──────┘  └──────────┬──────────┘  └───────┬────────┘  └───────┬────────┘  └──────────┬─────────┘  └────────┬──────────┘
-        │                      │                    │                  │                    │                    │
-        │ [App Launch]         │                    │                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │                      │ GetDeviceId()     │                  │                    │                    │
-        │                      │──────────────────>│                  │                    │                    │
-        │                      │<──────────────────│                  │                    │                    │
-        │                      │ deviceId (or new) │                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │                      │ RegisterDeviceAsync(deviceId)       │                    │                    │
-        │                      │───────────────────────────────────────>│                    │                    │
-        │                      │                    │                  │                    │                    │
-        │                      │                    │                  │ FindOrCreateUser("device_{id}@...")│
-        │                      │                    │                  │──────────────────>│                    │
-        │                      │                    │                  │<──────────────────│                    │
-        │                      │                    │                  │ AppUser (Device role)│                 │
-        │                      │                    │                  │                    │                    │
-        │                      │                    │                  │ GenerateJwtToken(role=Device, 1yr)│
-        │                      │                    │                  │──────────────────>│                    │
-        │                      │                    │                  │<──────────────────│                    │
-        │                      │                    │                  │  token            │                    │
-        │                      │                    │                  │                    │                    │
-        │  { accessToken }    │                    │                  │                    │                    │
-        │<────────────────────│                    │                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │ SaveAccessToken(token)                   │                  │                    │                    │
-        │────────────────────────────────────────>│                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │  [Audio needed — trigger Geofence]      │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │                      │ DownloadAudioAsync(scriptId)        │                    │
-        │                      │                    │                  │                    │                    │
-        │                      │ GET /api/audio/{id} │                  │                    │
-        │                      │ Authorization: Bearer {token}       │                    │
-        │                      │─────────────────────────────────────────────────────────────────────────────>│
-        │                      │                    │                  │                    │              GET /api/audio/{id}
-        │                      │                    │                  │                    │<─────────────────────────────────────│
-        │                      │                    │                  │                    │              200: audio bytes        │
-        │                      │                    │                  │                    │─────────────────────────────────────>│
-        │                      │<─────────────────────────────────────────────────────────────────────────│
-        │  audio bytes        │                    │                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │ Save to local cache │                    │                  │                    │                    │
-        │────────────────────────────────────────>│                  │                    │                    │
-        │                      │                    │                  │                    │                    │
-        │ PlayLocalFile()     │                    │                  │                    │                    │
-        │                      │                    │                  │                    │                    │
+┌──────────────┐  ┌─────────────────────┐  ┌────────────────┐  ┌───────────────┐  ┌────────────────────┐  ┌───────────────────┐
+│   MauiApp    │  │  AudioPlayerService │  │  Preferences   │  │ AuthController│  │     AppDbContext   │  │  AudioController  │
+└───────┬──────┘  └──────────┬──────────┘  └───────┬────────┘  └───────┬───────┘  └──────────┬─────────┘  └────────┬──────────┘
+        │                    │                     │                   │                     │                     │
+        │ [App Launch]       │                     │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │                    │ GetDeviceId()       │                   │                     │                     │
+        │                    │────────────────────>│                   │                     │                     │
+        │                    │<────────────────────│                   │                     │                     │
+        │                    │ deviceId (or new)   │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │                    │ RegisterDeviceAsync(deviceId)           │                     │                     │
+        │                    │────────────────────────────────────────>│                     │                     │
+        │                    │                     │                   │                     │                     │
+        │                    │                     │                   │ FindOrCreateUser("device_{id}@...")       │ 
+        │                    │                     │                   │────────────────────>│                     │
+        │                    │                     │                   │<────────────────────│                     │
+        │                    │                     │                   │ AppUser (Device role)│                    │
+        │                    │                     │                   │                     │                     │
+        │                    │                     │                   │ GenerateJwtToken(role=Device, 1yr)        │
+        │                    │                     │                   │────────────────────>│                     │
+        │                    │                     │                   │<────────────────────│                     │
+        │                    │                     │                   │  token              │                     │
+        │                    │                     │                   │                     │                     │
+        │  { accessToken }   │                     │                   │                     │                     │
+        │<───────────────────│                     │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │ SaveAccessToken(token)                   │                   │                     │                     │
+        │─────────────────────────────────────────>│                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │  [Audio needed — trigger Geofence]       │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │                    │ DownloadAudioAsync(scriptId)            │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │                    │ GET /api/audio/{id} │                   │                     │                     │
+        │                    │ Authorization: Bearer {token}           │                     │                     │
+        │                    │────────────────────────────────────────────────────────────────────────────────────>│
+        │                    │                     │                   │                     │   GET /api/audio/{id}
+        │                    │                     │                   │                     │<────────────────────│
+        │                    │                     │                   │                     │  200: audio bytes   │
+        │                    │                     │                   │                     │────────────────────>│
+        │                    │<────────────────────────────────────────────────────────────────────────────────────│
+        │  audio bytes       │                     │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │ Save to local cache│                     │                   │                     │                     │
+        │─────────────────────────────────────────>│                   │                     │                     │
+        │                    │                     │                   │                     │                     │
+        │ PlayLocalFile()    │                     │                   │                     │                     │
+        │                    │                     │                   │                     │                     │
 ```
 
 ---
