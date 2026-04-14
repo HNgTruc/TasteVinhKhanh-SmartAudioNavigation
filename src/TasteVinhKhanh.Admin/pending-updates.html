@@ -20,6 +20,9 @@
                 <a href="poi.html">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map-pin"/></svg></span> Điểm thuyết minh
                 </a>
+                <a href="audio.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clipboard-list"/></svg></span> Quản lý Audio
+                </a>
                 <a href="tour.html">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map"/></svg></span> Quản lý Tours
                 </a>
@@ -30,6 +33,9 @@
                 <a href="pending-updates.html" class="active">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clock"/></svg></span> Duyệt cập nhật
                     <span class="nav-badge nav-badge-warning" id="pendingBadge" style="display:none">0</span>
+                </a>
+                <a href="usage-history.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clipboard-list"/></svg></span> Lịch sử SD
                 </a>
             </nav>
             <div class="sidebar-bottom">
@@ -227,38 +233,38 @@
         document.getElementById('updateEmpty').style.display = 'none';
 
         try {
-            // Tab 'all' → load tất cả (không filter status)
-            // Các tab khác → filter đúng status để giảm data
-            let updatePromise, imgPromise, delPromise;
+            const statuses = ['Pending', 'Approved', 'Rejected'];
+            const pickItems = (resp) => Array.isArray(resp?.items) ? resp.items : [];
 
             if (currentFilter === 'all') {
-                updatePromise = getPendingUpdates(1, 200, 'all');
-                imgPromise    = getStagingImages('all').catch(() => ({ items: [] }));
-                delPromise    = getDeletionRequests('all').catch(() => ({ items: [] }));
+                const [updateBatches, imgBatches, delBatches, logoBatches] = await Promise.all([
+                    Promise.all(statuses.map(s => getPendingUpdates(1, 200, s).catch(() => ({ items: [] })))),
+                    Promise.all(statuses.map(s => getStagingImages(s).catch(() => ({ items: [] })))),
+                    Promise.all(statuses.map(s => getDeletionRequests(s).catch(() => ({ items: [] })))),
+                    Promise.all(statuses.map(s => getPendingLogos(s).catch(() => ({ items: [] }))))
+                ]);
+
+                allUpdates   = updateBatches.flatMap(pickItems);
+                allImages    = imgBatches.flatMap(pickItems);
+                allDeletions = delBatches.flatMap(pickItems);
+                allLogos     = logoBatches.flatMap(pickItems);
             } else {
                 const apiStatus = currentFilter.charAt(0).toUpperCase() + currentFilter.slice(1).toLowerCase();
-                updatePromise = getPendingUpdates(1, 200, apiStatus);
-                imgPromise    = getStagingImages(apiStatus).catch(() => ({ items: [] }));
-                delPromise    = getDeletionRequests(apiStatus).catch(() => ({ items: [] }));
+                const [updateData, imgData, delData, logoData] = await Promise.all([
+                    getPendingUpdates(1, 200, apiStatus),
+                    getStagingImages(apiStatus).catch(() => ({ items: [] })),
+                    getDeletionRequests(apiStatus).catch(() => ({ items: [] })),
+                    getPendingLogos(apiStatus).catch(() => ({ items: [] }))
+                ]);
+
+                allUpdates   = pickItems(updateData);
+                allImages    = pickItems(imgData);
+                allDeletions = pickItems(delData);
+                allLogos     = pickItems(logoData);
             }
 
-            const [updateData, imgData, delData] = await Promise.all([
-                updatePromise, imgPromise, delPromise
-            ]);
-
-            allUpdates   = updateData?.items || [];
-            allImages    = imgData?.items || [];
-            allDeletions = delData?.items || [];
-
-            // Load logo pending
-            const logoPromise = currentFilter === 'all' || currentFilter === 'pending'
-                ? getPendingLogos(currentFilter === 'all' ? 'all' : 'Pending').catch(() => ({ items: [] }))
-                : getPendingLogos(currentFilter).catch(() => ({ items: [] }));
-            const logoData = await logoPromise;
-            allLogos = logoData?.items || [];
-
             // Dùng stats từ backend API (đã tính đúng UTC+7)
-            renderStats(updateData?.stats);
+            renderStats();
             renderTable(filterAll());
         } catch (e) {
             console.error('Load error:', e);
@@ -355,30 +361,36 @@
     function filterAll() {
         const filterLower = currentFilter.toLowerCase();
         const isAll = currentFilter === 'all';
+        const allStatuses = new Set(['pending', 'approved', 'rejected']);
+        const matchStatus = (value) => {
+            const normalized = (value || '').toLowerCase();
+            if (isAll) return allStatuses.has(normalized);
+            return normalized === filterLower;
+        };
 
         const poiRows = allUpdates
-            .filter(u => isAll || (u.status || '').toLowerCase() === filterLower)
+            .filter(u => matchStatus(u.status))
             .filter(u => !searchQuery || (u.poiName || '').toLowerCase().includes(searchQuery)
                 || (u.vendorName || '').toLowerCase().includes(searchQuery)
                 || (u.submittedBy || '').toLowerCase().includes(searchQuery))
             .map(u => ({ ...u, _type: 'poi' }));
 
         const imgRows = allImages
-            .filter(i => isAll || (i.status || '').toLowerCase() === filterLower)
+            .filter(i => matchStatus(i.status))
             .filter(i => !searchQuery || (i.fileName || '').toLowerCase().includes(searchQuery)
                 || (i.vendorName || '').toLowerCase().includes(searchQuery)
                 || (i.poiName || '').toLowerCase().includes(searchQuery))
             .map(i => ({ ...i, _type: 'image' }));
 
         const delRows = allDeletions
-            .filter(d => isAll || (d.status || '').toLowerCase() === filterLower)
+            .filter(d => matchStatus(d.status))
             .filter(d => !searchQuery || (d.fileName || '').toLowerCase().includes(searchQuery)
                 || (d.vendorName || '').toLowerCase().includes(searchQuery)
                 || (d.poiName || '').toLowerCase().includes(searchQuery))
             .map(d => ({ ...d, _type: 'deletion' }));
 
         const logoRows = allLogos
-            .filter(l => isAll || (l.status || '').toLowerCase() === filterLower)
+            .filter(l => matchStatus(l.status))
             .filter(l => !searchQuery || (l.fileName || '').toLowerCase().includes(searchQuery)
                 || (l.vendorName || '').toLowerCase().includes(searchQuery)
                 || (l.poiName || '').toLowerCase().includes(searchQuery))

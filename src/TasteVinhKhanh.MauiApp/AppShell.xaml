@@ -13,6 +13,8 @@
                       ContentTemplate="{DataTemplate views:MapPage}"/>
         <ShellContent Route="audio"
                       ContentTemplate="{DataTemplate views:AudioPage}"/>
+        <ShellContent Route="favorites"
+                      ContentTemplate="{DataTemplate views:FavoritesPage}"/>
         <ShellContent Route="settings"
                       ContentTemplate="{DataTemplate views:SettingsPage}"/>
         <ShellContent Route="PoiDetailPage"

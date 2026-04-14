@@ -13,7 +13,7 @@
 └──────┬───────┘     └──────┬───────┘     └───────────┬───────────┘     └──────┬─────┘
        │                    │                         │                        │
        │ [App Launch]       │                         │                        │
-       │────────────────────>│                        │                        │
+       │───────────────────>│                         │                        │
        │                    │ Init (load POIs from    │                        │
        │                    │  local SQLite)          │                        │
        │                    │                         │                        │
@@ -32,7 +32,7 @@
        │                    │──PoiTriggered event──>  │                        │
        │                    │                         │                        │
        │                    │                         │ ShowPoiNotification()  │
-       │                    │                         │ PlayAsync(poi,dist,loc)│ 
+       │                    │                         │ PlayAsync(poi,dist,loc)│
        │                    │                         │                        │
        │                    │                         │ InsertLogAsync() ─────>│ POST /analytics/logs
        │                    │                         │                        │
@@ -124,14 +124,14 @@ LocationService      GeofenceEngine          AppDatabase
       │                   │ List<LocalPoi>      │
       │                   │                     │
       │                   │ [for each POI]      │
-      │                   │──HaversineMeters()─>│ 
+      │                   │──HaversineMeters()─>│
       │                   │ distance = X meters │
-      │                   │<────────────────────│ 
+      │                   │<────────────────────│
       │                   │                     │
       │                   │ [distance <= poi.TriggerRadius]
       │                   │                     │
       │                   │ WasRecentlyPlayedAsync(poiId, 5min)
-      │                   │────────────────────>│ 
+      │                   │────────────────────>│
       │                   │                     │
       │                   │<────────────────────│
       │                   │ true/false (cooldown)
@@ -237,7 +237,6 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
        │                    │                     │
 ```
 
-
 ---
 
 ## 3. Sequence Diagram tổng hợp (single view)
@@ -263,7 +262,7 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
         │                  │──────────────────> │                  │                  │                   │
         │                  │                    │                  │                  │                   │
         │                  │                    │ CheckLocationAsync(lat/lng)         │                   │
-        │                  │                    │──HaversineMeters()──>               │                   │
+        │                  │                    │HaversineMeters()─>│                 │                   │
         │                  │                    │<──distance(m)────│                  │                   │
         │                  │                    │                  │                  │                   │
         │                  │                    │ WasRecentlyPlayedAsync(poiId, 5min) │                   │
@@ -295,7 +294,7 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
         │                  │                    │                  │                  │                   │
         │                  │                    │                  │ [NO] DownloadAudioAsync(scriptId)    │
         │                  │                    │                  │─────────────────────────────────────>│
-        │                  │                    │                  │                  │ GET /api/audio/{id} 
+        │                  │                    │                  │                  │ GET /api/audio/{id}
         │                  │                    │                  │<─────────────────────────────────────│
         │                  │                    │                  │                  │ 200 OK (audio bytes)
         │                  │                    │                  │                  │                   │
@@ -323,19 +322,19 @@ SyncService(MAUI)      AppDatabase           AnalyticsController(API)
 
 ## 4. Thành phần & File mapping
 
-| Thành phần | File trong codebase |
-|---|---|
-| Location polling | `MauiApp/Services/LocationService.cs` |
-| Geofence check | `MauiApp/Services/GeofenceEngine.cs` |
-| Audio orchestration | `MauiApp/Services/NarrationEngine.cs` |
-| Audio download + playback | `MauiApp/Services/AudioPlayerService.cs` |
-| Local SQLite (POIs + logs) | `MauiApp/Data/AppDatabase.cs` |
-| Sync với server | `MauiApp/Services/SyncService.cs` |
-| Push notification | `MauiApp/Services/NotificationService.cs` |
-| API: sync POIs | `Api/Controllers/SyncController.cs` → `GET /api/sync` |
-| API: serve audio | `Api/Controllers/AudioController.cs` → `GET /api/audio/{id}` |
-| API: device register | `Api/Controllers/AuthController.cs` → `POST /api/auth/device-register` |
-| API: analytics logs | `Api/Controllers/AnalyticsController.cs` → `POST /api/analytics/logs` |
+| Thành phần                 | File trong codebase                                                    |
+| -------------------------- | ---------------------------------------------------------------------- |
+| Location polling           | `MauiApp/Services/LocationService.cs`                                  |
+| Geofence check             | `MauiApp/Services/GeofenceEngine.cs`                                   |
+| Audio orchestration        | `MauiApp/Services/NarrationEngine.cs`                                  |
+| Audio download + playback  | `MauiApp/Services/AudioPlayerService.cs`                               |
+| Local SQLite (POIs + logs) | `MauiApp/Data/AppDatabase.cs`                                          |
+| Sync với server            | `MauiApp/Services/SyncService.cs`                                      |
+| Push notification          | `MauiApp/Services/NotificationService.cs`                              |
+| API: sync POIs             | `Api/Controllers/SyncController.cs` → `GET /api/sync`                  |
+| API: serve audio           | `Api/Controllers/AudioController.cs` → `GET /api/audio/{id}`           |
+| API: device register       | `Api/Controllers/AuthController.cs` → `POST /api/auth/device-register` |
+| API: analytics logs        | `Api/Controllers/AnalyticsController.cs` → `POST /api/analytics/logs`  |
 
 ---
 
@@ -398,7 +397,7 @@ Vendor           VendorController         AppDbContext          Admin           
    │                    │ [Save to staging]   │                  │                      │                   │
    │                    │                     │                  │                      │                   │
    │                    │ SaveFileAsync(file, staging/poi_{poiId}/{guid}.{ext})         │                   │
-   │                    │──────────────────────────────────────────────────────────────>│                   │ 
+   │                    │──────────────────────────────────────────────────────────────>│                   │
    │                    │                     │                  │                      │                   │
    │                    │<──────────────────────────────────────────────────────────────│                   │
    │                    │      file path      │                  │                      │                   │
@@ -420,7 +419,7 @@ Vendor           VendorController         AppDbContext          Admin           
    │                    │                     │                  │                      │                   │
    │                    │                     │         200: [StagingImage, ...]        │                   │
    │                    │                     │                  │─────────────────────>│                   │
-   │                    │                     │                  │ [Admin sees pending] │                   │ 
+   │                    │                     │                  │ [Admin sees pending] │                   │
    │                    │                     │                  │                      │                   │
    │                    │                     │                  │                      │ [Admin clicks "Approve"]
    │                    │                     │                  │                      │─────────────────> │
@@ -505,10 +504,10 @@ Vendor           VendorController         AppDbContext          Admin           
    │                    │<────────────────────│                  │                      │                   │
    │                    │                     │                  │                      │                   │
    │                    │ AddStagingImage(    │                  │                      │                   │
-   │                    │   StagingType=Deletion,                │                      │                   │                   
-   │                    │   Status=Pending,                      │                      │                   │                   
-   │                    │   OriginalImageId=imageId              │                      │                   │                   
-   │                    │ )                                      │                      │                   │                   
+   │                    │   StagingType=Deletion,                │                      │                   │
+   │                    │   Status=Pending,                      │                      │                   │
+   │                    │   OriginalImageId=imageId              │                      │                   │
+   │                    │ )                                      │                      │                   │
    │                    │────────────────────>│                  │                      │                   │
    │                    │                     │ Insert StagingImage record              │                   │
    │                    │<────────────────────│                  │                      │                   │
@@ -657,19 +656,19 @@ Admin            AdminVendorController    AppDbContext
 
 ## 5. Thành phần & File mapping
 
-| Thành phần | File trong codebase |
-|---|---|
-| Vendor upload (staging) | `Api/Controllers/VendorController.cs` → `POST /api/vendor/images/staging` |
-| Vendor delete request | `Api/Controllers/VendorController.cs` → `POST /api/vendor/images/delete-request` |
-| Admin list staging | `Api/Controllers/AdminVendorController.cs` → `GET /api/admin/staging-images` |
-| Admin list deletion requests | `Api/Controllers/AdminVendorController.cs` → `GET /api/admin/staging-images/deletion` |
-| Admin approve upload | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/approve` |
-| Admin reject upload | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/reject` |
-| Admin approve deletion | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/approve-deletion` |
-| Admin reject deletion | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/reject-deletion` |
-| Staging entity | `Shared/Models/StagingImage.cs` |
-| Staging DB | `Api/Data/AppDbContext.cs` |
-| File storage | `wwwroot/staging/` + `wwwroot/images/` |
+| Thành phần                   | File trong codebase                                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| Vendor upload (staging)      | `Api/Controllers/VendorController.cs` → `POST /api/vendor/images/staging`                           |
+| Vendor delete request        | `Api/Controllers/VendorController.cs` → `POST /api/vendor/images/delete-request`                    |
+| Admin list staging           | `Api/Controllers/AdminVendorController.cs` → `GET /api/admin/staging-images`                        |
+| Admin list deletion requests | `Api/Controllers/AdminVendorController.cs` → `GET /api/admin/staging-images/deletion`               |
+| Admin approve upload         | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/approve`          |
+| Admin reject upload          | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/reject`           |
+| Admin approve deletion       | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/approve-deletion` |
+| Admin reject deletion        | `Api/Controllers/AdminVendorController.cs` → `POST /api/admin/staging-images/{id}/reject-deletion`  |
+| Staging entity               | `Shared/Models/StagingImage.cs`                                                                     |
+| Staging DB                   | `Api/Data/AppDbContext.cs`                                                                          |
+| File storage                 | `wwwroot/staging/` + `wwwroot/images/`                                                              |
 
 ---
 
@@ -687,14 +686,14 @@ Admin            AdminVendorController    AppDbContext
 
 # Authentication Flow — Sequence Diagram
 
-> Mô tả luồng đăng nhập → nhận JWT → truy cập API có role-based authorization. Gồm 3 nhánh: Admin/Vendor Login, Vendor Registration, Device Registration (MAUI).
+> Mô tả luồng đăng nhập → nhận JWT → truy cập API có role-based authorization. Gồm 4 nhánh: Admin Login, Vendor Login (endpoint riêng), Vendor Registration/Forgot Password, Device Registration (MAUI).
 
 ---
 
 ## 1. Tổng quan — Authentication Architecture
 
 ```
-┌─────────┐   POST /api/auth/login      ┌─────────────────┐   Validate   ┌──────────────┐
+┌─────────┐   POST /api/auth/login hoặc /api/auth/vendor-login   ┌─────────────────┐   Validate   ┌──────────────┐
 │ Browser │ ──────────────────────────> │  AuthController │ ──────────>  │  UserManager │
 │  (Admin/│   {email, password}         │                 │  FindByEmail │  (ASP.NET    │
 │  Vendor)│                             │                 │  + CheckPwd  │   Identity)  │
@@ -719,7 +718,7 @@ Admin            AdminVendorController    AppDbContext
 
 ---
 
-## 2. Path 1: Admin / Vendor Login
+## 2. Path 1: Admin Login / Vendor Login
 
 ```
 Actor: Admin/Vendor (browser)
@@ -727,7 +726,7 @@ Participant: AuthController (API) | AuthService | UserManager (ASP.NET Identity)
 
 Browser            AuthController         AuthService           UserManager          Vendors table       JwtSecurityTokenHandler
    │                     │                     │                    │                     │                      │
-   │ POST /api/auth/login│                     │                    │                     │                      │
+   │ POST /api/auth/login (Admin) hoặc /api/auth/vendor-login (Vendor)│                │                     │                      │
    │ {email, password}   │                     │                    │                     │                      │
    │────────────────────>│                     │                    │                     │                      │
    │                     │                     │                    │                     │                      │
@@ -753,12 +752,15 @@ Browser            AuthController         AuthService           UserManager     
    │                     │                     │                    │                     │                      │
    │                     │                     │ [role == "Vendor"] │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ GetVendorByUserIdAsync(user.Id)          │                      │ 
-   │                     │                     │─────────────────────────────────────────>│                      │ 
-   │                     │                     │<─────────────────────────────────────────│                      │ 
-   │                     │                     │ Vendor {Status, PoiPointId}?             │                      │ 
+   │                     │                     │ GetVendorByUserIdAsync(user.Id)          │                      │
+   │                     │                     │─────────────────────────────────────────>│                      │
+   │                     │                     │<─────────────────────────────────────────│                      │
+   │                     │                     │ Vendor {Status, PoiPointId}?             │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ [Vendor + Status != "Approved"]          │                      │ 
+   │                     │                     │ [Vendor + Status == "Suspended"]         │                      │
+   │                     │                     │ 403: "Tài khoản vendor đã ngưng hợp tác" │                      │
+   │                     │                     │                    │                     │                      │
+   │                     │                     │ [Vendor + Status != "Approved"]          │                      │
    │                     │                     │                    │                     │                      │
    │                     │                     │ 403: "Tài khoản đang chờ được duyệt"     │                      │
    │                     │                     │                    │                     │                      │
@@ -774,10 +776,10 @@ Browser            AuthController         AuthService           UserManager     
    │                     │    (vendorId: vendor.Id) IF Vendor}      │                     │                      │
    │                     │                     │                    │                     │                      │
    │                     │                     │                    │                     │                      │
-   │                     │                     │ GenerateJwtToken(claims)                 │                      │ 
-   │                     │                     │─────────────────────────────────────────>│                      │     
-   │                     │                     │<─────────────────────────────────────────│                      │ 
-   │                     │                     │  { token: "jwt...", expiresAt: datetime }│                      │ 
+   │                     │                     │ GenerateJwtToken(claims)                 │                      │
+   │                     │                     │─────────────────────────────────────────>│                      │
+   │                     │                     │<─────────────────────────────────────────│                      │
+   │                     │                     │  { token: "jwt...", expiresAt: datetime }│                      │
    │                     │                     │                    │                     │                      │
    │                     │                     │                    │                     │                      │
    │  200 OK             │                     │                    │                     │                      │
@@ -792,7 +794,7 @@ Browser            AuthController         AuthService           UserManager     
 
 ---
 
-## 3. Path 2: Vendor Registration
+## 3. Path 2: Vendor Registration + Forgot Password
 
 ```
 Actor: Vendor (browser)
@@ -829,10 +831,39 @@ Browser            AuthController         AuthService           UserManager     
    │                     │                     │  Vendor created                          │
    │                     │                     │                    │                     │
    │                     │                     │                    │                     │
-   │  200 OK: "Tài khoản đang chờ được duyệt"  │                    │                     │ 
+   │  200 OK: "Tài khoản đang chờ được duyệt"  │                    │                     │
    │<────────────────────│                     │                    │                     │
    │ [Vendor CANNOT login until Admin approves]│                    │                     │
    │                     │                     │                    │                     │
+```
+
+---
+
+### 3b. Vendor Forgot Password
+
+```
+Actor: Vendor (browser)
+Participant: AuthController | AuthService | UserManager | Vendors table
+
+Browser            AuthController         AuthService           UserManager          Vendors table
+   │                     │                     │                    │                     │
+   │ POST /api/auth/vendor-forgot-password     │                    │                     │
+   │ { email, phone, newPassword }             │                    │                     │
+   │────────────────────>│                     │                    │                     │
+   │                     │ ResetVendorPasswordAsync(dto)            │                     │
+   │                     │───────────────────> │                    │                     │
+   │                     │                     │ FindByEmailAsync(email)                  │
+   │                     │                     │──────────────────> │                     │
+   │                     │                     │<────────────────── │                     │
+   │                     │                     │                    │ Get vendor by UserId│
+   │                     │                     │─────────────────────────────────────────>│
+   │                     │                     │<─────────────────────────────────────────│
+   │                     │                     │ Validate phone + GeneratePasswordResetToken
+   │                     │                     │ ResetPasswordAsync(user, token, newPassword)
+   │                     │                     │──────────────────> │                     │
+   │                     │                     │<────────────────── │                     │
+   │ 200 OK: "Khôi phục mật khẩu thành công"   │                    │                     │
+   │<────────────────────│                     │                    │                     │
 ```
 
 ---
@@ -866,21 +897,21 @@ MauiApp              AuthController         Preferences          AppUser
    │                       │ DeviceRegisterAsync(deviceId)         │
    │                       │────────────────────>│                 │
    │                       │                     │                 │
-   │                       │                     │ FindOrCreateUser(              
-   │                       │                     │   email: "device_{deviceId}     
-   │                       │                     │    @tastevinhkhanh.local",     
-   │                       │                     │   role: "Device"           
-   │                       │                     │ )               │              
+   │                       │                     │ FindOrCreateUser(
+   │                       │                     │   email: "device_{deviceId}
+   │                       │                     │    @tastevinhkhanh.local",
+   │                       │                     │   role: "Device"
+   │                       │                     │ )               │
    │                       │                     │────────────────>│
    │                       │                     │<────────────────│
-   │                       │                     │  AppUser created/found         
+   │                       │                     │  AppUser created/found
    │                       │                     │                 │
-   │                       │                     │ GenerateJwtToken()             
-   │                       │                     │   claims: { role: "Device",    
-   │                       │                     │   deviceId: "..." }             
+   │                       │                     │ GenerateJwtToken()
+   │                       │                     │   claims: { role: "Device",
+   │                       │                     │   deviceId: "..." }
    │                       │                     │────────────────>│
    │                       │                     │<────────────────│
-   │                       │                     │  token (expires 1 year)   
+   │                       │                     │  token (expires 1 year)
    │                       │                     │                 │
    │                       │                     │                 │
    │  200 OK: { accessToken, expiresIn }         │                 │
@@ -940,26 +971,26 @@ MauiApp              AuthController         Preferences          AppUser
 
 ## 6. Role & Access Matrix
 
-| Role | Login endpoint | JWT Claims | Accessible endpoints |
-|---|---|---|---|
-| `Admin` | `POST /api/auth/login` | `sub, email, name, role=Admin` | All admin endpoints + admin-only audio |
-| `Vendor` | `POST /api/auth/login` | `sub, email, name, role=Vendor, vendorId` | Vendor-only endpoints (if `Status=Approved`) |
-| `Device` | `POST /api/auth/device-register` | `sub, role=Device, deviceId` | `GET /api/audio/{id}`, `GET /api/sync`, `POST /api/analytics/logs` |
-| `Anonymous` | — | — | `GET /api/poi`, `GET /api/tours`, `POST /api/sync/playback` |
+| Role        | Login endpoint                   | JWT Claims                                | Accessible endpoints                                               |
+| ----------- | -------------------------------- | ----------------------------------------- | ------------------------------------------------------------------ |
+| `Admin`     | `POST /api/auth/login`           | `sub, email, name, role=Admin`            | All admin endpoints + admin-only audio                             |
+| `Vendor`    | `POST /api/auth/vendor-login`    | `sub, email, name, role=Vendor, vendorId` | Vendor-only endpoints (if `Status=Approved`, blocked when `Suspended`) |
+| `Device`    | `POST /api/auth/device-register` | `sub, role=Device, deviceId`              | `GET /api/audio/{id}`, `GET /api/sync`, `POST /api/analytics/logs` |
+| `Anonymous` | —                                | —                                         | `GET /api/poi`, `GET /api/tour`, `POST /api/sync/playback`         |
 
 ---
 
 ## 7. Thành phần & File mapping
 
-| Thành phần | File trong codebase |
-|---|---|
-| Login + register | `Api/Controllers/AuthController.cs` |
-| JWT generation + validation | `Api/Services/AuthService.cs` |
-| ASP.NET Identity | `Api/Services/AuthService.cs` → `UserManager<AppUser>` |
-| Device auth | `Api/Services/AuthService.cs` → `GetOrCreateDeviceTokenAsync()` |
-| JWT config | `Api/Program.cs` → `AddJwtBearer()` |
-| Vendor approval gate | `Api/Services/AuthService.cs` → `IsVendorApprovedAsync()` |
-| MAUI preferences | `MauiApp/Services/AudioPlayerService.cs` → `Preferences.Get/Set` |
+| Thành phần                  | File trong codebase                                              |
+| --------------------------- | ---------------------------------------------------------------- |
+| Login + register            | `Api/Controllers/AuthController.cs`                              |
+| JWT generation + validation | `Api/Services/AuthService.cs`                                    |
+| ASP.NET Identity            | `Api/Services/AuthService.cs` → `UserManager<AppUser>`           |
+| Device auth                 | `Api/Services/AuthService.cs` → `GetOrCreateDeviceTokenAsync()`  |
+| JWT config                  | `Api/Program.cs` → `AddJwtBearer()`                              |
+| Vendor approval/status gate | `Api/Services/AuthService.cs` → `IsVendorApprovedAsync()`, `GetVendorStatusByEmailAsync()` |
+| MAUI preferences            | `MauiApp/Services/AudioPlayerService.cs` → `Preferences.Get/Set` |
 
 ---
 
@@ -1273,7 +1304,7 @@ Participant: AdminVendorController | AppDbContext | PoiPoint | Vendors table
 
 Admin             AdminVendorController       AppDbContext         PoiPoint         Vendors
    │                      │                       │                   │                  │
-   │ POST /api/admin/pending-updates/{id}/approve (PoiPointId == 0)   │                  │     
+   │ POST /api/admin/pending-updates/{id}/approve (PoiPointId == 0)   │                  │
    │─────────────────────>│                       │                   │                  │
    │                      │                       │                   │                  │
    │                      │ [PoiPointId == 0 — CREATE new POI]        │                  │
@@ -1393,27 +1424,27 @@ Admin             AdminVendorController       AppDbContext
 
 ## 6. Change Type Detection
 
-| Điều kiện trong `PendingPOIUpdate` | `changeType` | Admin action |
-|---|---|---|
-| `PoiPointId == 0` | `poi_created` | Tạo POI mới + assign cho Vendor |
-| `Payload` có dữ liệu | `poi_updated` | Áp dụng thay đổi vào `PoiPoint` |
-| `ImagesPayload` có dữ liệu | `image_uploaded` | Xóa ảnh cũ → insert ảnh mới |
-| `ScriptsPayload` có dữ liệu | `script_updated` | Upsert `AudioScript` theo ngôn ngữ |
+| Điều kiện trong `PendingPOIUpdate` | `changeType`     | Admin action                       |
+| ---------------------------------- | ---------------- | ---------------------------------- |
+| `PoiPointId == 0`                  | `poi_created`    | Tạo POI mới + assign cho Vendor    |
+| `Payload` có dữ liệu               | `poi_updated`    | Áp dụng thay đổi vào `PoiPoint`    |
+| `ImagesPayload` có dữ liệu         | `image_uploaded` | Xóa ảnh cũ → insert ảnh mới        |
+| `ScriptsPayload` có dữ liệu        | `script_updated` | Upsert `AudioScript` theo ngôn ngữ |
 
 ---
 
 ## 7. Thành phần & File mapping
 
-| Thành phần | File trong codebase |
-|---|---|
-| POI CRUD (Admin) | `Api/Controllers/PoiController.cs` |
-| Vendor POI update | `Api/Controllers/VendorController.cs` → `PUT /api/vendor/pois/{id}` |
-| Admin review pending | `Api/Controllers/AdminVendorController.cs` → `GET/POST /api/admin/pending-updates` |
-| POI business logic | `Api/Services/PoiService.cs` |
-| Pending update entity | `Shared/Models/PendingPOIUpdate.cs` |
-| POI entity | `Shared/Models/PoiPoint.cs` |
-| Vendor entity | `Shared/Models/Vendor.cs` |
-| MauiApp reads POI | `Api/Controllers/SyncController.cs` → `GET /api/sync` |
+| Thành phần            | File trong codebase                                                                |
+| --------------------- | ---------------------------------------------------------------------------------- |
+| POI CRUD (Admin)      | `Api/Controllers/PoiController.cs`                                                 |
+| Vendor POI update     | `Api/Controllers/VendorController.cs` → `PUT /api/vendor/pois/{id}`                |
+| Admin review pending  | `Api/Controllers/AdminVendorController.cs` → `GET/POST /api/admin/pending-updates` |
+| POI business logic    | `Api/Services/PoiService.cs`                                                       |
+| Pending update entity | `Shared/Models/PendingPOIUpdate.cs`                                                |
+| POI entity            | `Shared/Models/PoiPoint.cs`                                                        |
+| Vendor entity         | `Shared/Models/Vendor.cs`                                                          |
+| MauiApp reads POI     | `Api/Controllers/SyncController.cs` → `GET /api/sync`                              |
 
 ---
 
@@ -1484,7 +1515,7 @@ AudioPlayerService    Preferences
        │ GetDeviceId()     │
        │──────────────────>│
        │                   │
-       │ [device_id exists?] 
+       │ [device_id exists?]
        │<──────────────────│
        │ YES ──> use existing
        │                   │
@@ -1646,7 +1677,7 @@ AudioPlayerService    Preferences          AuthController(API)
         │                    │ RegisterDeviceAsync(deviceId)           │                     │                     │
         │                    │────────────────────────────────────────>│                     │                     │
         │                    │                     │                   │                     │                     │
-        │                    │                     │                   │ FindOrCreateUser("device_{id}@...")       │ 
+        │                    │                     │                   │ FindOrCreateUser("device_{id}@...")       │
         │                    │                     │                   │────────────────────>│                     │
         │                    │                     │                   │<────────────────────│                     │
         │                    │                     │                   │ AppUser (Device role)│                    │
@@ -1688,28 +1719,28 @@ AudioPlayerService    Preferences          AuthController(API)
 
 ## 4. Security Model
 
-| Khía cạnh | Chi tiết |
-|---|---|
-| **User identity** | Device user: `device_{guid}@tastevinhkhanh.local` — không có password |
-| **Role** | `"Device"` — chỉ có quyền download audio + sync + log playback |
-| **Token lifetime** | **1 năm** — không cần refresh thường xuyên |
-| **Scope** | Không thể access Vendor/Admin endpoints dù có token |
-| **On 401** | Tự động re-register → nhận token mới → retry |
-| **Offline** | Token lưu trong `Preferences`, dùng được khi offline để decrypt cache |
+| Khía cạnh          | Chi tiết                                                              |
+| ------------------ | --------------------------------------------------------------------- |
+| **User identity**  | Device user: `device_{guid}@tastevinhkhanh.local` — không có password |
+| **Role**           | `"Device"` — chỉ có quyền download audio + sync + log playback        |
+| **Token lifetime** | **1 năm** — không cần refresh thường xuyên                            |
+| **Scope**          | Không thể access Vendor/Admin endpoints dù có token                   |
+| **On 401**         | Tự động re-register → nhận token mới → retry                          |
+| **Offline**        | Token lưu trong `Preferences`, dùng được khi offline để decrypt cache |
 
 ---
 
 ## 5. Thành phần & File mapping
 
-| Thành phần | File trong codebase |
-|---|---|
-| Device registration endpoint | `Api/Controllers/AuthController.cs` → `POST /api/auth/device-register` |
-| Device user creation | `Api/Services/AuthService.cs` → `GetOrCreateDeviceTokenAsync()` |
-| MAUI: get/set device ID | `MauiApp/Services/AudioPlayerService.cs` → `Preferences.Get/Set("device_id")` |
-| MAUI: get/set token | `MauiApp/Services/AudioPlayerService.cs` → `Preferences.Get/Set("device_token")` |
-| Audio file endpoint | `Api/Controllers/AudioController.cs` → `GET /api/audio/{id}` `[Authorize(Roles="Device")]` |
-| JWT config | `Api/Program.cs` → `AddJwtBearer()` với device policy |
-| Cache storage | `FileSystem.AppDataDirectory/audio/{poiId}_{lang}.mp3` |
+| Thành phần                   | File trong codebase                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------ |
+| Device registration endpoint | `Api/Controllers/AuthController.cs` → `POST /api/auth/device-register`                     |
+| Device user creation         | `Api/Services/AuthService.cs` → `GetOrCreateDeviceTokenAsync()`                            |
+| MAUI: get/set device ID      | `MauiApp/Services/AudioPlayerService.cs` → `Preferences.Get/Set("device_id")`              |
+| MAUI: get/set token          | `MauiApp/Services/AudioPlayerService.cs` → `Preferences.Get/Set("device_token")`           |
+| Audio file endpoint          | `Api/Controllers/AudioController.cs` → `GET /api/audio/{id}` `[Authorize(Roles="Device")]` |
+| JWT config                   | `Api/Program.cs` → `AddJwtBearer()` với device policy                                      |
+| Cache storage                | `FileSystem.AppDataDirectory/audio/{poiId}_{lang}.mp3`                                     |
 
 ---
 

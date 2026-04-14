@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TasteVinhKhanh Admin — Dashboard</title>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
 
@@ -20,6 +21,9 @@
                 <a href="poi.html">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map-pin"/></svg></span> Điểm thuyết minh
                 </a>
+                <a href="audio.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clipboard-list"/></svg></span> Quản lý Audio
+                </a>
                 <a href="tour.html">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map"/></svg></span> Quản lý Tours
                 </a>
@@ -30,6 +34,9 @@
                 <a href="pending-updates.html">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clock"/></svg></span> Duyệt cập nhật
                     <span class="nav-badge nav-badge-warning" id="pendingBadge" style="display:none;margin-left:auto">0</span>
+                </a>
+                <a href="usage-history.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clipboard-list"/></svg></span> Lịch sử SD
                 </a>
             </nav>
             <div class="sidebar-bottom">
@@ -112,12 +119,57 @@
                     </div>
                 </div>
 
+                <!-- HEATMAP -->
+                <div class="card heatmap-card" style="margin-top:16px">
+                    <div class="table-header heatmap-header">
+                        <h3 class="heatmap-title">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map-pin"/></svg>
+                            Bản đồ nhiệt vị trí người dùng
+                        </h3>
+                        <div class="heatmap-filters">
+                            <input type="date" id="heatmapFrom" class="form-input heatmap-date-input">
+                            <span class="heatmap-date-sep">—</span>
+                            <input type="date" id="heatmapTo" class="form-input heatmap-date-input">
+                            <button class="btn btn-outline btn-sm heatmap-refresh-btn" onclick="loadHeatmap()">
+                                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-refresh"/></svg> Cập nhật
+                            </button>
+                        </div>
+                    </div>
+                    <div id="heatmapContainer" class="heatmap-container">
+                        <div id="heatmapMap" style="height:360px; background:#f0f4f8">
+                            <div id="heatmapInitMsg" style="display:flex; align-items:center; justify-content:center; height:100%; font-size:13px; color:var(--gray-400)">
+                                <div style="text-align:center">
+                                    <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px; display:block; opacity:.4"><use href="#icon-map-pin"/></svg>
+                                    Đang tải bản đồ…
+                                </div>
+                            </div>
+                        </div>
+                        <div class="heatmap-meta-row">
+                            <span id="heatmapMeta" class="heatmap-meta-text">Chưa có dữ liệu</span>
+                            <span id="heatmapLegend" class="heatmap-legend">
+                                <span class="heatmap-legend-dot low"></span> Ít
+                                <span class="heatmap-legend-dot mid"></span> TB
+                                <span class="heatmap-legend-dot high"></span> Nhiều
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Hourly chart -->
+                    <div id="heatmapHourChart" class="hour-chart-wrap">
+                        <div class="hour-chart-title">Lượt nghe theo giờ (0–23h)</div>
+                        <div id="hourStatus" class="hour-chart-status" style="display:none"></div>
+                        <div id="hourBars" class="hour-bars"></div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
 
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script>
     if (!requireAuth()) throw new Error('Not authenticated');
 
@@ -159,6 +211,171 @@
     }
 
     loadDashboard();
+    loadHeatmap();
+
+    // ─── Heatmap ────────────────────────────────────────────────────────────────
+    let heatMap = null;
+    let heatData = null; // lưu data để re-render khi filter thay đổi
+    const HEATMAP_DEFAULT_CENTER = [10.7619, 106.7046]; // Phố ẩm thực Vĩnh Khánh
+    const HEATMAP_DEFAULT_ZOOM = 16;
+
+    function normalizeHeatmapData(raw) {
+        const sourcePoints = raw?.points ?? raw?.Points ?? [];
+        const points = (Array.isArray(sourcePoints) ? sourcePoints : [])
+            .map(p => ({
+                latitude: Number(p?.latitude ?? p?.Latitude ?? 0),
+                longitude: Number(p?.longitude ?? p?.Longitude ?? 0),
+                weight: Number(p?.weight ?? p?.Weight ?? 0)
+            }))
+            .filter(p => Number.isFinite(p.latitude) && Number.isFinite(p.longitude) && Number.isFinite(p.weight));
+
+        const totalCount = Number(raw?.totalCount ?? raw?.TotalCount);
+        return {
+            points,
+            totalCount: Number.isFinite(totalCount) ? totalCount : points.reduce((s, p) => s + p.weight, 0)
+        };
+    }
+
+    function normalizeHourlyData(raw) {
+        if (!Array.isArray(raw)) return [];
+        return raw.map(h => ({
+            hour: Number(h?.hour ?? h?.Hour ?? 0),
+            count: Number(h?.count ?? h?.Count ?? 0)
+        }))
+        .filter(h => Number.isFinite(h.hour) && Number.isFinite(h.count))
+        .sort((a, b) => a.hour - b.hour);
+    }
+
+    async function loadHeatmap() {
+        const from = document.getElementById('heatmapFrom').value || null;
+        const to   = document.getElementById('heatmapTo').value   || null;
+
+        const msg = document.getElementById('heatmapInitMsg');
+        if (msg) { msg.style.display = 'flex'; }
+
+        let data = { points: [], totalCount: 0 };
+        let hourly = [];
+        let heatmapErr = null;
+        let hourlyErr = null;
+
+        try {
+            const raw = await getHeatmapData(from, to);
+            data = normalizeHeatmapData(raw);
+        } catch (e) {
+            heatmapErr = e;
+        }
+
+        try {
+            const rawHourly = await getHeatmapByHour(from, to);
+            hourly = normalizeHourlyData(rawHourly);
+        } catch (e) {
+            hourlyErr = e;
+        }
+
+        heatData = data;
+
+        document.getElementById('heatmapMeta').textContent =
+            data.points.length
+                ? `${data.points.length.toLocaleString()} điểm · ${data.totalCount.toLocaleString()} lượt nghe`
+                : 'Chưa có dữ liệu vị trí người dùng';
+
+        // Không để lỗi chart giờ làm hỏng map
+        const hourStatus = document.getElementById('hourStatus');
+        if (hourStatus) {
+            if (hourlyErr) {
+                hourStatus.style.display = 'block';
+                hourStatus.style.color = '#e53935';
+                hourStatus.textContent = 'Không tải được dữ liệu theo giờ';
+            } else {
+                hourStatus.style.display = 'block';
+                hourStatus.style.color = 'var(--gray-400)';
+                hourStatus.textContent = '';
+            }
+        }
+
+        const hourlySource = hourly.length
+            ? hourly
+            : Array.from({ length: 24 }, (_, h) => ({ hour: h, count: 0 }));
+        document.getElementById('heatmapHourChart').style.display = 'block';
+        const max = Math.max(...hourlySource.map(h => h.count), 1);
+        document.getElementById('hourBars').innerHTML = hourlySource.map(h => {
+            const pct = (h.count / max) * 100;
+            return `<div class="hour-bar-col" title="${h.hour}h: ${h.count} lượt">
+                <div class="hour-bar-fill ${h.count > 0 ? 'active' : ''}" style="height:${pct}%"></div>
+                <div class="hour-bar-label">${h.hour}</div>
+            </div>`;
+        }).join('');
+
+        if (!window.L || typeof L.map !== 'function') {
+            if (msg) {
+                const text = msg.querySelector('div');
+                msg.style.display = 'flex';
+                if (text) text.innerHTML =
+                    '<svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px;display:block;opacity:.4"><use href="#icon-alert-triangle"/></svg>Không tải được thư viện bản đồ';
+            }
+            return;
+        }
+
+        if (!heatMap) {
+            heatMap = L.map('heatmapMap', {
+                zoomControl: true,
+                attributionControl: false
+            }).setView(HEATMAP_DEFAULT_CENTER, HEATMAP_DEFAULT_ZOOM);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19
+            }).addTo(heatMap);
+        }
+
+        if (heatMap._heatLayer) {
+            heatMap.removeLayer(heatMap._heatLayer);
+            heatMap._heatLayer = null;
+        }
+        if (heatMap._pointLayer) {
+            heatMap.removeLayer(heatMap._pointLayer);
+            heatMap._pointLayer = null;
+        }
+
+        if (data.points.length) {
+            if (msg) msg.style.display = 'none';
+            const maxWeight = Math.max(...data.points.map(p => p.weight), 1);
+
+            if (typeof L.heatLayer === 'function') {
+                // Chuẩn hóa intensity theo maxWeight để dữ liệu ít vẫn thấy rõ vùng nóng.
+                const latLngs = data.points.map(p => [
+                    p.latitude,
+                    p.longitude,
+                    Math.max(p.weight / maxWeight, 0.35)
+                ]);
+                heatMap._heatLayer = L.heatLayer(latLngs, {
+                    radius: 36,
+                    blur: 22,
+                    maxZoom: 17,
+                    gradient: { 0.2: '#4fc3f7', 0.5: '#ffeb3b', 0.8: '#f44336' }
+                }).addTo(heatMap);
+            } else {
+                // Fallback: nếu plugin heatmap lỗi, vẫn hiện điểm bằng circle marker
+                heatMap._pointLayer = L.layerGroup(
+                    data.points.map(p => L.circleMarker([p.latitude, p.longitude], {
+                        radius: Math.min(14, Math.max(4, p.weight)),
+                        color: '#f44336',
+                        fillColor: '#ff9800',
+                        fillOpacity: 0.5,
+                        weight: 1
+                    }))
+                ).addTo(heatMap);
+            }
+
+            // Luôn ghim map vào vị trí mặc định khi mở/cập nhật dashboard.
+            heatMap.setView(HEATMAP_DEFAULT_CENTER, HEATMAP_DEFAULT_ZOOM);
+        } else {
+            if (msg) {
+                const text = msg.querySelector('div');
+                msg.style.display = 'flex';
+                if (text) text.innerHTML =
+                    `<svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 8px;display:block;opacity:.4"><use href="#icon-map-pin"/></svg>${heatmapErr ? 'Không tải được dữ liệu vị trí' : 'Chưa có dữ liệu vị trí'}`;
+            }
+        }
+    }
 
     // Load badge counts into sidebar
     getPendingStats().then(stats => {

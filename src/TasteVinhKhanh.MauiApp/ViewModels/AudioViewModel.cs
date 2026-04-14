@@ -33,9 +33,11 @@ public partial class AudioViewModel : ObservableObject
     [ObservableProperty] private string _tNavHome = "";
     [ObservableProperty] private string _tNavMap = "";
     [ObservableProperty] private string _tNavAudio = "";
+    [ObservableProperty] private string _tNavFavorites = "";
     [ObservableProperty] private string _tNavSettings = "";
 
     private LocalPoi? _currentPoi;
+    private TimeSpan _pausedPosition = TimeSpan.Zero;
 
     private static readonly string LastPoiIdKey = "last_played_poi_id";
 
@@ -50,8 +52,33 @@ public partial class AudioViewModel : ObservableObject
 
         _narration.NarrationStarted += OnNarrationStarted;
         _narration.NarrationFinished += OnNarrationFinished;
+        _narration.PlaybackPositionChanged += OnPlaybackPositionChanged;
 
         _ = RestoreLastPlayedAsync();
+    }
+
+    partial void OnIsPlayingChanged(bool value)
+    {
+        _geofence?.SetGeofenceBlocked(value);
+    }
+
+    private void OnPlaybackPositionChanged(double positionSec, double durationSec)
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            if (positionSec >= 0)
+            {
+                var pos = TimeSpan.FromSeconds(positionSec);
+                CurrentTime = $"{pos.Minutes:D2}:{pos.Seconds:D2}";
+            }
+
+            if (durationSec > 0)
+            {
+                var dur = TimeSpan.FromSeconds(durationSec);
+                TotalTime = $"{dur.Minutes:D2}:{dur.Seconds:D2}";
+                Progress = positionSec / durationSec;
+            }
+        });
     }
 
     private void RefreshTexts()
@@ -63,6 +90,7 @@ public partial class AudioViewModel : ObservableObject
         TNavHome = _i18n.T("Nav_Home");
         TNavMap = _i18n.T("Nav_Map");
         TNavAudio = _i18n.T("Nav_Audio");
+        TNavFavorites = _i18n.T("Nav_Favorites");
         TNavSettings = _i18n.T("Nav_Settings");
     }
 
@@ -89,9 +117,10 @@ public partial class AudioViewModel : ObservableObject
 
     private void OnNarrationFinished()
     {
-        if (!IsPlaying) return; // tránh gọi 2 lần
+        if (!IsPlaying && PlayPauseIcon == "▶") return;
         PlayPauseIcon = "▶";
         IsPlaying = false;
+        _geofence?.SetGeofenceBlocked(false);
     }
 
     private List<LocalPoi> _poisCache = null;
@@ -120,18 +149,39 @@ public partial class AudioViewModel : ObservableObject
     {
         if (IsPlaying)
         {
-            // Dừng audio đang phát — chạy trên background thread để không block UI
-            _ = Task.Run(() => _narration.Stop());
+            // Tạm dừng — giữ nguyên player để resume đúng vị trí
+            _pausedPosition = _narration.Pause();
             PlayPauseIcon = "▶";
             IsPlaying = false;
         }
         else
         {
             if (_currentPoi == null) return;
-            // Phát lại audio
+            if (_pausedPosition > TimeSpan.Zero)
+            {
+                _narration.Resume();
+                PlayPauseIcon = "⏸";
+                IsPlaying = true;
+                return;
+            }
+            // Phát lại từ đúng vị trí đã Pause, không phát lại từ đầu
             _ = _narration.PlayAsync(_currentPoi, 0,
-                new Location(10.7629, 106.6604), "manual");
+                new Location(10.7629, 106.6604), "manual", _pausedPosition);
+            PlayPauseIcon = "⏸";
+            IsPlaying = true;
         }
+    }
+
+    [RelayCommand]
+    public void Stop()
+    {
+        _narration.Stop();
+        _geofence?.SetGeofenceBlocked(false); // mở lại geofence
+        _pausedPosition = TimeSpan.Zero;
+        Progress = 0;
+        CurrentTime = "00:00";
+        PlayPauseIcon = "▶";
+        IsPlaying = false;
     }
 
     [RelayCommand]
@@ -149,4 +199,27 @@ public partial class AudioViewModel : ObservableObject
     [RelayCommand]
     public async Task GoToSettings()
         => await Shell.Current.GoToAsync("//settings");
+
+    [RelayCommand]
+    public async Task GoToFavorites()
+        => await Shell.Current.GoToAsync("//favorites");
+
+    // ── External call from AudioPage: bắt đầu phát thủ công 1 POI ──
+    public async Task PlayPoiAsync(LocalPoi poi)
+    {
+        _currentPoi = poi;
+        NowPlayingName = poi.Name;
+        NowPlayingDescription = poi.ShortDescription;
+        NowPlayingStallLabel = $"{TStall}{poi.Id:D2}";
+
+        await _narration.PlayAsync(poi, 0,
+            new Location(10.7629, 106.6604), "manual", null);
+        PlayPauseIcon = "⏸";
+        IsPlaying = true;
+        Preferences.Set(LastPoiIdKey, poi.Id);
+    }
+
+    // ── Inject GeofenceEngine để block khi nghe thủ công ──
+    private GeofenceEngine? _geofence;
+    public void SetGeofenceEngine(GeofenceEngine geofence) => _geofence = geofence;
 }

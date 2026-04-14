@@ -118,9 +118,9 @@ using (var scope = app.Services.CreateScope())
     // Tạo role Admin và Vendor nếu chưa có
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     if (!await roleManager.RoleExistsAsync("Admin"))
-        await roleManager.CreateAsync(new IdentityRole("Admin"));
+        await roleManager.CreateAsync(new IdentityRole("Admin") { NormalizedName = "ADMIN" });
     if (!await roleManager.RoleExistsAsync("Vendor"))
-        await roleManager.CreateAsync(new IdentityRole("Vendor"));
+        await roleManager.CreateAsync(new IdentityRole("Vendor") { NormalizedName = "VENDOR" });
 
     // Tạo tài khoản admin mặc định
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();

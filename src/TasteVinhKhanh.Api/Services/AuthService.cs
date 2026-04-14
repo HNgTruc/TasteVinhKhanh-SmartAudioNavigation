@@ -14,6 +14,8 @@ public interface IAuthService
     Task<LoginResponse?> LoginAsync(LoginRequest request);
     Task<(bool Success, string Message)> VendorRegisterAsync(VendorRegisterRequest request);
     Task<bool> IsVendorApprovedAsync(string email);
+    Task<string?> GetVendorStatusByEmailAsync(string email);
+    Task<(bool Success, string Message)> ResetVendorPasswordAsync(VendorForgotPasswordRequest request);
     Task<DeviceTokenResponse> GetOrCreateDeviceTokenAsync(string deviceId);
 }
 
@@ -140,6 +142,57 @@ public class AuthService : IAuthService
         if (user == null) return false;
         var vendor = _db.Vendors.FirstOrDefault(v => v.UserId == user.Id);
         return vendor?.Status == "Approved";
+    }
+
+    public async Task<string?> GetVendorStatusByEmailAsync(string email)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null) return null;
+        var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == user.Id);
+        return vendor?.Status;
+    }
+
+    public async Task<(bool Success, string Message)> ResetVendorPasswordAsync(VendorForgotPasswordRequest request)
+    {
+        var email = request.Email?.Trim() ?? string.Empty;
+        var phone = request.Phone?.Trim() ?? string.Empty;
+        var newPassword = request.NewPassword ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(phone) || string.IsNullOrWhiteSpace(newPassword))
+            return (false, "Vui lòng nhập đầy đủ Email, Số điện thoại và Mật khẩu mới.");
+
+        if (newPassword.Length < 8 || !newPassword.Any(char.IsDigit))
+            return (false, "Mật khẩu mới phải có ít nhất 8 kí tự và chứa ít nhất 1 chữ số.");
+
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+            return (false, "Không tìm thấy tài khoản với email này.");
+
+        var vendor = _db.Vendors.FirstOrDefault(v => v.UserId == user.Id);
+        if (vendor == null)
+            return (false, "Tài khoản không phải vendor.");
+
+        if (!string.Equals(vendor.Phone?.Trim(), phone, StringComparison.Ordinal))
+            return (false, "Số điện thoại xác minh không đúng.");
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        if (!result.Succeeded)
+        {
+            var msg = string.Join("; ", result.Errors
+                .Select(e => e.Description)
+                .Select(desc => desc switch
+                {
+                    var d when d.Contains("Password", StringComparison.OrdinalIgnoreCase) ||
+                               d.Contains("digit", StringComparison.OrdinalIgnoreCase) ||
+                               d.Contains("length", StringComparison.OrdinalIgnoreCase)
+                        => "Mật khẩu mới phải có ít nhất 8 kí tự và chứa ít nhất 1 chữ số.",
+                    _ => desc
+                }));
+            return (false, msg);
+        }
+
+        return (true, "Khôi phục mật khẩu thành công. Bạn có thể đăng nhập lại.");
     }
 
     /// <summary>

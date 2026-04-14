@@ -25,7 +25,7 @@ public class Vendor
     /// <summary>Địa chỉ</summary>
     public string? Address { get; set; }
 
-    /// <summary>Trạng thái: Pending | Approved | Rejected</summary>
+    /// <summary>Trạng thái: Pending | Approved | Rejected | Suspended</summary>
     public string Status { get; set; } = "Pending";
 
     /// <summary>Lý do từ chối (nếu có)</summary>

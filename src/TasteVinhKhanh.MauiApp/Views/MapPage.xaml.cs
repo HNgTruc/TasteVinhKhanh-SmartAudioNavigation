@@ -10,6 +10,7 @@ public partial class MapPage : ContentPage
     private readonly MapViewModel _vm;
     private readonly Dictionary<int, Pin> _pinMap = new();
     private Microsoft.Maui.Controls.Maps.Map? _map;
+    private string _lastPoiSignature = "";
 
     public MapPage(MapViewModel vm)
     {
@@ -53,6 +54,11 @@ public partial class MapPage : ContentPage
     {
         if (_map == null) return;
 
+        var signature = string.Join('|', _vm.Pois
+            .OrderBy(p => p.Id)
+            .Select(p => $"{p.Id}:{p.UpdatedAt.Ticks}:{p.Latitude:F6}:{p.Longitude:F6}:{p.TriggerRadiusMeters:F1}"));
+        if (signature == _lastPoiSignature) return;
+
         _pinMap.Clear();
         _map.Pins.Clear();
         _map.MapElements.Clear();
@@ -91,6 +97,7 @@ public partial class MapPage : ContentPage
         }
 
         FitMapToPositions(positions);
+        _lastPoiSignature = signature;
     }
 
     private void FitMapToPositions(List<Location> positions)

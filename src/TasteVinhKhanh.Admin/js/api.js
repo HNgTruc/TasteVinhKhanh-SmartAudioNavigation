@@ -130,6 +130,49 @@ async function getTopPois(top = 10) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// HEATMAP APIs  (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/analytics/heatmap — bản đồ nhiệt tọa độ */
+async function getHeatmapData(from = null, to = null) {
+    let url = '/api/analytics/heatmap';
+    const params = [];
+    if (from) params.push(`from=${encodeURIComponent(from)}`);
+    if (to)   params.push(`to=${encodeURIComponent(to)}`);
+    if (params.length) url += '?' + params.join('&');
+    return await apiCall('GET', url);
+}
+
+/** GET /api/analytics/heatmap/by-hour — thống kê theo giờ */
+async function getHeatmapByHour(from = null, to = null) {
+    let url = '/api/analytics/heatmap/by-hour';
+    const params = [];
+    if (from) params.push(`from=${encodeURIComponent(from)}`);
+    if (to)   params.push(`to=${encodeURIComponent(to)}`);
+    if (params.length) url += '?' + params.join('&');
+    return await apiCall('GET', url);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// USAGE HISTORY APIs  (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/** GET /api/analytics/history — lịch sử nghe chi tiết */
+async function getUsageHistory({ poiPointId = null, deviceId = null, fromDate = null, toDate = null, page = 1, pageSize = 50 } = {}) {
+    const params = new URLSearchParams({ page, pageSize });
+    if (poiPointId) params.set('poiPointId', poiPointId);
+    if (deviceId)   params.set('deviceId', deviceId);
+    if (fromDate)   params.set('fromDate', fromDate);
+    if (toDate)     params.set('toDate', toDate);
+    return await apiCall('GET', `/api/analytics/history?${params}`);
+}
+
+/** GET /api/analytics/devices — top thiết bị hoạt động */
+async function getTopDevices(top = 20) {
+    return await apiCall('GET', `/api/analytics/devices?top=${top}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // TOUR APIs
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -183,7 +226,7 @@ async function createVendor(data) {
     return await apiCall('POST', '/api/admin/vendors', data);
 }
 
-/** DELETE /api/admin/vendors/:id — xoá vendor */
+/** DELETE /api/admin/vendors/:id — ngưng hợp tác vendor */
 async function deleteVendor(id) {
     const res = await fetch(`${API_BASE}/api/admin/vendors/${id}`, {
         method: 'DELETE',
@@ -194,7 +237,7 @@ async function deleteVendor(id) {
     });
     if (res.status === 401) { logout(); return null; }
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.message || `Xoá thất bại (HTTP ${res.status})`);
+    if (!res.ok) throw new Error(data.message || `Ngưng hợp tác thất bại (HTTP ${res.status})`);
     return data;
 }
 
@@ -220,7 +263,12 @@ async function getVendorPois(vendorId) {
 /** GET /api/admin/pending-updates — danh sách thay đổi chờ duyệt */
 async function getPendingUpdates(page = 1, pageSize = 20, status = 'Pending') {
     let url = `/api/admin/pending-updates?page=${page}&pageSize=${pageSize}`;
-    if (status && status !== 'all') url += `&status=${encodeURIComponent(status)}`;
+    if (status === 'all') {
+        // status rỗng để backend bỏ filter, trả về tất cả trạng thái
+        url += '&status=';
+    } else if (status) {
+        url += `&status=${encodeURIComponent(status)}`;
+    }
     return await apiCall('GET', url);
 }
 
@@ -253,7 +301,11 @@ async function getPendingStats() {
 /** GET /api/admin/staging-images — danh sách ảnh chờ duyệt */
 async function getStagingImages(status = 'Pending') {
     let url = '/api/admin/staging-images';
-    if (status && status !== 'all') url += `?status=${encodeURIComponent(status)}`;
+    if (status === 'all') {
+        url += '?status=';
+    } else if (status) {
+        url += `?status=${encodeURIComponent(status)}`;
+    }
     return await apiCall('GET', url);
 }
 
@@ -274,7 +326,11 @@ async function rejectStagingImage(id, reason = '') {
 /** GET /api/admin/staging-images/logo — danh sách logo chờ duyệt */
 async function getPendingLogos(status = 'Pending') {
     let url = '/api/admin/staging-images/logo';
-    if (status && status !== 'all') url += `?status=${encodeURIComponent(status)}`;
+    if (status === 'all') {
+        url += '?status=';
+    } else if (status) {
+        url += `?status=${encodeURIComponent(status)}`;
+    }
     return await apiCall('GET', url);
 }
 
@@ -324,7 +380,11 @@ async function deletePoiImage(poiId, imageId) {
 /** GET /api/admin/staging-images/deletion — danh sách yêu cầu xóa ảnh chờ duyệt */
 async function getDeletionRequests(status = 'Pending') {
     let url = '/api/admin/staging-images/deletion';
-    if (status && status !== 'all') url += `?status=${encodeURIComponent(status)}`;
+    if (status === 'all') {
+        url += '?status=';
+    } else if (status) {
+        url += `?status=${encodeURIComponent(status)}`;
+    }
     return await apiCall('GET', url);
 }
 

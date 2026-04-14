@@ -373,7 +373,7 @@
                     <GradientStop Color="#0D0D0D" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+            <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,10,0,24">
 
                 <!-- Home -->
                 <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
@@ -414,12 +414,21 @@
                     </Border>
                 </Grid>
 
-                <!-- Settings — active -->
+                <!-- Favorites -->
                 <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToFavoritesCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="❤️" FontSize="22" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="{Binding TNavFavorites}" FontSize="10" TextColor="#444444"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <!-- Settings -->
+                <StackLayout Grid.Column="4" Spacing="4" HorizontalOptions="Center">
                     <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 10"
                             Stroke="Transparent" Padding="10,6" HorizontalOptions="Center">
-                        <Label Text="⚙" FontSize="20" TextColor="#FF6B35"
-                               HorizontalOptions="Center"/>
+                        <Label Text="⚙" FontSize="20" TextColor="#FF6B35" HorizontalOptions="Center"/>
                     </Border>
                     <Label Text="{Binding TNavSettings}" FontSize="10" TextColor="#FF6B35"
                            HorizontalOptions="Center"/>

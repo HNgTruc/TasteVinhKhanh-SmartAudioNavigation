@@ -8,6 +8,7 @@ public class NarrationEngine
     private readonly AppDatabase _db;
     private readonly AudioPlayerService _audioPlayer;
     private bool _isPlaying = false;
+    private bool _isPaused = false;
     private readonly SemaphoreSlim _lock = new(1, 1);
     private CancellationTokenSource? _ttsCts;
     private CancellationTokenSource? _playbackCts;
@@ -16,11 +17,21 @@ public class NarrationEngine
     public event Action<string>? NarrationStarted;   // string = poi.Name (AudioViewModel dùng)
     public event Action<string>? NarrationStartedWithLang; // string = langCode (PoiDetail dùng)
     public event Action? NarrationFinished;
+    /// <summary>
+    /// Fire định kỳ khi audio đang phát: (currentPosition seconds, totalDuration seconds).
+    /// Duration lấy trực tiếp từ metadata file audio.
+    /// </summary>
+    public event Action<double, double>? PlaybackPositionChanged;
+    private LocalPoi? _currentPoi;
+    public bool IsPlaying => _isPlaying;
+    public bool IsPaused => _isPaused;
 
     public NarrationEngine(AppDatabase db, AudioPlayerService audioPlayer)
     {
         _db = db;
         _audioPlayer = audioPlayer;
+        _audioPlayer.PlaybackPositionChanged += (pos, dur) =>
+            PlaybackPositionChanged?.Invoke(pos, dur);
     }
 
     /// <summary>
@@ -30,14 +41,27 @@ public class NarrationEngine
     /// 3. Không tải được → TTS fallback
     /// </summary>
     public async Task PlayAsync(LocalPoi poi, double distanceMeters, Location userLocation,
-        string triggerType = "geofence_proximity")
+        string triggerType = "geofence_proximity", TimeSpan? startPosition = null)
     {
         await _lock.WaitAsync();
         _playbackCts = new CancellationTokenSource();
         try
         {
-            if (_isPlaying) return;
+            var previousPoi = _currentPoi;
+            _currentPoi = poi;
+
+            // Đang pause cùng POI → chỉ resume, không phát lại từ đầu
+            if (_isPaused && previousPoi != null && previousPoi.Id == poi.Id && startPosition == null)
+            {
+                _audioPlayer.Resume();
+                _isPlaying = true;
+                _isPaused = false;
+                return;
+            }
+
+            if (_isPlaying && !_isPaused) return;
             _isPlaying = true;
+            _isPaused = false;
 
             var script = await _db.GetAudioScriptAsync(poi.Id, CurrentLanguage)
                       ?? await _db.GetAudioScriptAsync(poi.Id, "vi");
@@ -67,7 +91,7 @@ public class NarrationEngine
             {
                 try
                 {
-                    await _audioPlayer.PlayAudioAsync(script, _playbackCts.Token);
+                    await _audioPlayer.PlayAudioAsync(script, _playbackCts.Token, startPosition);
                     return;
                 }
                 catch (OperationCanceledException) { return; }
@@ -79,7 +103,7 @@ public class NarrationEngine
             {
                 try
                 {
-                    await _audioPlayer.PlayAudioAsync(script, _playbackCts.Token);
+                    await _audioPlayer.PlayAudioAsync(script, _playbackCts.Token, startPosition);
                     return;
                 }
                 catch (OperationCanceledException) { return; }
@@ -91,10 +115,15 @@ public class NarrationEngine
         }
         finally
         {
-            _playbackCts = null;
-            _isPlaying = false;
+            if (!_isPaused)
+            {
+                _playbackCts = null;
+                _isPlaying = false;
+                _currentPoi = null;
+            }
             _lock.Release();
-            NarrationFinished?.Invoke();
+            if (!_isPaused)
+                NarrationFinished?.Invoke();
         }
     }
 
@@ -107,7 +136,33 @@ public class NarrationEngine
         _playbackCts?.Cancel();
         _audioPlayer.Stop();
         _isPlaying = false;
+        _isPaused = false;
+        _currentPoi = null;
         try { NarrationFinished?.Invoke(); } catch { /* ignore */ }
+    }
+
+    /// <summary>
+    /// Tạm dừng audio — GIỮ player để Resume đúng vị trí.
+    /// Trả về vị trí đã phát được (để hiển thị progress).
+    /// </summary>
+    public TimeSpan Pause()
+    {
+        if (!_isPlaying) return TimeSpan.Zero;
+        _isPaused = true;
+        _isPlaying = false;
+        var pos = _audioPlayer.GetCurrentPosition();
+        _audioPlayer.Pause();
+        return pos;
+    }
+
+    /// <summary>
+    /// Tiếp tục phát từ vị trí đã Pause.
+    /// </summary>
+    public void Resume()
+    {
+        _audioPlayer.Resume();
+        _isPaused = false;
+        _isPlaying = true;
     }
 
     private async Task SpeakWithTtsAsync(LocalAudioScript script, CancellationToken ct = default)

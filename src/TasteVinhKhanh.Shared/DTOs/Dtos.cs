@@ -267,6 +267,14 @@ public class VendorLoginRequest
     public string Password { get; set; } = string.Empty;
 }
 
+/// <summary>Vendor quên mật khẩu: xác minh email + số điện thoại để đặt lại mật khẩu</summary>
+public class VendorForgotPasswordRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+}
+
 /// <summary>Kết quả login cho cả Admin lẫn Vendor</summary>
 public class AuthResponse
 {
@@ -567,4 +575,88 @@ public class ApproveLogoRequest
 {
     [JsonPropertyName("poiPointId")]
     public int PoiPointId { get; set; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ANALYTICS — HEATMAP DTOs
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>Một điểm trên heatmap — tọa độ + số lượt phát</summary>
+public class HeatmapPointDto
+{
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
+    public int Weight { get; set; }
+}
+
+/// <summary>Mảng HeatmapPointDto — dùng cho Leaflet heat layer</summary>
+public class HeatmapDataDto
+{
+    public List<HeatmapPointDto> Points { get; set; } = new();
+    /// <summary>Tổng số điểm dữ liệu</summary>
+    public int TotalCount { get; set; }
+}
+
+/// <summary>Tổng hợp heatmap theo khung giờ (giờ trong ngày)</summary>
+public class HeatmapByHourDto
+{
+    /// <summary>0–23</summary>
+    public int Hour { get; set; }
+    public int Count { get; set; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ANALYTICS — USER USAGE HISTORY DTOs
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>Một lượt nghe trong lịch sử</summary>
+public class UsageHistoryItemDto
+{
+    public int Id { get; set; }
+    public int PoiPointId { get; set; }
+    public string PoiName { get; set; } = string.Empty;
+    public string LanguageCode { get; set; } = string.Empty;
+    public string TriggerType { get; set; } = string.Empty;
+    public double DistanceMeters { get; set; }
+    public DateTime PlayedAt { get; set; }
+    /// <summary>Anonymous device ID (nên ẩn/format để bảo mật)</summary>
+    public string DeviceId { get; set; } = string.Empty;
+}
+
+/// <summary>Danh sách lịch sử phân trang</summary>
+public class UsageHistoryResponseDto
+{
+    public List<UsageHistoryItemDto> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+}
+
+/// <summary>Filter lịch sử người dùng</summary>
+public class UsageHistoryFilterDto
+{
+    public int? PoiPointId { get; set; }
+    public string? DeviceId { get; set; }
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
+}
+
+/// <summary>Thống kê theo thiết bị</summary>
+public class DeviceStatsDto
+{
+    public string DeviceId { get; set; } = string.Empty;
+    public int TotalPlays { get; set; }
+    public int UniquePois { get; set; }
+    public DateTime? FirstPlay { get; set; }
+    public DateTime? LastPlay { get; set; }
+}
+
+/// <summary>Top thiết bị hoạt động nhiều nhất</summary>
+public class TopDeviceDto
+{
+    public string DeviceId { get; set; } = string.Empty;
+    public int TotalPlays { get; set; }
+    public int UniquePois { get; set; }
+    public DateTime? FirstPlay { get; set; }
+    public DateTime LastPlay { get; set; }
 }

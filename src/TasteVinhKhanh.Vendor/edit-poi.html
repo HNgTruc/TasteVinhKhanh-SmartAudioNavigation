@@ -20,6 +20,9 @@
                 <a href="edit-poi.html" class="active">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map-pin"/></svg></span> Điểm thuyết minh
                 </a>
+                <a href="audio.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg></span> Quản lý Audio
+                </a>
                 <a href="upload-images.html">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg></span> Upload ảnh
                 </a>
@@ -73,7 +76,6 @@
                                 <th style="width:140px">Toạ độ</th>
                                 <th style="width:80px">Bán kính</th>
                                 <th style="width:80px">Ưu tiên</th>
-                                <th style="width:160px">Ngôn ngữ</th>
                                 <th style="width:100px">Trạng thái</th>
                                 <th style="width:140px">Thao tác</th>
                             </tr>
@@ -154,145 +156,6 @@
         </div>
     </div>
 
-    <!-- MODAL: QUẢN LÝ SCRIPT -->
-    <div class="modal-overlay" id="scriptModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="scriptModalTitle">🎤 Script thuyết minh</h3>
-                <button class="btn-icon" onclick="closeModal('scriptModal')">✕</button>
-            </div>
-            <div class="modal-body">
-                <p style="font-size:12px; color:var(--gray-500); margin-bottom:14px">
-                    Viết nội dung TTS → nhấn <strong>Generate</strong> để tạo audio. Audio ưu tiên hơn TTS.
-                </p>
-                <input type="hidden" id="scriptPoiId">
-
-                <div id="scriptTabs">
-                    <div class="tabs">
-                        <div class="tab active" data-tab="tab-vi">🇻🇳 VI</div>
-                        <div class="tab" data-tab="tab-en">🇬🇧 EN</div>
-                        <div class="tab" data-tab="tab-zh">🇨🇳 ZH</div>
-                        <div class="tab" data-tab="tab-ko">🇰🇷 KO</div>
-                        <div class="tab" data-tab="tab-ja">🇯🇵 JA</div>
-                    </div>
-
-                    <div class="tab-content active" id="tab-vi">
-                        <div class="form-group">
-                            <label>Nội dung TTS — Tiếng Việt</label>
-                            <textarea id="tts-vi" class="form-control" rows="4"
-                                      placeholder="Nhập nội dung thuyết minh bằng tiếng Việt..."></textarea>
-                        </div>
-                        <div class="audio-bar" id="audio-bar-vi" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px">
-                            <span id="audio-status-vi" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span>
-                            <div style="display:flex; gap:6px; flex-wrap:wrap">
-                                <button class="btn btn-outline btn-sm" id="btn-preview-vi" onclick="vendorPreviewAudio('vi')" disabled>▶ Nghe thử</button>
-                                <button class="btn btn-secondary btn-sm" id="btn-generate-vi" onclick="vendorDoGenerateAudio('vi')" disabled>🎵 Generate TTS</button>
-                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
-                                    📁 Upload
-                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none"
-                                           onchange="vendorOnAudioFileSelected(this, 'vi')">
-                                </label>
-                                <button class="btn btn-danger btn-sm" id="btn-delete-vi" onclick="vendorDeleteAudio('vi')" disabled>🗑 Xóa</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm" onclick="saveScript('vi')">💾 Lưu VI</button>
-                    </div>
-
-                    <div class="tab-content" id="tab-en">
-                        <div class="form-group">
-                            <label>TTS Script — English</label>
-                            <textarea id="tts-en" class="form-control" rows="4"
-                                      placeholder="Enter narration in English..."></textarea>
-                        </div>
-                        <div class="audio-bar" id="audio-bar-en" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px">
-                            <span id="audio-status-en" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span>
-                            <div style="display:flex; gap:6px; flex-wrap:wrap">
-                                <button class="btn btn-outline btn-sm" id="btn-preview-en" onclick="vendorPreviewAudio('en')" disabled>▶ Preview</button>
-                                <button class="btn btn-secondary btn-sm" id="btn-generate-en" onclick="vendorDoGenerateAudio('en')" disabled>🎵 Generate TTS</button>
-                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
-                                    📁 Upload
-                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none"
-                                           onchange="vendorOnAudioFileSelected(this, 'en')">
-                                </label>
-                                <button class="btn btn-danger btn-sm" id="btn-delete-en" onclick="vendorDeleteAudio('en')" disabled>🗑 Delete</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm" onclick="saveScript('en')">💾 Save EN</button>
-                    </div>
-
-                    <div class="tab-content" id="tab-zh">
-                        <div class="form-group">
-                            <label>TTS Script — 中文</label>
-                            <textarea id="tts-zh" class="form-control" rows="4"
-                                      placeholder="请输入中文讲解内容..."></textarea>
-                        </div>
-                        <div class="audio-bar" id="audio-bar-zh" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px">
-                            <span id="audio-status-zh" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span>
-                            <div style="display:flex; gap:6px; flex-wrap:wrap">
-                                <button class="btn btn-outline btn-sm" id="btn-preview-zh" onclick="vendorPreviewAudio('zh')" disabled>▶ 预览</button>
-                                <button class="btn btn-secondary btn-sm" id="btn-generate-zh" onclick="vendorDoGenerateAudio('zh')" disabled>🎵 Generate TTS</button>
-                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
-                                    📁 上传
-                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none"
-                                           onchange="vendorOnAudioFileSelected(this, 'zh')">
-                                </label>
-                                <button class="btn btn-danger btn-sm" id="btn-delete-zh" onclick="vendorDeleteAudio('zh')" disabled>🗑 删除</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm" onclick="saveScript('zh')">💾 保存 ZH</button>
-                    </div>
-
-                    <div class="tab-content" id="tab-ko">
-                        <div class="form-group">
-                            <label>TTS Script — 한국어</label>
-                            <textarea id="tts-ko" class="form-control" rows="4"
-                                      placeholder="한국어 해설을 입력하세요..."></textarea>
-                        </div>
-                        <div class="audio-bar" id="audio-bar-ko" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px">
-                            <span id="audio-status-ko" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span>
-                            <div style="display:flex; gap:6px; flex-wrap:wrap">
-                                <button class="btn btn-outline btn-sm" id="btn-preview-ko" onclick="vendorPreviewAudio('ko')" disabled>▶ 미리보기</button>
-                                <button class="btn btn-secondary btn-sm" id="btn-generate-ko" onclick="vendorDoGenerateAudio('ko')" disabled>🎵 Generate TTS</button>
-                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
-                                    📁 업로드
-                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none"
-                                           onchange="vendorOnAudioFileSelected(this, 'ko')">
-                                </label>
-                                <button class="btn btn-danger btn-sm" id="btn-delete-ko" onclick="vendorDeleteAudio('ko')" disabled>🗑 삭제</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm" onclick="saveScript('ko')">💾 저장 KO</button>
-                    </div>
-
-                    <div class="tab-content" id="tab-ja">
-                        <div class="form-group">
-                            <label>TTS Script — 日本語</label>
-                            <textarea id="tts-ja" class="form-control" rows="4"
-                                      placeholder="日本語のナレーションを入力してください..."></textarea>
-                        </div>
-                        <div class="audio-bar" id="audio-bar-ja" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px">
-                            <span id="audio-status-ja" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span>
-                            <div style="display:flex; gap:6px; flex-wrap:wrap">
-                                <button class="btn btn-outline btn-sm" id="btn-preview-ja" onclick="vendorPreviewAudio('ja')" disabled>▶ プレビュー</button>
-                                <button class="btn btn-secondary btn-sm" id="btn-generate-ja" onclick="vendorDoGenerateAudio('ja')" disabled>🎵 Generate TTS</button>
-                                <label class="btn btn-outline btn-sm" style="cursor:pointer">
-                                    📁 アップロード
-                                    <input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none"
-                                           onchange="vendorOnAudioFileSelected(this, 'ja')">
-                                </label>
-                                <button class="btn btn-danger btn-sm" id="btn-delete-ja" onclick="vendorDeleteAudio('ja')" disabled>🗑 削除</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary btn-sm" onclick="saveScript('ja')">💾 保存 JA</button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('scriptModal')">Đóng</button>
-            </div>
-        </div>
-    </div>
-
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script>
@@ -336,18 +199,12 @@
                 <td>${p.triggerRadiusMeters}m</td>
                 <td><span class="badge badge-gray">${p.priority}</span></td>
                 <td>
-                    ${(p.audioScripts || []).map(s =>
-                        `<span class="badge badge-info" style="margin:1px">${s.languageCode.toUpperCase()}</span>`
-                    ).join('')}
-                </td>
-                <td>
                     <span class="badge ${p.isActive ? 'badge-success' : 'badge-danger'}">
                         ${p.isActive ? 'Hoạt động' : 'Ẩn'}
                     </span>
                 </td>
                 <td>
                     <button class="btn-icon edit" onclick="openEditModal(${p.id})" title="Sửa">✏️</button>
-                    <button class="btn-icon script" onclick="openScriptModal(${p.id})" title="Script">🎤</button>
                     <a href="upload-images.html?poiId=${p.id}" class="btn-icon image" title="Upload ảnh">🖼️</a>
                 </td>
             </tr>
@@ -445,200 +302,6 @@
 
         btn.textContent = 'Lưu';
         btn.disabled = false;
-    }
-
-    // ── MODAL: SCRIPT ────────────────────────────────────────────────────────
-
-    function openScriptModal(poiId) {
-        const poi = allPois.find(p => p.id === poiId);
-        if (!poi) return;
-
-        document.getElementById('scriptPoiId').value = poiId;
-        document.getElementById('scriptModalTitle').textContent = `🎤 Scripts: ${poi.name}`;
-
-        ['vi', 'en', 'zh', 'ko', 'ja'].forEach(lang => {
-            const script = (poi.audioScripts || []).find(s => s.languageCode === lang);
-            document.getElementById(`tts-${lang}`).value = script?.ttsScript || '';
-            document.getElementById(`tts-${lang}`).dataset.scriptId = script?.id || '';
-            vendorUpdateAudioStatus(lang, !!script?.isAudioUploaded, !!script?.ttsScript);
-        });
-
-        initTabs('scriptTabs');
-        openModal('scriptModal');
-    }
-
-    // ── VENDOR AUDIO STATUS UI ───────────────────────────────────────────────
-
-    function vendorUpdateAudioStatus(lang, hasAudio, hasText) {
-        const statusEl = document.getElementById(`audio-status-${lang}`);
-        const previewBtn = document.getElementById(`btn-preview-${lang}`);
-        const generateBtn = document.getElementById(`btn-generate-${lang}`);
-        const deleteBtn = document.getElementById(`btn-delete-${lang}`);
-
-        if (hasAudio) {
-            statusEl.textContent = '✅ Audio sẵn sàng';
-        } else if (hasText) {
-            statusEl.textContent = '🔊 Chỉ có TTS — nhấn Generate để tạo audio';
-        } else {
-            statusEl.textContent = '❌ Chưa có audio';
-        }
-
-        previewBtn.disabled = !hasAudio;
-        generateBtn.disabled = !hasText || hasAudio;
-        deleteBtn.disabled = !hasAudio;
-    }
-
-    // ── VENDOR AUDIO OPERATIONS ─────────────────────────────────────────────
-
-    let vendorPendingAudioFile = null;
-    let vendorPendingAudioLang = null;
-
-    function vendorOnAudioFileSelected(input, lang) {
-        if (!input.files || !input.files[0]) return;
-        const file = input.files[0];
-        const maxSize = 10 * 1024 * 1024;
-        if (file.size > maxSize) {
-            showToast('File vượt quá 10MB!', 'error');
-            input.value = '';
-            return;
-        }
-        vendorPendingAudioFile = file;
-        vendorPendingAudioLang = lang;
-        document.getElementById(`audio-status-${lang}`).textContent = `📁 ${file.name}`;
-    }
-
-    async function vendorDoGenerateAudio(lang) {
-        const poiId = document.getElementById('scriptPoiId').value;
-        const btn = document.getElementById(`btn-generate-${lang}`);
-        btn.disabled = true;
-        btn.textContent = '⏳ Đang generate...';
-
-        try {
-            const token = localStorage.getItem('vendorToken');
-            const res = await fetch(`${API_BASE}/api/audio/vendor/generate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ poiId: parseInt(poiId), languageCode: lang })
-            });
-            if (!res.ok) {
-                let msg = 'Generate failed';
-                try { const b = await res.json(); msg = b.message || msg; } catch {}
-                throw new Error(msg);
-            }
-            showToast(`✅ Audio ${lang.toUpperCase()} đã được tạo!`, 'success');
-            vendorUpdateAudioStatus(lang, true, true);
-            await loadPois();
-        } catch (e) {
-            showToast('Generate thất bại: ' + (e.message || ''), 'error');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '🎵 Generate TTS';
-        }
-    }
-
-    async function vendorPreviewAudio(lang) {
-        const scriptId = document.getElementById(`tts-${lang}`).dataset.scriptId;
-        if (!scriptId) { showToast('Chưa có audio để phát!', 'error'); return; }
-        const token = localStorage.getItem('vendorToken');
-        // Dùng fetch lấy audio blob rồi gán vào Audio object — tránh CORS
-        try {
-            const res = await fetch(`${API_BASE}/api/audio/${parseInt(scriptId)}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) { showToast('Không thể tải audio.', 'error'); return; }
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
-            audio.play();
-            audio.onerror = () => { showToast('Không thể phát audio.', 'error'); URL.revokeObjectURL(url); };
-        } catch (e) { showToast('Không thể phát audio.', 'error'); }
-    }
-
-    async function vendorDeleteAudio(lang) {
-        if (!confirm(`Xóa audio ${lang.toUpperCase()}?`)) return;
-        const scriptId = document.getElementById(`tts-${lang}`).dataset.scriptId;
-        if (!scriptId) return;
-
-        try {
-            const token = localStorage.getItem('vendorToken');
-            const res = await fetch(`${API_BASE}/api/audio/vendor/${parseInt(scriptId)}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (!res.ok) {
-                let msg = 'Delete failed';
-                try { const b = await res.json(); msg = b.message || msg; } catch {}
-                throw new Error(msg);
-            }
-            showToast(`Đã xóa audio ${lang.toUpperCase()}`);
-            vendorUpdateAudioStatus(lang, false, true);
-            await loadPois();
-        } catch (e) {
-            showToast('Xóa thất bại: ' + (e.message || ''), 'error');
-        }
-    }
-
-    async function saveScript(lang) {
-        const poiId = document.getElementById('scriptPoiId').value;
-        const tts = document.getElementById(`tts-${lang}`).value;
-        const ttsEl = document.getElementById(`tts-${lang}`);
-        const token = localStorage.getItem('vendorToken');
-
-        try {
-            const res = await fetch(`${API_BASE}/api/vendor/pois/${poiId}/scripts`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ languageCode: lang, ttsScript: tts })
-            });
-            if (!res.ok) {
-                let msg = 'Save failed';
-                try { const b = await res.json(); msg = b.message || msg; } catch {}
-                throw new Error(msg);
-            }
-            const result = await res.json();
-
-            if (result && result.id) {
-                ttsEl.dataset.scriptId = result.id;
-
-                // Upload pending file nếu có
-                if (vendorPendingAudioFile && vendorPendingAudioLang === lang) {
-                    const formData = new FormData();
-                    formData.append('poiId', poiId);
-                    formData.append('lang', lang);
-                    formData.append('file', vendorPendingAudioFile);
-                    const uploadRes = await fetch(`${API_BASE}/api/audio/vendor/upload`, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}` },
-                        body: formData
-                    });
-                    vendorPendingAudioFile = null;
-                    vendorPendingAudioLang = null;
-                    if (uploadRes.ok) {
-                        const uploadResult = await uploadRes.json();
-                        ttsEl.dataset.scriptId = uploadResult.scriptId;
-                        showToast(`✅ Script + audio đã lưu!`, 'success');
-                        vendorUpdateAudioStatus(lang, true, true);
-                        await loadPois();
-                        return;
-                    } else {
-                        showToast('⚠️ Script lưu nhưng upload audio thất bại.', 'error');
-                    }
-                }
-
-                vendorUpdateAudioStatus(lang, result.isAudioUploaded, !!tts);
-            }
-
-            showToast(`Đã lưu script ${lang.toUpperCase()}`);
-            await loadPois();
-        } catch (e) {
-            showToast(`Lưu ${lang.toUpperCase()} thất bại!`, 'error');
-        }
     }
 
     // ── HELPERS ──────────────────────────────────────────────────────────────

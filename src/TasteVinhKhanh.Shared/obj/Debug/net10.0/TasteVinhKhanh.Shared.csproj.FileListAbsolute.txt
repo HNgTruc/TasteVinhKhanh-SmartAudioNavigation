@@ -1,15 +1,3 @@
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\bin\Debug\net10.0\TasteVinhKhanh.Shared.deps.json
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\bin\Debug\net10.0\TasteVinhKhanh.Shared.dll
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\bin\Debug\net10.0\TasteVinhKhanh.Shared.pdb
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\TasteVinhKhanh.Shared.GeneratedMSBuildEditorConfig.editorconfig
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\TasteVinhKhanh.Shared.AssemblyInfoInputs.cache
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\TasteVinhKhanh.Shared.AssemblyInfo.cs
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\TasteVinhKhanh.Shared.csproj.CoreCompileInputs.cache
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\TasteVinhKhanh.Shared.sourcelink.json
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\TasteVinhKhanh.Shared.dll
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\refint\TasteVinhKhanh.Shared.dll
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\TasteVinhKhanh.Shared.pdb
-D:\do an c#\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\obj\Debug\net10.0\ref\TasteVinhKhanh.Shared.dll
 c:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\bin\Debug\net10.0\TasteVinhKhanh.Shared.deps.json
 c:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\bin\Debug\net10.0\TasteVinhKhanh.Shared.dll
 c:\Users\dell\source\repos\TasteVinhKhanh-SmartAudioNavigation\src\TasteVinhKhanh.Shared\bin\Debug\net10.0\TasteVinhKhanh.Shared.pdb

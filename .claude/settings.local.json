@@ -85,7 +85,28 @@
       "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"vendor_aloquan@vinhkhanh.com\",\"password\":\"VinhKhanh123\"}')",
       "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('count:', len\\(d\\)\\); [print\\(p['id'], p['name']\\) for p in d]\")",
       "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"vendor_aloquan@vinhkhanh.com\",\"password\":\"VinhKhanh123\"}')",
-      "Read(//Users/ledinhhoangvu/Projects/**)"
+      "Read(//Users/ledinhhoangvu/Projects/**)",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" status --short)",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" status --short src/TasteVinhKhanh.MauiApp/obj/)",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" rm -r --cached \"src/TasteVinhKhanh.MauiApp/obj\" \"src/TasteVinhKhanh.MauiApp/bin\" \"src/TasteVinhKhanh.Api/obj\" \"src/TasteVinhKhanh.Api/bin\" \"src/TasteVinhKhanh.Shared/obj\" \"src/TasteVinhKhanh.Shared/bin\")",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" restore --staged \"src/\" \"bin/\")",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" ls-files \"src/TasteVinhKhanh.MauiApp/obj/\")",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" checkout -- \"src/TasteVinhKhanh.MauiApp/obj\" \"src/TasteVinhKhanh.MauiApp/bin\" \"src/TasteVinhKhanh.Api/obj\" \"src/TasteVinhKhanh.Api/bin\" \"src/TasteVinhKhanh.Shared/obj\" \"src/TasteVinhKhanh.Shared/bin\")",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" reset HEAD -- \"src/TasteVinhKhanh.MauiApp/obj\" \"src/TasteVinhKhanh.MauiApp/bin\" \"src/TasteVinhKhanh.Api/obj\" \"src/TasteVinhKhanh.Api/bin\" \"src/TasteVinhKhanh.Shared/obj\" \"src/TasteVinhKhanh.Shared/bin\")",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" ls-files -- \"src/TasteVinhKhanh.MauiApp/obj/\" \"src/TasteVinhKhanh.MauiApp/bin/\")",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" rm -r --cached \"src/TasteVinhKhanh.MauiApp/obj\" \"src/TasteVinhKhanh.MauiApp/bin\")",
+      "Bash(Remove-Item -Recurse -Force \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\\\\src\\\\TasteVinhKhanh.MauiApp\\\\obj\")",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" reset HEAD)",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" rm -r --cached src/TasteVinhKhanh.MauiApp/obj src/TasteVinhKhanh.MauiApp/bin src/TasteVinhKhanh.Api/obj src/TasteVinhKhanh.Api/bin src/TasteVinhKhanh.Shared/obj src/TasteVinhKhanh.Shared/bin)",
+      "Bash(dotnet restore:*)",
+      "Bash(git -C \"c:\\\\Users\\\\dell\\\\source\\\\repos\\\\TasteVinhKhanh-SmartAudioNavigation\" diff src/TasteVinhKhanh.MauiApp/Services/NarrationEngine.cs)",
+      "Bash(curl -s http://localhost:5000/api/analytics/heatmap)",
+      "Bash(curl -v http://localhost:5000/api/analytics/heatmap)",
+      "Bash(curl -s http://localhost:5000/api/analytics/summary -H \"Authorization: Bearer $\\(curl -s -X POST http://localhost:5000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@vinhkhanh.com\",\"password\":\"Admin@12345\"}')",
+      "Bash(curl -s http://localhost:5000/api/analytics/heatmap -H \"Authorization: Bearer $\\(curl -s -X POST http://localhost:5000/api/auth/login -H \"Content-Type: application/json\" -d '{\"email\":\"admin@vinhkhanh.com\",\"password\":\"Admin@12345\"}')",
+      "Bash(curl -s -X POST http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\\\\\"email\\\\\":\\\\\"admin@vinhkhanh.com\\\\\",\\\\\"password\\\\\":\\\\\"Admin@12345\\\\\"}')",
+      "Bash(curl -s http://localhost:5000/api/analytics/heatmap -H \"Authorization: Bearer $\\(curl -s -X POST http://localhost:5000/api/auth/login -H 'Content-Type: application/json' -d '{\\\\\"email\\\\\":\\\\\"admin@vinhkhanh.com\\\\\",\\\\\"password\\\\\":\\\\\"Admin@12345\\\\\"}')",
+      "Bash(curl -s -m 3 http://localhost:5000/api/poi)"
     ]
   }
 }

@@ -60,31 +60,9 @@ public class AudioController : ControllerBase
     [HttpPost("admin/upload")]
     public async Task<IActionResult> AdminUploadAudio([FromForm] int poiId, [FromForm] string lang, [FromForm] IFormFile file)
     {
-        if (file == null || file.Length == 0)
-            return BadRequest(new { message = "Không có file nào được chọn." });
-
-        var maxSize = 10 * 1024 * 1024; // 10MB
-        if (file.Length > maxSize)
-            return BadRequest(new { message = "File vượt quá 10MB." });
-
-        var allowedExt = new[] { ".mp3", ".m4a", ".wav", ".ogg", ".webm" };
-        var ext = Path.GetExtension(file.FileName).ToLower();
-        if (!allowedExt.Contains(ext))
-            return BadRequest(new { message = "Chỉ chấp nhận: mp3, m4a, wav, ogg, webm." });
-
-        var poi = await _db.PoiPoints.FindAsync(poiId);
-        if (poi == null) return NotFound(new { message = "POI không tồn tại." });
-
-        var result = await _audio.SaveAudioFileAsync(file, poiId, lang);
-        if (result == null)
-            return BadRequest(new { message = "Lưu audio thất bại." });
-
-        var script = await _db.AudioScripts.FindAsync(result.Value.scriptId);
-        return Ok(new
+        return StatusCode(StatusCodes.Status403Forbidden, new
         {
-            scriptId = result.Value.scriptId,
-            filePath = result.Value.path,
-            message = $"Đã upload audio {lang.ToUpperInvariant()} cho POI #{poiId}"
+            message = "Admin chỉ được duyệt. Chỉ Vendor mới được thêm/chỉnh sửa audio."
         });
     }
 
@@ -93,11 +71,10 @@ public class AudioController : ControllerBase
     [HttpDelete("admin/{scriptId}")]
     public async Task<IActionResult> AdminDeleteAudio(int scriptId)
     {
-        var script = await _db.AudioScripts.FindAsync(scriptId);
-        if (script == null) return NotFound(new { message = "Script không tồn tại." });
-
-        await _audio.DeleteAudioFileAsync(scriptId);
-        return Ok(new { message = "Đã xóa audio." });
+        return StatusCode(StatusCodes.Status403Forbidden, new
+        {
+            message = "Admin chỉ được duyệt. Chỉ Vendor mới được thêm/chỉnh sửa audio."
+        });
     }
 
     /// <summary>Admin tạo audio từ TTS script đã có trong DB</summary>
@@ -105,58 +82,9 @@ public class AudioController : ControllerBase
     [HttpPost("admin/generate")]
     public async Task<IActionResult> AdminGenerateAudio([FromBody] GenerateAudioRequest req)
     {
-        if (req.PoiId <= 0 || string.IsNullOrWhiteSpace(req.LanguageCode))
-            return BadRequest(new { message = "Thiếu poiId hoặc languageCode." });
-
-        // Lấy script hiện có
-        var script = await _db.AudioScripts
-            .FirstOrDefaultAsync(s => s.PoiPointId == req.PoiId && s.LanguageCode == req.LanguageCode);
-
-        if (script == null)
-            return NotFound(new { message = $"Script {req.LanguageCode} cho POI #{req.PoiId} chưa có. Vui lòng nhấn 'Lưu' trước." });
-
-        if (string.IsNullOrWhiteSpace(script.TtsScript))
-            return BadRequest(new { message = $"Script {req.LanguageCode} chưa có nội dung TTS. Vui lòng nhập nội dung rồi nhấn 'Lưu' trước." });
-
-        // Gọi TTS generation service
-        var ttsResult = await _tts.GenerateFromTextAsync(script.TtsScript, req.LanguageCode);
-        if (!ttsResult.Success || ttsResult.AudioBytes == null)
+        return StatusCode(StatusCodes.Status403Forbidden, new
         {
-            _log.LogWarning("TTS generation failed for script {ScriptId}: {Error}",
-                script.Id, ttsResult.ErrorMessage);
-            // Trả 200 nhưng kèm flag để frontend phân biệt — hoặc dùng 500 tùy nghiệp vụ
-            return StatusCode(503, new
-            {
-                message = $"TTS generation thất bại: {ttsResult.ErrorMessage ?? "Unknown error"}",
-                hint = "Vui lòng đảm bảo Python đã cài và chạy: pip install edge-tts"
-            });
-        }
-
-        // Lưu file tạm rồi xử lý như upload
-        var tmpPath = Path.Combine(Path.GetTempPath(), $"tts_{Guid.NewGuid()}.mp3");
-        await System.IO.File.WriteAllBytesAsync(tmpPath, ttsResult.AudioBytes);
-
-        await using var stream = new FileStream(tmpPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        var formFile = new FormFile(stream, 0, stream.Length, "file", "tts.mp3")
-        {
-            Headers = new HeaderDictionary(),
-            ContentType = "audio/mpeg"
-        };
-
-        var result = await _audio.SaveAudioFileAsync(formFile, req.PoiId, req.LanguageCode);
-
-        // Dispose stream trước khi xóa file — tránh lock "file is being used by another process"
-        await stream.DisposeAsync();
-
-        try { System.IO.File.Delete(tmpPath); } catch { /* ignore — file có thể đã bị xóa bởi TTS service hoặc bị lock */ }
-
-        if (result == null)
-            return BadRequest(new { message = "Lưu audio thất bại." });
-
-        return Ok(new
-        {
-            scriptId = result.Value.scriptId,
-            message = $"TTS audio đã được tạo cho {req.LanguageCode.ToUpperInvariant()}"
+            message = "Admin chỉ được duyệt. Chỉ Vendor mới được thêm/chỉnh sửa audio."
         });
     }
 

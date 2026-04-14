@@ -86,6 +86,21 @@ async function vendorLogin(email, password) {
     }
 }
 
+async function vendorForgotPassword(email, phone, newPassword) {
+    try {
+        const res = await fetch(`${API_BASE}/api/auth/vendor-forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, phone, newPassword })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Không thể khôi phục mật khẩu.');
+        return { success: true, message: data.message || 'Khôi phục mật khẩu thành công.' };
+    } catch (err) {
+        return { success: false, message: err.message || 'Khôi phục mật khẩu thất bại.' };
+    }
+}
+
 function vendorLogout() {
     localStorage.removeItem('vendorToken');
     localStorage.removeItem('vendorName');

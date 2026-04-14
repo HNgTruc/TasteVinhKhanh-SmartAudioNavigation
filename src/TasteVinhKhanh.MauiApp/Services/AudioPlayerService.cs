@@ -13,14 +13,32 @@ namespace TasteVinhKhanh.MauiApp.Services;
 /// </summary>
 public class AudioPlayerService(HttpClient http, AppDatabase db)
 {
-    private IAudioPlayer? _currentPlayer;
+    private IAudioPlayer? _currentPlayer; // dùng cho Pause/Play/Seek/Duration
+    private AsyncAudioPlayer? _asyncPlayer; // dùng cho PlayAsync (await)
     private TaskCompletionSource<bool>? _currentTcs;
+    private CancellationTokenSource? _positionTimerCts;
 
     /// <summary>
-    /// Dừng audio đang phát ngay lập tức.
+    /// Fire định kỳ khi audio đang phát: (currentPosition seconds, totalDuration seconds).
     /// </summary>
-    public void Stop()
+    public event Action<double, double>? PlaybackPositionChanged;
+
+    /// <summary>
+    /// Dừng timer, audio, và dispose player.
+    /// Trả về vị trí đã phát được (tính bằng giây) để có thể resume.
+    /// </summary>
+    public TimeSpan Stop()
     {
+        StopPositionTimer();
+
+        double lastPosSec = 0;
+        try
+        {
+            if (_currentPlayer != null)
+                lastPosSec = _currentPlayer.CurrentPosition;
+        }
+        catch { /* ignore */ }
+
         try
         {
             _currentTcs?.TrySetCanceled();
@@ -40,14 +58,23 @@ public class AudioPlayerService(HttpClient http, AppDatabase db)
         }
         catch { /* ignore */ }
 
+        try
+        {
+            _asyncPlayer?.Dispose();
+        }
+        catch { /* ignore */ }
+
         _currentPlayer = null;
+        _asyncPlayer = null;
+        return TimeSpan.FromSeconds(lastPosSec);
     }
 
     /// <summary>
     /// Đảm bảo audio đã tải về local, rồi phát.
     /// Priority: local file → download from protected endpoint → TTS fallback.
     /// </summary>
-    public async Task PlayAudioAsync(LocalAudioScript script, CancellationToken ct = default)
+    public async Task PlayAudioAsync(LocalAudioScript script,
+        CancellationToken ct = default, TimeSpan? startPosition = null)
     {
         var localPath = script.LocalAudioPath;
 
@@ -56,7 +83,7 @@ public class AudioPlayerService(HttpClient http, AppDatabase db)
         {
             try
             {
-                await PlayLocalFileAsync(localPath, ct);
+                await PlayLocalFileAsync(localPath, ct, startPosition);
                 return;
             }
             catch (OperationCanceledException) { throw; }
@@ -77,7 +104,7 @@ public class AudioPlayerService(HttpClient http, AppDatabase db)
                     FileSystem.AppDataDirectory, "audio",
                     $"{script.PoiPointId}_{script.LanguageCode}.mp3");
                 if (File.Exists(savedPath))
-                    await PlayLocalFileAsync(savedPath, ct);
+                    await PlayLocalFileAsync(savedPath, ct, startPosition);
                 return;
             }
             catch (OperationCanceledException) { throw; }
@@ -142,14 +169,96 @@ public class AudioPlayerService(HttpClient http, AppDatabase db)
         }
     }
 
-    private async Task PlayLocalFileAsync(string path, CancellationToken ct = default)
+    private void StopPositionTimer()
     {
-        Stop();
+        try { _positionTimerCts?.Cancel(); _positionTimerCts?.Dispose(); }
+        catch { /* ignore */ }
+        _positionTimerCts = null;
+    }
+
+    /// <summary>
+    /// Tạm dừng audio nhưng GIỮ NGUYÊN player để có thể resume đúng vị trí.
+    /// </summary>
+    public void Pause()
+    {
+        StopPositionTimer();
+        try { _currentPlayer?.Pause(); } catch { /* ignore */ }
+    }
+
+    /// <summary>
+    /// Trả về vị trí hiện tại của audio đang phát.
+    /// </summary>
+    public TimeSpan GetCurrentPosition()
+    {
+        try { return TimeSpan.FromSeconds(_currentPlayer?.CurrentPosition ?? 0); }
+        catch { return TimeSpan.Zero; }
+    }
+
+    /// <summary>
+    /// Tiếp tục phát từ vị trí đã tạm dừng.
+    /// </summary>
+    public void Resume()
+    {
+        try { _currentPlayer?.Play(); } catch { /* ignore */ }
+        StartPositionTimerLoop(); // timer tự đọc cả position + duration
+    }
+
+    private void StartPositionTimerLoop()
+    {
+        StopPositionTimer();
+        _positionTimerCts = new CancellationTokenSource();
+        _ = PositionTimerLoop(_positionTimerCts.Token);
+    }
+
+    private async Task PositionTimerLoop(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested && _currentPlayer != null)
+        {
+            try
+            {
+                var posSec = _currentPlayer.CurrentPosition;
+                var durSec = _currentPlayer.Duration;
+                if (durSec > 0)
+                    PlaybackPositionChanged?.Invoke(posSec, durSec);
+            }
+            catch { /* ignore */ }
+            try { await Task.Delay(250, ct); }
+            catch { break; }
+        }
+    }
+
+    private void StartPositionTimer(double totalDurationSec)
+    {
+        StopPositionTimer();
+        _positionTimerCts = new CancellationTokenSource();
+        _ = PositionTimerWithDuration(totalDurationSec, _positionTimerCts.Token);
+    }
+
+    private async Task PositionTimerWithDuration(double totalDurationSec, CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested && _currentPlayer != null)
+        {
+            try
+            {
+                var posSec = _currentPlayer.CurrentPosition;
+                if (totalDurationSec > 0)
+                    PlaybackPositionChanged?.Invoke(posSec, totalDurationSec);
+            }
+            catch { /* ignore */ }
+            try { await Task.Delay(250, ct); }
+            catch { break; }
+        }
+    }
+
+    private async Task PlayLocalFileAsync(string path,
+        CancellationToken ct = default, TimeSpan? startPosition = null)
+    {
+        Stop(); // dọn player cũ
 
         if (!File.Exists(path))
             throw new FileNotFoundException($"Audio file not found: {path}");
 
-        // Đọc file trước (không truyền ct để tránh crash khi Stop() gọi giữa chừng)
+        // Đọc file thành stream để tạo player
         byte[] bytes;
         try { bytes = await File.ReadAllBytesAsync(path); }
         catch { throw new FileNotFoundException($"Cannot read audio file: {path}"); }
@@ -157,12 +266,27 @@ public class AudioPlayerService(HttpClient http, AppDatabase db)
         using var stream = new MemoryStream(bytes);
         _currentPlayer = AudioManager.Current.CreatePlayer(stream);
 
-        _currentTcs = new TaskCompletionSource<bool>();
-        _currentPlayer.PlaybackEnded += (s, e) => _currentTcs.TrySetResult(true);
+        // Seek đến vị trí resume (nếu có)
+        if (startPosition.HasValue && startPosition.Value.TotalSeconds > 0)
+            _currentPlayer.Seek(startPosition.Value.TotalSeconds);
 
+        _currentTcs = new TaskCompletionSource<bool>();
+        _currentPlayer.PlaybackEnded += (s, e) =>
+        {
+            StopPositionTimer();
+            _currentTcs.TrySetResult(true);
+        };
+
+        // Lấy Duration ngay khi player được tạo (từ metadata file audio)
+        double totalDurationSec;
+        try { totalDurationSec = _currentPlayer.Duration; }
+        catch { totalDurationSec = 0; }
+
+        StartPositionTimer(totalDurationSec);
         _currentPlayer.Play();
 
-        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        // Chờ cho đến khi phát xong hoặc bị cancel
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(300));
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token);
         try
         {
@@ -170,13 +294,16 @@ public class AudioPlayerService(HttpClient http, AppDatabase db)
         }
         catch (OperationCanceledException)
         {
-            _currentPlayer?.Stop();
+            StopPositionTimer();
+            try { _currentPlayer?.Stop(); } catch { /* ignore */ }
             throw;
         }
         finally
         {
-            _currentPlayer?.Dispose();
+            StopPositionTimer();
+            try { _currentPlayer?.Dispose(); } catch { /* ignore */ }
             _currentPlayer = null;
+            _asyncPlayer = null;
             _currentTcs = null;
         }
     }

@@ -51,10 +51,16 @@ public class PoiController : ControllerBase
     [HttpPut("{poiId}/scripts")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpsertScript(int poiId, [FromBody] UpsertAudioScriptRequest request)
-        => Ok(await _poi.UpsertScriptAsync(poiId, request));
+        => StatusCode(StatusCodes.Status403Forbidden, new
+        {
+            message = "Admin chỉ được duyệt audio. Chỉ Vendor mới được thêm/chỉnh sửa audio."
+        });
 
     [HttpDelete("{poiId}/scripts/{lang}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteScript(int poiId, string lang)
-        => await _poi.DeleteScriptAsync(poiId, lang) ? NoContent() : NotFound();
+        => StatusCode(StatusCodes.Status403Forbidden, new
+        {
+            message = "Admin chỉ được duyệt audio. Chỉ Vendor mới được thêm/chỉnh sửa audio."
+        });
 }

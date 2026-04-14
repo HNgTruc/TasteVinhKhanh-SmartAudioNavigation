@@ -58,7 +58,7 @@
                 </Grid>
 
                 <!-- ══ QUICK ACTIONS ══ -->
-                <Grid Padding="20,0,20,24" ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Grid Padding="20,0,20,24" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="12">
                     <!-- Map card -->
                     <Border Grid.Column="0" StrokeShape="RoundRectangle 16"
                             Stroke="#252525" Padding="18,16">
@@ -85,7 +85,7 @@
                     </Border>
 
                     <!-- Audio card -->
-                    <Border Grid.Column="1" StrokeShape="RoundRectangle 16"
+                    <Border Grid.Column="1" Grid.Row="0" StrokeShape="RoundRectangle 16"
                             Stroke="#252525" Padding="18,16">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -107,6 +107,33 @@
                                    TextColor="#FFFFFF"/>
                             <Label Text="{Binding TAudioSub}" FontSize="12" TextColor="#666666"/>
                         </StackLayout>
+                    </Border>
+
+                    <!-- Tour card -->
+                    <Border Grid.ColumnSpan="2" Grid.Row="1" StrokeShape="RoundRectangle 16"
+                            Stroke="#252525" Padding="18,16">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#1A1A1A" Offset="0"/>
+                                <GradientStop Color="#101010" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoToToursCommand}"/>
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 12"
+                                    Stroke="Transparent" Padding="10" WidthRequest="44"
+                                    HeightRequest="44">
+                                <Label Text="🧭" FontSize="22"
+                                       HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+                            <StackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                <Label Text="{Binding TTour}" FontSize="16" FontAttributes="Bold"
+                                       TextColor="#FFFFFF"/>
+                                <Label Text="{Binding TTourSub}" FontSize="12" TextColor="#666666"/>
+                            </StackLayout>
+                        </Grid>
                     </Border>
                 </Grid>
 
@@ -211,7 +238,7 @@
                     <GradientStop Color="#0D0D0D" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+            <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,10,0,24">
                 <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
                     <Border BackgroundColor="#FF6B3520" StrokeShape="RoundRectangle 10"
                             Stroke="Transparent" Padding="10,6" HorizontalOptions="Center">
@@ -245,6 +272,13 @@
                     </Border>
                 </Grid>
                 <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToFavoritesCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="❤️" FontSize="22" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="{Binding TNavFavorites}" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Grid.Column="4" Spacing="4" HorizontalOptions="Center">
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
                     </StackLayout.GestureRecognizers>

@@ -17,6 +17,9 @@ public partial class SyncService : ObservableObject
 {
     private readonly HttpClient _http;
     private readonly AppDatabase _db;
+    private readonly object _syncStateLock = new();
+    private DateTime _lastSyncAttemptAtUtc = DateTime.MinValue;
+    private SyncResult _lastSyncResult = new() { Success = true, Message = "", UpdatedCount = 0, FromCache = false };
 
     [ObservableProperty] private string _syncStatus = "Chưa đồng bộ";
     [ObservableProperty] private bool _isSyncing = false;
@@ -33,21 +36,35 @@ public partial class SyncService : ObservableObject
     /// Lưu vào SQLite local để app chạy offline.
     /// Nếu API lỗi → dùng dữ liệu offline có sẵn.
     /// </summary>
-    public async Task<SyncResult> SyncPoisAsync()
+    public async Task<SyncResult> SyncPoisAsync(bool force = false)
     {
+        lock (_syncStateLock)
+        {
+            if (IsSyncing)
+                return _lastSyncResult;
+
+            var tooSoon = DateTime.UtcNow - _lastSyncAttemptAtUtc < TimeSpan.FromSeconds(45);
+            if (!force && tooSoon)
+                return _lastSyncResult;
+
+            _lastSyncAttemptAtUtc = DateTime.UtcNow;
+        }
+
         // ── 1. Kiểm tra mạng ──────────────────────────────────────
         var network = Connectivity.NetworkAccess;
         if (network != NetworkAccess.Internet)
         {
             var cached = await _db.GetAllPoisAsync();
             SyncStatus = $"Offline — có {cached.Count} điểm trong bộ nhớ";
-            return new SyncResult
+            var result = new SyncResult
             {
                 Success = true,
                 Message = $"Offline — có {cached.Count} điểm trong bộ nhớ",
                 UpdatedCount = cached.Count,
                 FromCache = true
             };
+            _lastSyncResult = result;
+            return result;
         }
 
         IsSyncing = true;
@@ -83,12 +100,14 @@ public partial class SyncService : ObservableObject
                 LastSyncAt = utcSyncedAt;
                 SyncStatus = $"Đã cập nhật {response.Pois.Count} điểm từ server";
 
-                return new SyncResult
+                var result = new SyncResult
                 {
                     Success = true,
                     UpdatedCount = response.Pois.Count,
                     Message = $"Đã cập nhật {response.Pois.Count} điểm từ server"
                 };
+                _lastSyncResult = result;
+                return result;
             }
 
             // Fallback: filter trả 0 → gọi full sync để đảm bảo dữ liệu đầy đủ
@@ -105,12 +124,14 @@ public partial class SyncService : ObservableObject
                     await _db.SaveLastSyncAtAsync(fullUtc);
                     LastSyncAt = fullUtc;
                     SyncStatus = $"Full: {full.Pois.Count} điểm";
-                    return new SyncResult
+                    var result = new SyncResult
                     {
                         Success = true,
                         UpdatedCount = full.Pois.Count,
                         Message = $"Full refresh: {full.Pois.Count} điểm"
                     };
+                    _lastSyncResult = result;
+                    return result;
                 }
             }
 
@@ -118,29 +139,37 @@ public partial class SyncService : ObservableObject
             LastSyncAt = utcSyncedAt;
             SyncStatus = "";
 
-            return new SyncResult
+            var finalResult = new SyncResult
             {
                 Success = true,
                 Message = "",
                 UpdatedCount = 0
             };
+            _lastSyncResult = finalResult;
+            return finalResult;
         }
         catch (OperationCanceledException)
         {
             // Timeout — API không phản hồi
             SyncStatus = "⚠️ Server không phản hồi (timeout)";
-            return await BuildOfflineResult("Server không phản hồi sau 10 giây");
+            var result = await BuildOfflineResult("Server không phản hồi sau 10 giây");
+            _lastSyncResult = result;
+            return result;
         }
         catch (HttpRequestException ex)
         {
             // Không kết nối được — có thể API chưa chạy
             SyncStatus = $"⚠️ Không kết nối được server: {ex.Message}";
-            return await BuildOfflineResult($"Không kết nối server: {ex.Message}");
+            var result = await BuildOfflineResult($"Không kết nối server: {ex.Message}");
+            _lastSyncResult = result;
+            return result;
         }
         catch (Exception ex)
         {
             SyncStatus = $"⚠️ Lỗi sync: {ex.Message}";
-            return await BuildOfflineResult($"Lỗi: {ex.Message}");
+            var result = await BuildOfflineResult($"Lỗi: {ex.Message}");
+            _lastSyncResult = result;
+            return result;
         }
         finally
         {

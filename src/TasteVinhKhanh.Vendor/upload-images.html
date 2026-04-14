@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TasteVinhKhanh — Upload Ảnh</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20260414-2">
 </head>
-<body>
+<body class="upload-images-page">
 
     <div class="layout">
 
@@ -19,6 +19,9 @@
                 </a>
                 <a href="edit-poi.html">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map-pin"/></svg></span> Điểm thuyết minh
+                </a>
+                <a href="audio.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg></span> Quản lý Audio
                 </a>
                 <a href="upload-images.html" class="active">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg></span> Upload ảnh
@@ -44,12 +47,15 @@
 
         <!-- MAIN -->
         <main class="main">
-            <div class="topbar">
-                <h2><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> Upload Ảnh</h2>
+            <div class="topbar upload-topbar">
+                <div class="upload-topbar-title">
+                    <h2><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg> Upload Ảnh</h2>
+                    <div class="upload-topbar-subtitle">Quản lý ảnh quán ăn theo chuẩn hiển thị trên ứng dụng</div>
+                </div>
                 <a href="dashboard.html" class="btn btn-outline btn-sm"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-arrow-left"/></svg> Quay lại</a>
             </div>
 
-            <div class="content">
+            <div class="content upload-content">
 
                 <!-- POI SELECTOR -->
                 <div class="card card-poi-select">
@@ -66,21 +72,21 @@
                 </div>
 
                 <!-- LOGO SECTION -->
-                <div id="logoSection" class="card" style="display:none">
-                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px">
+                <div id="logoSection" class="card upload-section-card" style="display:none">
+                    <div class="section-head">
                         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l2-4h16l2 4"/><path d="M4 7v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-                        <span style="font-weight:600; font-size:14px; color:var(--gray-800)">Logo quán</span>
-                        <span id="logoStatus" class="badge" style="font-size:11px"></span>
+                        <span class="section-title-text">Logo quán</span>
+                        <span id="logoStatus" class="badge section-status-badge"></span>
                     </div>
 
                     <!-- Logo preview -->
-                    <div id="logoCurrent" style="display:none; margin-bottom:16px">
-                        <div style="display:flex; align-items:center; gap:12px">
+                    <div id="logoCurrent" class="logo-current-wrap" style="display:none">
+                        <div class="logo-current-content">
                             <img id="logoCurrentImg" src="" alt="Logo hiện tại"
-                                 style="width:72px; height:72px; object-fit:cover; border-radius:12px; border:2px solid var(--gray-200)">
+                                 class="logo-current-img">
                             <div>
-                                <div style="font-size:12px; color:var(--gray-500); margin-bottom:4px">Logo hiện tại</div>
-                                <button class="btn btn-outline btn-sm" onclick="clearLogo()" style="color:var(--danger); border-color:var(--danger)">
+                                <div class="logo-current-caption">Logo hiện tại</div>
+                                <button class="btn btn-outline btn-sm btn-outline-danger" onclick="clearLogo()">
                                     <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-trash-2"/></svg>
                                     Xóa logo
                                 </button>
@@ -90,34 +96,34 @@
 
                     <!-- Upload new logo -->
                     <div id="logoUploadArea">
-                        <div id="logoDropZone" class="upload-drop-zone" style="padding:24px; min-height:80px">
+                        <div id="logoDropZone" class="upload-drop-zone logo-drop-zone">
                             <input type="file" id="logoFileInput" accept="image/*" style="display:none" onchange="onLogoSelected()">
-                            <div style="display:flex; align-items:center; gap:16px; cursor:pointer" onclick="document.getElementById('logoFileInput').click()">
-                                <div style="width:48px; height:48px; background:var(--gray-100); border-radius:8px; display:flex; align-items:center; justify-content:center">
+                            <div class="logo-dropzone-inner" onclick="document.getElementById('logoFileInput').click()">
+                                <div class="logo-dropzone-icon-wrap">
                                     <svg width="22" height="22" fill="none" stroke="var(--gray-400)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg>
                                 </div>
                                 <div>
-                                    <div style="font-size:13px; color:var(--gray-700); font-weight:500">Tải lên logo mới</div>
-                                    <div style="font-size:11px; color:var(--gray-400); margin-top:2px">PNG, JPG, WEBP • Tối đa 5MB</div>
+                                    <div class="logo-dropzone-title">Tải lên logo mới</div>
+                                    <div class="logo-dropzone-hint">PNG, JPG, WEBP • Tối đa 5MB</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Pending logo preview (TÁCH RIÊNG — không nằm trong logoUploadArea) -->
-                    <div id="logoPendingArea" style="display:none; margin-top:12px">
-                        <div style="display:flex; align-items:center; gap:12px; padding:10px 12px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px">
+                    <div id="logoPendingArea" class="logo-pending-area" style="display:none">
+                        <div class="logo-pending-card">
                             <img id="logoPendingImg" src="" alt="Logo mới"
-                                 style="width:48px; height:48px; object-fit:cover; border-radius:8px">
-                            <div style="flex:1">
-                                <div style="font-size:12px; font-weight:500; color:var(--gray-800)">Logo mới</div>
-                                <div style="font-size:11px; color:var(--gray-500); margin-top:2px">Đang chờ gửi duyệt</div>
+                                 class="logo-pending-img">
+                            <div class="logo-pending-text">
+                                <div class="logo-pending-title">Logo mới</div>
+                                <div class="logo-pending-subtitle">Đang chờ gửi duyệt</div>
                             </div>
-                            <button class="btn-icon" onclick="clearPendingLogo()" title="Xóa" style="color:var(--gray-400)">
+                            <button class="btn-icon" onclick="clearPendingLogo()" title="Xóa">
                                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-x"/></svg>
                             </button>
                         </div>
-                        <button class="btn btn-primary btn-sm" onclick="sendLogoForApproval()" id="logoSendBtn" style="margin-top:10px; width:100%">
+                        <button class="btn btn-primary btn-sm btn-block logo-send-btn" onclick="sendLogoForApproval()" id="logoSendBtn">
                             <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg>
                             Gửi logo để duyệt
                         </button>
@@ -527,22 +533,22 @@
         list.style.display = 'block';
         empty.style.display = 'none';
         list.innerHTML = requests.map(r => `
-            <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;margin-bottom:8px;background:white">
-                <div style="width:48px;height:48px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--gray-100);display:flex;align-items:center;justify-content:center">
-                    <img src="${API_BASE}${r.referencedImageUrl || ''}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentElement.innerHTML='🖼️'">
+            <div class="deletion-item">
+                <div class="deletion-thumb">
+                    <img src="${API_BASE}${r.referencedImageUrl || ''}" onerror="this.style.display='none';this.parentElement.innerHTML='🖼️'">
                 </div>
-                <div style="flex:1;min-width:0">
-                    <div style="font-size:13px;font-weight:500;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                <div class="deletion-main">
+                    <div class="deletion-file-name">
                         ${escapeHtml(r.fileName || '—')}
                     </div>
-                    <div style="font-size:12px;color:var(--gray-500);margin-top:2px">
+                    <div class="deletion-created-at">
                         📅 ${formatDateTime(r.createdAt)}
                     </div>
                 </div>
                 <span class="badge ${r.status === 'Approved' ? 'badge-success' : r.status === 'Rejected' ? 'badge-danger' : 'badge-warning'}">
                     ${r.status === 'Approved' ? '✅ Đã duyệt' : r.status === 'Rejected' ? '❌ Từ chối' : '⏳ Chờ duyệt'}
                 </span>
-                ${r.adminNote ? `<div style="font-size:11px;color:var(--gray-500);flex-basis:100%;margin-top:4px;padding-left:60px">💬 ${escapeHtml(r.adminNote)}</div>` : ''}
+                ${r.adminNote ? `<div class="deletion-admin-note">💬 ${escapeHtml(r.adminNote)}</div>` : ''}
             </div>
         `).join('');
     }
@@ -676,7 +682,7 @@
             showToast(`${failCount} ảnh gửi thất bại.`, 'error');
         }
 
-        btn.textContent = '📨 Gửi duyệt';
+        btn.textContent = 'Gửi duyệt';
         btn.disabled = false;
     }
 

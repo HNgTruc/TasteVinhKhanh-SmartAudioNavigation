@@ -38,6 +38,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _tNavHome = "";
     [ObservableProperty] private string _tNavMap = "";
     [ObservableProperty] private string _tNavAudio = "";
+    [ObservableProperty] private string _tNavFavorites = "";
     [ObservableProperty] private string _tNavSettings = "";
 
     public SettingsViewModel(NarrationEngine narration, LocalizationService i18n)
@@ -83,6 +84,7 @@ public partial class SettingsViewModel : ObservableObject
         TNavHome = _i18n.T("Nav_Home");
         TNavMap = _i18n.T("Nav_Map");
         TNavAudio = _i18n.T("Nav_Audio");
+        TNavFavorites = _i18n.T("Nav_Favorites");
         TNavSettings = _i18n.T("Nav_Settings");
     }
 
@@ -118,4 +120,8 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     public async Task GoToSettings()
         => await Shell.Current.GoToAsync("//settings");
+
+    [RelayCommand]
+    public async Task GoToFavorites()
+        => await Shell.Current.GoToAsync("//favorites");
 }

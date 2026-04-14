@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TasteVinhKhanh.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c2ea8e065feaa60b955d0ebd9e19c798a1a68bb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fdb061dc5486d1fc8874090e930da3b18ee72188")]
 [assembly: System.Reflection.AssemblyProductAttribute("TasteVinhKhanh.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TasteVinhKhanh.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

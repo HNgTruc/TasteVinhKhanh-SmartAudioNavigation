@@ -11,8 +11,23 @@ public class GeofenceEngine
     private readonly AppDatabase _db;
     private readonly NarrationEngine _narration;
     private readonly NotificationService _notif;
+    private readonly HashSet<int> _autoPlayedPoiIds = new();
 
     public event Action<LocalPoi, double>? PoiTriggered;
+
+    /// <summary>
+    /// True = geofence đang bị chặn (user đang nghe thủ công từ AudioPage).
+    /// Set true khi bắt đầu phát thủ công, false khi phát xong hoặc dừng.
+    /// </summary>
+    private bool _geofenceBlocked = false;
+    public bool GeofenceBlocked { get => _geofenceBlocked; set => _geofenceBlocked = value; }
+
+    public void SetGeofenceBlocked(bool blocked) => _geofenceBlocked = blocked;
+
+    /// <summary>
+    /// Reset danh sách đã auto-play (nếu muốn mở lại theo phiên mới).
+    /// </summary>
+    public void ResetSessionAutoplay() => _autoPlayedPoiIds.Clear();
 
     public GeofenceEngine(AppDatabase db, NarrationEngine narration, NotificationService notif)
     {
@@ -23,6 +38,11 @@ public class GeofenceEngine
 
     public async Task CheckLocationAsync(Location location)
     {
+        // Bỏ qua nếu user đang nghe thủ công từ AudioPage/PoiDetail
+        if (_geofenceBlocked) return;
+        if (_narration.IsPlaying) return;
+        if (_narration.IsPaused) return;
+
         var pois = await _db.GetAllPoisAsync();
 
         // Tìm POI gần nhất trong bán kính, ưu tiên Priority cao
@@ -35,11 +55,12 @@ public class GeofenceEngine
                     p.Latitude, p.Longitude)
             })
             .Where(x => x.Distance <= x.Poi.TriggerRadiusMeters)
-            .OrderByDescending(x => x.Poi.Priority)
-            .ThenBy(x => x.Distance)
+            .OrderBy(x => x.Distance)
+            .ThenByDescending(x => x.Poi.Priority)
             .FirstOrDefault();
 
         if (inRange == null) return;
+        if (_autoPlayedPoiIds.Contains(inRange.Poi.Id)) return;
 
         // Kiểm tra cooldown 5 phút
         if (await _db.WasRecentlyPlayedAsync(inRange.Poi.Id, TimeSpan.FromMinutes(5)))
@@ -48,8 +69,8 @@ public class GeofenceEngine
         // Gửi notification để người dùng biết (dù điện thoại đang khóa)
         await _notif.ShowPoiNotificationAsync(inRange.Poi.Name, inRange.Distance);
 
-        // Kích hoạt thuyết minh — dừng audio cũ trước khi phát quán mới
-        _narration.Stop();
+        // Kích hoạt thuyết minh cho POI vừa vào vùng
+        _autoPlayedPoiIds.Add(inRange.Poi.Id);
         PoiTriggered?.Invoke(inRange.Poi, inRange.Distance);
         await _narration.PlayAsync(inRange.Poi, inRange.Distance, location);
     }

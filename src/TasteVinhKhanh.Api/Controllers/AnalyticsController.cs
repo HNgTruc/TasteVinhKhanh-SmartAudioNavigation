@@ -32,4 +32,43 @@ public class AnalyticsController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> TopPois([FromQuery] int top = 10)
         => Ok(await _analytics.GetTopPoisAsync(top));
+
+    /// <summary>Bản đồ nhiệt — tọa độ + weight</summary>
+    [HttpGet("heatmap")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Heatmap([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        => Ok(await _analytics.GetHeatmapDataAsync(from, to));
+
+    /// <summary>Heatmap theo giờ trong ngày (0–23)</summary>
+    [HttpGet("heatmap/by-hour")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> HeatmapByHour([FromQuery] DateTime? from, [FromQuery] DateTime? to)
+        => Ok(await _analytics.GetHeatmapByHourAsync(from, to));
+
+    /// <summary>Lịch sử nghe chi tiết — có phân trang + filter</summary>
+    [HttpGet("history")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> History(
+        [FromQuery] int? poiPointId,
+        [FromQuery] string? deviceId,
+        [FromQuery] DateTime? fromDate,
+        [FromQuery] DateTime? toDate,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
+    {
+        var filter = new UsageHistoryFilterDto
+        {
+            PoiPointId = poiPointId,
+            DeviceId = deviceId,
+            FromDate = fromDate,
+            ToDate = toDate
+        };
+        return Ok(await _analytics.GetUsageHistoryAsync(filter, page, pageSize));
+    }
+
+    /// <summary>Top thiết bị hoạt động nhiều nhất</summary>
+    [HttpGet("devices")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> TopDevices([FromQuery] int top = 20)
+        => Ok(await _analytics.GetTopDevicesAsync(top));
 }

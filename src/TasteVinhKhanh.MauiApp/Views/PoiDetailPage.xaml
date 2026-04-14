@@ -22,6 +22,7 @@
         <conv:MultiLangTextColorConverter x:Key="MultiLangTextColorConverter"/>
         <conv:MultiLangBadgeVisibleConverter x:Key="MultiLangBadgeVisibleConverter"/>
         <conv:MultiLangStrokeConverter x:Key="MultiLangStrokeConverter"/>
+        <conv:FavoriteHeartConverter x:Key="FavoriteHeartConverter"/>
     </ContentPage.Resources>
 
     <Grid RowDefinitions="Auto,*,Auto">
@@ -155,10 +156,14 @@
                                 <TapGestureRecognizer Tapped="OnTabFavoriteTapped"/>
                             </StackLayout.GestureRecognizers>
                             <Border StrokeShape="RoundRectangle 12" Stroke="Transparent"
-                                    Padding="10">
-                                <Label Text="&#x2B50;" FontSize="22" HorizontalOptions="Center"/>
+                                    Padding="10"
+                                    BackgroundColor="{Binding IsFavoriteActive, Converter={StaticResource TabBgConverter}}">
+                                <Label Text="{Binding Poi.Id, Converter={StaticResource FavoriteHeartConverter}}"
+                                       FontSize="22" HorizontalOptions="Center"
+                                       TextColor="{Binding IsFavoriteActive, Converter={StaticResource TabTextConverter}}"/>
                             </Border>
-                            <Label Text="{Binding TFavorite}" FontSize="11" TextColor="#666666"
+                            <Label Text="{Binding TFavorite}" FontSize="11"
+                                   TextColor="{Binding IsFavoriteActive, Converter={StaticResource TabTextConverter}}"
                                    HorizontalOptions="Center"/>
                         </StackLayout>
                     </Grid>
@@ -330,7 +335,7 @@
                     <GradientStop Color="#0D0D0D" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*,*,*,*" HeightRequest="90">
+            <Grid ColumnDefinitions="*,*,*,*,*" HeightRequest="90">
 
                 <!-- Home -->
                 <Grid Grid.Column="0">
@@ -380,8 +385,22 @@
                     </Border>
                 </Grid>
 
-                <!-- Settings -->
+                <!-- Favorites -->
                 <Grid Grid.Column="3">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToFavoritesCommand}"/>
+                    </Grid.GestureRecognizers>
+                    <StackLayout Spacing="4" HorizontalOptions="Center"
+                                 VerticalOptions="Center">
+                        <Label Text="❤️" FontSize="22" TextColor="#444444"
+                               HorizontalOptions="Center"/>
+                        <Label Text="{Binding TNavFavorites}" FontSize="10" TextColor="#444444"
+                               HorizontalOptions="Center"/>
+                    </StackLayout>
+                </Grid>
+
+                <!-- Settings -->
+                <Grid Grid.Column="4">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
                     </Grid.GestureRecognizers>

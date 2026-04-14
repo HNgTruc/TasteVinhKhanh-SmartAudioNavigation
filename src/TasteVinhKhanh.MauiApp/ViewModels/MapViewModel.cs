@@ -26,6 +26,7 @@ public partial class MapViewModel : ObservableObject
     [ObservableProperty] private string _poiCountLabel = "";
     [ObservableProperty] private Location? _currentUserLocation;
     [ObservableProperty] private int? _nearestPoiId;
+    [ObservableProperty] private bool _isInitialized = false;
 
     // ── Bindable translated strings ──
     [ObservableProperty] private string _tHeader = "";
@@ -40,6 +41,7 @@ public partial class MapViewModel : ObservableObject
     [ObservableProperty] private string _tNavHome = "";
     [ObservableProperty] private string _tNavMap = "";
     [ObservableProperty] private string _tNavAudio = "";
+    [ObservableProperty] private string _tNavFavorites = "";
     [ObservableProperty] private string _tNavSettings = "";
 
     // Favorites stored as comma-separated IDs in Preferences
@@ -111,7 +113,10 @@ public partial class MapViewModel : ObservableObject
         var stored = Preferences.Get(FavKey, "");
         _favoriteIds = string.IsNullOrEmpty(stored)
             ? new HashSet<int>()
-            : new HashSet<int>(stored.Split(',').Select(int.Parse));
+            : new HashSet<int>(
+                stored.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                      .Select(s => int.TryParse(s.Trim(), out var v) ? v : -1)
+                      .Where(v => v >= 0));
     }
 
     private void SaveFavorites()
@@ -135,6 +140,13 @@ public partial class MapViewModel : ObservableObject
     [RelayCommand]
     public async Task InitAsync()
     {
+        if (IsInitialized)
+        {
+            await _location.StartAsync();
+            _ = _sync.UploadPendingLogsAsync();
+            return;
+        }
+
         IsLoading = true;
         StatusMessage = _i18n.T("Map_Syncing");
         SyncDetail = "";
@@ -181,6 +193,7 @@ public partial class MapViewModel : ObservableObject
 
         // Upload log cũ nếu có mạng
         _ = _sync.UploadPendingLogsAsync();
+        IsInitialized = true;
     }
 
     private async void OnLocationUpdated(Location location)
@@ -255,6 +268,10 @@ public partial class MapViewModel : ObservableObject
     public async Task GoToSettings()
         => await Shell.Current.GoToAsync("//settings");
 
+    [RelayCommand]
+    public async Task GoToFavorites()
+        => await Shell.Current.GoToAsync("//favorites");
+
     private void RefreshTexts()
     {
         THeader = _i18n.T("Map_Header");
@@ -269,6 +286,7 @@ public partial class MapViewModel : ObservableObject
         TNavHome = _i18n.T("Nav_Home");
         TNavMap = _i18n.T("Nav_Map");
         TNavAudio = _i18n.T("Nav_Audio");
+        TNavFavorites = _i18n.T("Nav_Favorites");
         TNavSettings = _i18n.T("Nav_Settings");
     }
 }

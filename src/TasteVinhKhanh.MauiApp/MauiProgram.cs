@@ -59,15 +59,25 @@ public static class MauiProgram
         builder.Services.AddTransient<HomeViewModel>();
         builder.Services.AddTransient<MapViewModel>();
         builder.Services.AddTransient<AudioViewModel>();
+        builder.Services.AddTransient<ToursViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddTransient<PoiDetailViewModel>();
+        builder.Services.AddTransient<FavoritesViewModel>();
 
         // Views
         builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<MapPage>();
         builder.Services.AddTransient<AudioPage>();
+        builder.Services.AddTransient<ToursPage>();
         builder.Services.AddSingleton<SettingsPage>();
         builder.Services.AddTransient<PoiDetailPage>();
+        builder.Services.AddTransient<FavoritesPage>();
+
+        builder.Services.AddHttpClient<ToursViewModel>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
 
         return builder.Build();
     }

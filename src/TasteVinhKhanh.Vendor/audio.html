@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh — Quản lý Audio</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-utensils"/></svg> TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-bar-chart-2"/></svg></span> Dashboard
+                </a>
+                <a href="edit-poi.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map-pin"/></svg></span> Điểm thuyết minh
+                </a>
+                <a href="audio.html" class="active">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg></span> Quản lý Audio
+                </a>
+                <a href="upload-images.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-upload"/></svg></span> Upload ảnh
+                </a>
+                <a href="profile.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-user"/></svg></span> Tài khoản
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">V</div>
+                    <div>
+                        <div class="user-name" id="userName">Vendor</div>
+                        <div class="user-role">Nhà cung cấp</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center" onclick="vendorLogout()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-log-out"/></svg> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="topbar">
+                <h2><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-mic"/></svg> Quản lý Audio</h2>
+            </div>
+            <div class="content">
+                <div class="card">
+                    <div class="table-header">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo tên điểm..." oninput="filterPois()">
+                        </div>
+                    </div>
+                    <div id="listLoading" class="loading"><div class="spinner"></div></div>
+                    <table id="poiTable" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>Tên điểm</th>
+                                <th style="width:180px">Ngôn ngữ có audio</th>
+                                <th style="width:100px">Trạng thái</th>
+                                <th style="width:120px">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="poiBody"></tbody>
+                    </table>
+                    <div id="poiEmpty" class="empty-state" style="display:none">
+                        <div class="empty-icon">📭</div>
+                        <p>Chưa có điểm thuyết minh nào.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="scriptModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="scriptModalTitle">🎤 Script thuyết minh</h3>
+                <button class="btn-icon" onclick="closeModal('scriptModal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:12px; color:var(--gray-500); margin-bottom:14px">
+                    Viết nội dung TTS → nhấn <strong>Generate</strong> để tạo audio.
+                </p>
+                <input type="hidden" id="scriptPoiId">
+                <div id="scriptTabs">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="tab-vi">🇻🇳 VI</div>
+                        <div class="tab" data-tab="tab-en">🇬🇧 EN</div>
+                        <div class="tab" data-tab="tab-zh">🇨🇳 ZH</div>
+                        <div class="tab" data-tab="tab-ko">🇰🇷 KO</div>
+                        <div class="tab" data-tab="tab-ja">🇯🇵 JA</div>
+                    </div>
+                    <div class="tab-content active" id="tab-vi"><div class="form-group"><label>Nội dung TTS — Tiếng Việt</label><textarea id="tts-vi" class="form-control" rows="4"></textarea></div><div class="audio-bar" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px"><span id="audio-status-vi" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span><div style="display:flex; gap:6px; flex-wrap:wrap"><button class="btn btn-outline btn-sm" id="btn-preview-vi" onclick="vendorPreviewAudio('vi')" disabled>▶ Nghe thử</button><button class="btn btn-secondary btn-sm" id="btn-generate-vi" onclick="vendorDoGenerateAudio('vi')" disabled>🎵 Generate TTS</button><label class="btn btn-outline btn-sm" style="cursor:pointer">📁 Upload<input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="vendorOnAudioFileSelected(this, 'vi')"></label><button class="btn btn-danger btn-sm" id="btn-delete-vi" onclick="vendorDeleteAudio('vi')" disabled>🗑 Xóa</button></div></div><button class="btn btn-primary btn-sm" onclick="saveScript('vi')">💾 Lưu VI</button></div>
+                    <div class="tab-content" id="tab-en"><div class="form-group"><label>TTS Script — English</label><textarea id="tts-en" class="form-control" rows="4"></textarea></div><div class="audio-bar" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px"><span id="audio-status-en" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span><div style="display:flex; gap:6px; flex-wrap:wrap"><button class="btn btn-outline btn-sm" id="btn-preview-en" onclick="vendorPreviewAudio('en')" disabled>▶ Preview</button><button class="btn btn-secondary btn-sm" id="btn-generate-en" onclick="vendorDoGenerateAudio('en')" disabled>🎵 Generate TTS</button><label class="btn btn-outline btn-sm" style="cursor:pointer">📁 Upload<input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="vendorOnAudioFileSelected(this, 'en')"></label><button class="btn btn-danger btn-sm" id="btn-delete-en" onclick="vendorDeleteAudio('en')" disabled>🗑 Delete</button></div></div><button class="btn btn-primary btn-sm" onclick="saveScript('en')">💾 Save EN</button></div>
+                    <div class="tab-content" id="tab-zh"><div class="form-group"><label>TTS Script — 中文</label><textarea id="tts-zh" class="form-control" rows="4"></textarea></div><div class="audio-bar" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px"><span id="audio-status-zh" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span><div style="display:flex; gap:6px; flex-wrap:wrap"><button class="btn btn-outline btn-sm" id="btn-preview-zh" onclick="vendorPreviewAudio('zh')" disabled>▶ 预览</button><button class="btn btn-secondary btn-sm" id="btn-generate-zh" onclick="vendorDoGenerateAudio('zh')" disabled>🎵 Generate TTS</button><label class="btn btn-outline btn-sm" style="cursor:pointer">📁 上传<input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="vendorOnAudioFileSelected(this, 'zh')"></label><button class="btn btn-danger btn-sm" id="btn-delete-zh" onclick="vendorDeleteAudio('zh')" disabled>🗑 删除</button></div></div><button class="btn btn-primary btn-sm" onclick="saveScript('zh')">💾 保存 ZH</button></div>
+                    <div class="tab-content" id="tab-ko"><div class="form-group"><label>TTS Script — 한국어</label><textarea id="tts-ko" class="form-control" rows="4"></textarea></div><div class="audio-bar" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px"><span id="audio-status-ko" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span><div style="display:flex; gap:6px; flex-wrap:wrap"><button class="btn btn-outline btn-sm" id="btn-preview-ko" onclick="vendorPreviewAudio('ko')" disabled>▶ 미리보기</button><button class="btn btn-secondary btn-sm" id="btn-generate-ko" onclick="vendorDoGenerateAudio('ko')" disabled>🎵 Generate TTS</button><label class="btn btn-outline btn-sm" style="cursor:pointer">📁 업로드<input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="vendorOnAudioFileSelected(this, 'ko')"></label><button class="btn btn-danger btn-sm" id="btn-delete-ko" onclick="vendorDeleteAudio('ko')" disabled>🗑 삭제</button></div></div><button class="btn btn-primary btn-sm" onclick="saveScript('ko')">💾 저장 KO</button></div>
+                    <div class="tab-content" id="tab-ja"><div class="form-group"><label>TTS Script — 日本語</label><textarea id="tts-ja" class="form-control" rows="4"></textarea></div><div class="audio-bar" style="margin-bottom:12px; display:flex; flex-direction:column; gap:8px"><span id="audio-status-ja" style="font-size:12px; color:var(--gray-500)">❌ Chưa có audio</span><div style="display:flex; gap:6px; flex-wrap:wrap"><button class="btn btn-outline btn-sm" id="btn-preview-ja" onclick="vendorPreviewAudio('ja')" disabled>▶ プレビュー</button><button class="btn btn-secondary btn-sm" id="btn-generate-ja" onclick="vendorDoGenerateAudio('ja')" disabled>🎵 Generate TTS</button><label class="btn btn-outline btn-sm" style="cursor:pointer">📁 アップロード<input type="file" accept=".mp3,.m4a,.wav,.ogg,.webm" style="display:none" onchange="vendorOnAudioFileSelected(this, 'ja')"></label><button class="btn btn-danger btn-sm" id="btn-delete-ja" onclick="vendorDeleteAudio('ja')" disabled>🗑 削除</button></div></div><button class="btn btn-primary btn-sm" onclick="saveScript('ja')">💾 保存 JA</button></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('scriptModal')">Đóng</button></div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    if (!requireVendorAuth()) throw new Error('Not authenticated');
+
+    let allPois = [];
+    let vendorPendingAudioFile = null;
+    let vendorPendingAudioLang = null;
+
+    async function loadPois() {
+        document.getElementById('listLoading').style.display = 'block';
+        document.getElementById('poiTable').style.display = 'none';
+        document.getElementById('poiEmpty').style.display = 'none';
+        try {
+            allPois = await getMyPois() || [];
+            renderTable(allPois);
+        } catch (e) {
+            showToast('Không thể tải danh sách POI', 'error');
+        }
+        document.getElementById('listLoading').style.display = 'none';
+    }
+
+    function renderTable(pois) {
+        if (pois.length === 0) {
+            document.getElementById('poiEmpty').style.display = 'block';
+            return;
+        }
+        document.getElementById('poiTable').style.display = 'table';
+        document.getElementById('poiBody').innerHTML = pois.map(p => {
+            const langs = (p.audioScripts || []).filter(s => s.isAudioUploaded).map(s => s.languageCode.toUpperCase());
+            return `
+                <tr>
+                    <td><div style="font-weight:600">${escapeHtml(p.name)}</div><div style="font-size:12px;color:var(--gray-500)">${escapeHtml(p.shortDescription || '')}</div></td>
+                    <td>${langs.length ? langs.map(x => `<span class="badge badge-info" style="margin:1px">${x}</span>`).join('') : '<span style="color:var(--gray-500)">Chưa có</span>'}</td>
+                    <td>${langs.length ? '<span class="badge badge-success">Có audio</span>' : '<span class="badge badge-gray">Chưa có</span>'}</td>
+                    <td><button class="btn btn-outline btn-sm" onclick="openScriptModal(${p.id})">Quản lý</button></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function filterPois() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        renderTable(allPois.filter(p => p.name.toLowerCase().includes(q) || (p.shortDescription || '').toLowerCase().includes(q)));
+    }
+
+    function openScriptModal(poiId) {
+        const poi = allPois.find(p => p.id === poiId);
+        if (!poi) return;
+        document.getElementById('scriptPoiId').value = poiId;
+        document.getElementById('scriptModalTitle').textContent = `🎤 Scripts: ${poi.name}`;
+        ['vi','en','zh','ko','ja'].forEach(lang => {
+            const script = (poi.audioScripts || []).find(s => s.languageCode === lang);
+            document.getElementById(`tts-${lang}`).value = script?.ttsScript || '';
+            document.getElementById(`tts-${lang}`).dataset.scriptId = script?.id || '';
+            vendorUpdateAudioStatus(lang, !!script?.isAudioUploaded, !!script?.ttsScript);
+        });
+        initTabs('scriptTabs');
+        openModal('scriptModal');
+    }
+
+    function vendorUpdateAudioStatus(lang, hasAudio, hasText) {
+        const statusEl = document.getElementById(`audio-status-${lang}`);
+        const previewBtn = document.getElementById(`btn-preview-${lang}`);
+        const generateBtn = document.getElementById(`btn-generate-${lang}`);
+        const deleteBtn = document.getElementById(`btn-delete-${lang}`);
+        statusEl.textContent = hasAudio ? '✅ Audio sẵn sàng' : hasText ? '🔊 Chỉ có TTS — nhấn Generate để tạo audio' : '❌ Chưa có audio';
+        previewBtn.disabled = !hasAudio;
+        generateBtn.disabled = !hasText || hasAudio;
+        deleteBtn.disabled = !hasAudio;
+    }
+
+    function vendorOnAudioFileSelected(input, lang) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('File vượt quá 10MB!', 'error');
+            input.value = '';
+            return;
+        }
+        vendorPendingAudioFile = file;
+        vendorPendingAudioLang = lang;
+        document.getElementById(`audio-status-${lang}`).textContent = `📁 ${file.name}`;
+    }
+
+    async function vendorDoGenerateAudio(lang) {
+        const poiId = document.getElementById('scriptPoiId').value;
+        const btn = document.getElementById(`btn-generate-${lang}`);
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang generate...';
+        try {
+            const token = localStorage.getItem('vendorToken');
+            const res = await fetch(`${API_BASE}/api/audio/vendor/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ poiId: parseInt(poiId, 10), languageCode: lang })
+            });
+            if (!res.ok) throw new Error('Generate failed');
+            showToast(`✅ Audio ${lang.toUpperCase()} đã được tạo!`, 'success');
+            vendorUpdateAudioStatus(lang, true, true);
+            await loadPois();
+        } catch (e) {
+            showToast('Generate thất bại: ' + (e.message || ''), 'error');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '🎵 Generate TTS';
+        }
+    }
+
+    async function vendorPreviewAudio(lang) {
+        const scriptId = document.getElementById(`tts-${lang}`).dataset.scriptId;
+        if (!scriptId) return showToast('Chưa có audio để phát!', 'error');
+        const token = localStorage.getItem('vendorToken');
+        try {
+            const res = await fetch(`${API_BASE}/api/audio/${parseInt(scriptId, 10)}`, { headers: { 'Authorization': `Bearer ${token}` } });
+            if (!res.ok) return showToast('Không thể tải audio.', 'error');
+            const url = URL.createObjectURL(await res.blob());
+            const audio = new Audio(url);
+            audio.play();
+        } catch (e) {
+            showToast('Không thể phát audio.', 'error');
+        }
+    }
+
+    async function vendorDeleteAudio(lang) {
+        const scriptId = document.getElementById(`tts-${lang}`).dataset.scriptId;
+        if (!scriptId) return;
+        confirmDialog(`Xóa audio ${lang.toUpperCase()}?`, async () => {
+            try {
+                const token = localStorage.getItem('vendorToken');
+                const res = await fetch(`${API_BASE}/api/audio/vendor/${parseInt(scriptId, 10)}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error('Delete failed');
+                showToast(`Đã xóa audio ${lang.toUpperCase()}`);
+                vendorUpdateAudioStatus(lang, false, true);
+                await loadPois();
+            } catch (e) {
+                showToast('Xóa thất bại: ' + (e.message || ''), 'error');
+            }
+        });
+    }
+
+    async function saveScript(lang) {
+        const poiId = document.getElementById('scriptPoiId').value;
+        const tts = document.getElementById(`tts-${lang}`).value;
+        const ttsEl = document.getElementById(`tts-${lang}`);
+        const token = localStorage.getItem('vendorToken');
+        try {
+            const res = await fetch(`${API_BASE}/api/vendor/pois/${poiId}/scripts`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ languageCode: lang, ttsScript: tts })
+            });
+            if (!res.ok) throw new Error('Save failed');
+            const result = await res.json();
+            if (result?.id) {
+                ttsEl.dataset.scriptId = result.id;
+                if (vendorPendingAudioFile && vendorPendingAudioLang === lang) {
+                    const formData = new FormData();
+                    formData.append('poiId', poiId);
+                    formData.append('lang', lang);
+                    formData.append('file', vendorPendingAudioFile);
+                    const uploadRes = await fetch(`${API_BASE}/api/audio/vendor/upload`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}` },
+                        body: formData
+                    });
+                    vendorPendingAudioFile = null;
+                    vendorPendingAudioLang = null;
+                    if (uploadRes.ok) {
+                        const uploadResult = await uploadRes.json();
+                        ttsEl.dataset.scriptId = uploadResult.scriptId;
+                        vendorUpdateAudioStatus(lang, true, true);
+                    }
+                } else {
+                    vendorUpdateAudioStatus(lang, !!result.isAudioUploaded, !!tts);
+                }
+            }
+            showToast(`Đã lưu script ${lang.toUpperCase()}`);
+            await loadPois();
+        } catch (e) {
+            showToast(`Lưu ${lang.toUpperCase()} thất bại!`, 'error');
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    loadPois();
+    </script>
+
+    <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+      <symbol id="icon-utensils" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v7"/></symbol>
+      <symbol id="icon-bar-chart-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+      <symbol id="icon-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+      <symbol id="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+      <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+      <symbol id="icon-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+      <symbol id="icon-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+    </svg>
+</body>
+</html>

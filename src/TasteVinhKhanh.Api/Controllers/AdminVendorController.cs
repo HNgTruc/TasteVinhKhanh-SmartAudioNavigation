@@ -93,6 +93,8 @@ public class AdminVendorController : ControllerBase
                 query = query.Where(v => v.Status == "Approved");
             else if (status == "Rejected")
                 query = query.Where(v => v.Status == "Rejected");
+            else if (status == "Suspended")
+                query = query.Where(v => v.Status == "Suspended");
         }
 
         var vendors = await query
@@ -258,41 +260,20 @@ public class AdminVendorController : ControllerBase
         return Ok(new { message = "Đã từ chối vendor." });
     }
 
-    /// <summary>Xoá vendor + tài khoản User</summary>
+    /// <summary>Ngưng hợp tác vendor (không xóa tài khoản/dữ liệu)</summary>
     [HttpDelete("vendors/{vendorId}")]
     public async Task<IActionResult> DeleteVendor(int vendorId)
     {
         var vendor = await _db.Vendors.FindAsync(vendorId);
         if (vendor == null) return NotFound(new { message = "Vendor không tồn tại." });
+        if (vendor.Status == "Suspended")
+            return BadRequest(new { message = "Vendor đã ở trạng thái ngưng hợp tác." });
 
-        var userId = vendor.UserId;
-        var vendorName = vendor.BusinessName;
+        vendor.Status = "Suspended";
+        vendor.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
 
-        // 1. Xoá PendingPOIUpdates trước
-        var pendingUpdates = await _db.PendingPOIUpdates
-            .Where(u => u.VendorId == vendorId)
-            .ToListAsync();
-        _db.PendingPOIUpdates.RemoveRange(pendingUpdates);
-
-        // 2. Xoá Vendor record
-        _db.Vendors.Remove(vendor);
-        await _db.SaveChangesAsync(); // commit Vendors + PendingPOIUpdates
-
-        // 3. Xoá User account qua UserManager (tự xử lý Identity tables)
-        var userManager = HttpContext.RequestServices
-            .GetRequiredService<UserManager<AppUser>>();
-        var user = await userManager.FindByIdAsync(userId);
-        if (user != null)
-        {
-            var result = await userManager.DeleteAsync(user);
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                return StatusCode(500, new { message = $"Không thể xoá user: {errors}" });
-            }
-        }
-
-        return Ok(new { message = $"Đã xoá vendor '{vendorName}' và tài khoản." });
+        return Ok(new { message = $"Đã ngưng hợp tác với vendor '{vendor.BusinessName}'." });
     }
 
     // ── POI UPDATE MANAGEMENT ─────────────────────────────────────────
@@ -301,18 +282,15 @@ public class AdminVendorController : ControllerBase
     [HttpGet("pending-updates")]
     public async Task<IActionResult> GetPendingUpdates([FromQuery] string status = "Pending")
     {
+        status = NormalizeStatusFilter(status, defaultStatus: "Pending");
+
         var query = _db.PendingPOIUpdates
             .Include(u => u.Vendor)
             .AsQueryable();
 
         if (!string.IsNullOrEmpty(status))
         {
-            if (status == "Pending")
-                query = query.Where(u => u.Status == "Pending");
-            else if (status == "Approved")
-                query = query.Where(u => u.Status == "Approved");
-            else if (status == "Rejected")
-                query = query.Where(u => u.Status == "Rejected");
+            query = query.Where(u => u.Status == status);
         }
         // status == "" (rỗng) → trả về TẤT CẢ, không filter
 
@@ -689,6 +667,8 @@ public class AdminVendorController : ControllerBase
     [HttpGet("staging-images")]
     public async Task<IActionResult> GetStagingImages([FromQuery] string status = "Pending")
     {
+        status = NormalizeStatusFilter(status, defaultStatus: "Pending");
+
         var query = _db.StagingImages
             .Include(x => x.Vendor)
             .Include(x => x.PoiPoint)
@@ -984,6 +964,8 @@ public class AdminVendorController : ControllerBase
     [HttpGet("staging-images/deletion")]
     public async Task<IActionResult> GetDeletionRequests([FromQuery] string status = "Pending")
     {
+        status = NormalizeStatusFilter(status, defaultStatus: "Pending");
+
         var query = _db.StagingImages
             .Include(x => x.Vendor)
             .Include(x => x.PoiPoint)
@@ -1172,6 +1154,8 @@ public class AdminVendorController : ControllerBase
     [HttpGet("staging-images/logo")]
     public async Task<IActionResult> GetPendingLogos([FromQuery] string status = "Pending")
     {
+        status = NormalizeStatusFilter(status, defaultStatus: "Pending");
+
         var query = _db.StagingImages
             .Include(x => x.Vendor)
             .Include(x => x.PoiPoint)
@@ -1204,6 +1188,20 @@ public class AdminVendorController : ControllerBase
             .CountAsync(x => (x.StagingType == "Logo" || x.StagingType == "LogoDeletion") && x.Status == "Pending");
 
         return Ok(new { items, pendingCount });
+    }
+
+    private static string NormalizeStatusFilter(string? status, string defaultStatus = "Pending")
+    {
+        if (status is null) return defaultStatus;
+
+        var value = status.Trim();
+        if (value.Length == 0) return string.Empty; // empty => no filter (All)
+        if (string.Equals(value, "all", StringComparison.OrdinalIgnoreCase)) return string.Empty;
+        if (string.Equals(value, "pending", StringComparison.OrdinalIgnoreCase)) return "Pending";
+        if (string.Equals(value, "approved", StringComparison.OrdinalIgnoreCase)) return "Approved";
+        if (string.Equals(value, "rejected", StringComparison.OrdinalIgnoreCase)) return "Rejected";
+
+        return value;
     }
 
     /// <summary>Duyệt logo — copy từ staging → /images/poi_X/logo và cập nhật PoiPoint.LogoUrl</summary>

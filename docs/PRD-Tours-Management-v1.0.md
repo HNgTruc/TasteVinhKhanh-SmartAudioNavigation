@@ -91,7 +91,7 @@ Module **Tours Management** cho phép admin tạo và quản lý các **Tour** �
 
 ### 3.2 Phạm vi ngoài (Out of Scope)
 
-- Xuất/bán tour cho người dùng cuối (MauiApp) — MauiApp chỉ sync POIs, không sync Tours
+- Quản lý vòng đời Tour trên MauiApp (tạo/sửa/xóa/reorder) — MauiApp chỉ dùng tour ở chế độ đọc
 - Giao diện bản đồ trên admin
 - Quản lý lịch trình / thời gian bắt đầu/kết thúc tour
 - Tối ưu lộ trình tự động (auto-routing)
@@ -512,7 +512,7 @@ Soft-delete tour (IsActive = false).
 
 | # | Câu hỏi | Giả định |
 |---|---------|----------|
-| OQ-01 | MauiApp có cần sync tours không? | **Không.** MVP: MauiApp chỉ sync POIs. Tours quản lý riêng trên Admin. |
+| OQ-01 | MauiApp có cần sync tours không? | **Có (read-only).** MauiApp gọi `GET /api/tour` và `GET /api/tour/{id}` để hiển thị; chỉ Admin mới được CRUD/reorder tour. |
 | OQ-02 | Admin có cần duplicate/copy tour không? | **Không.** MVP loại trừ. |
 | OQ-03 | Tour có hỗ trợ đa ngôn ngữ (VI/EN) không? | **Không.** Tên/mô tả tour chỉ có 1 ngôn ngữ (VI). |
 | OQ-04 | Có giới hạn số tour được tạo không? | **Không.** Không giới hạn. |

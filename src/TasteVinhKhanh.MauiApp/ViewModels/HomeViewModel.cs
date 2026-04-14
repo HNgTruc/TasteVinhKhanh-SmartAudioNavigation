@@ -27,9 +27,12 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty] private string _tMapSub = "";
     [ObservableProperty] private string _tAudio = "";
     [ObservableProperty] private string _tAudioSub = "";
+    [ObservableProperty] private string _tTour = "";
+    [ObservableProperty] private string _tTourSub = "";
     [ObservableProperty] private string _tNavHome = "";
     [ObservableProperty] private string _tNavMap = "";
     [ObservableProperty] private string _tNavAudio = "";
+    [ObservableProperty] private string _tNavFavorites = "";
     [ObservableProperty] private string _tNavSettings = "";
 
     public HomeViewModel(AppDatabase db, SyncService sync,
@@ -58,9 +61,12 @@ public partial class HomeViewModel : ObservableObject
         TMapSub = _i18n.T("Home_MapSub");
         TAudio = _i18n.T("Home_Audio");
         TAudioSub = _i18n.T("Home_AudioSub");
+        TTour = _i18n.T("Home_Tour");
+        TTourSub = _i18n.T("Home_TourSub");
         TNavHome = _i18n.T("Nav_Home");
         TNavMap = _i18n.T("Nav_Map");
         TNavAudio = _i18n.T("Nav_Audio");
+        TNavFavorites = _i18n.T("Nav_Favorites");
         TNavSettings = _i18n.T("Nav_Settings");
     }
 
@@ -89,6 +95,14 @@ public partial class HomeViewModel : ObservableObject
         => await Shell.Current.GoToAsync("//audio");
 
     [RelayCommand]
+    public async Task GoToTours()
+        => await Shell.Current.GoToAsync("tours");
+
+    [RelayCommand]
     public async Task GoToSettings()
         => await Shell.Current.GoToAsync("//settings");
+
+    [RelayCommand]
+    public async Task GoToFavorites()
+        => await Shell.Current.GoToAsync("//favorites");
 }

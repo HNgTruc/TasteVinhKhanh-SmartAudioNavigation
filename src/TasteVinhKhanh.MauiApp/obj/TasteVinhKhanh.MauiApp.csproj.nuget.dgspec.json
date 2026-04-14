@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj": {}
+    "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj": {}
   },
   "projects": {
-    "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj": {
+    "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj",
+        "projectUniqueName": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj",
         "projectName": "TasteVinhKhanh.MauiApp",
-        "projectPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj",
-        "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-        "outputPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\obj\\",
+        "projectPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\TasteVinhKhanh.MauiApp.csproj",
+        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.MauiApp\\obj\\",
         "projectStyle": "PackageReference",
         "crossTargeting": true,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -34,8 +34,8 @@
           "net10.0-android36.0": {
             "targetAlias": "net10.0-android",
             "projectReferences": {
-              "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj": {
-                "projectPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj"
+              "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj": {
+                "projectPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj"
               }
             }
           }
@@ -407,20 +407,20 @@
         }
       }
     },
-    "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj": {
+    "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj",
+        "projectUniqueName": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj",
         "projectName": "TasteVinhKhanh.Shared",
-        "projectPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj",
-        "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-        "outputPath": "D:\\do an c#\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\obj\\",
+        "projectPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\TasteVinhKhanh.Shared.csproj",
+        "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\dell\\source\\repos\\TasteVinhKhanh-SmartAudioNavigation\\src\\TasteVinhKhanh.Shared\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

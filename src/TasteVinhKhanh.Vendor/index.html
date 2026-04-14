@@ -37,6 +37,10 @@
             </button>
 
             <p class="switch-mode">
+                <a href="#" onclick="showForgotPassword(); return false;">Quên mật khẩu?</a>
+            </p>
+
+            <p class="switch-mode">
                 Chưa có tài khoản? <a href="#" onclick="showRegister(); return false;">Đăng kí ngay</a>
             </p>
         </div>
@@ -98,6 +102,42 @@
                 Đã có tài khoản? <a href="#" onclick="showLogin(); return false;">Đăng nhập</a>
             </p>
         </div>
+
+        <!-- FORGOT PASSWORD FORM -->
+        <div class="register-card" id="forgotCard" style="display:none">
+            <div class="login-logo">
+                <svg width="40" height="40" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-utensils"/></svg>
+                <span>TasteVinhKhanh</span>
+            </div>
+            <h1>Khôi phục tài khoản</h1>
+            <p>Xác minh bằng email và số điện thoại</p>
+
+            <div id="forgotAlertBox" class="alert alert-error" style="display:none"></div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="forgotEmail" class="form-control" placeholder="vendor@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                <input type="tel" id="forgotPhone" class="form-control" placeholder="VD: 0901234567" pattern="[0-9]{10}" maxlength="10" inputmode="numeric">
+            </div>
+
+            <div class="form-group">
+                <label>Mật khẩu mới</label>
+                <input type="password" id="forgotPassword" class="form-control" placeholder="Ít nhất 8 kí tự, có số">
+            </div>
+
+            <button class="btn btn-primary" style="width:100%; justify-content:center; padding:10px"
+                    onclick="doForgotPassword()" id="forgotBtn">
+                Khôi phục mật khẩu
+            </button>
+
+            <p class="switch-mode">
+                Nhớ lại mật khẩu? <a href="#" onclick="showLogin(); return false;">Đăng nhập</a>
+            </p>
+        </div>
     </div>
 
     <script src="js/api.js"></script>
@@ -110,12 +150,21 @@
 
     function showRegister() {
         document.querySelector('.login-card').style.display = 'none';
+        document.getElementById('forgotCard').style.display = 'none';
         document.getElementById('registerCard').style.display = 'block';
     }
 
     function showLogin() {
+        document.getElementById('forgotCard').style.display = 'none';
         document.getElementById('registerCard').style.display = 'none';
         document.querySelector('.login-card').style.display = 'block';
+    }
+
+    function showForgotPassword() {
+        document.querySelector('.login-card').style.display = 'none';
+        document.getElementById('registerCard').style.display = 'none';
+        document.getElementById('forgotCard').style.display = 'block';
+        document.getElementById('forgotEmail').value = document.getElementById('email').value.trim();
     }
 
     async function doRegister() {
@@ -212,6 +261,50 @@
         }
 
         btn.textContent = 'Đăng nhập';
+        btn.disabled = false;
+    }
+
+    async function doForgotPassword() {
+        const email = document.getElementById('forgotEmail').value.trim();
+        const phone = document.getElementById('forgotPhone').value.trim();
+        const newPassword = document.getElementById('forgotPassword').value;
+        const alertBox = document.getElementById('forgotAlertBox');
+        const btn = document.getElementById('forgotBtn');
+
+        if (!email || !phone || !newPassword) {
+            alertBox.textContent = 'Vui lòng nhập đầy đủ thông tin.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        if (!/^\d{10}$/.test(phone) || !phone.startsWith('0')) {
+            alertBox.textContent = 'Số điện thoại phải là 10 chữ số và bắt đầu bằng 0.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        if (newPassword.length < 8 || !/\d/.test(newPassword)) {
+            alertBox.textContent = 'Mật khẩu mới phải có ít nhất 8 kí tự và chứa ít nhất 1 chữ số.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        btn.textContent = 'Đang khôi phục...';
+        btn.disabled = true;
+        alertBox.style.display = 'none';
+
+        const result = await vendorForgotPassword(email, phone, newPassword);
+        if (result.success) {
+            showToast(result.message || 'Khôi phục mật khẩu thành công.', 'success');
+            showLogin();
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = '';
+        } else {
+            alertBox.textContent = result.message || 'Khôi phục mật khẩu thất bại.';
+            alertBox.style.display = 'block';
+        }
+
+        btn.textContent = 'Khôi phục mật khẩu';
         btn.disabled = false;
     }
 

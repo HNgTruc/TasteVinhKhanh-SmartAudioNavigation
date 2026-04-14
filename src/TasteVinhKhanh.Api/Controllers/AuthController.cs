@@ -57,12 +57,26 @@ public class AuthController : ControllerBase
         if (result.Role != "Vendor")
             return StatusCode(403, new { message = "Tài khoản không có quyền truy cập vendor." });
 
+        var vendorStatus = await _auth.GetVendorStatusByEmailAsync(request.Email);
+        if (vendorStatus == "Suspended")
+            return StatusCode(403, new { message = "Tài khoản vendor đã ngưng hợp tác. Vui lòng liên hệ quản trị viên." });
+
         // Kiểm tra vendor đã được admin duyệt chưa
         var vendorApproved = await _auth.IsVendorApprovedAsync(request.Email);
         if (!vendorApproved)
             return StatusCode(403, new { message = "Tài khoản của bạn đang chờ được duyệt. Vui lòng liên hệ quản trị viên." });
 
         return Ok(result);
+    }
+
+    /// <summary>Vendor quên mật khẩu — xác minh email + số điện thoại để đặt lại mật khẩu</summary>
+    [HttpPost("vendor-forgot-password")]
+    public async Task<IActionResult> VendorForgotPassword([FromBody] VendorForgotPasswordRequest request)
+    {
+        var result = await _auth.ResetVendorPasswordAsync(request);
+        if (!result.Success)
+            return BadRequest(new { message = result.Message });
+        return Ok(new { message = result.Message });
     }
 
     /// <summary>

@@ -67,6 +67,8 @@ public partial class LocalizationService : ObservableObject
         ["Home_MapSub"]      = new[] { "Tìm quán",                 "Find stalls",          "寻找摊位",                "노점 찾기",            "屋台を探す" },
         ["Home_Audio"]       = new[] { "Thuyết minh",              "Audio Guide",          "语音导览",                "오디오 가이드",        "オーディオガイド" },
         ["Home_AudioSub"]    = new[] { "Câu chuyện phố",           "Street stories",        "街道故事",                "거리 이야기",          "ストリートの物語" },
+        ["Home_Tour"]        = new[] { "Tour",                     "Tours",                "导览路线",                "투어",                "ツアー" },
+        ["Home_TourSub"]     = new[] { "Lộ trình gợi ý",           "Suggested routes",     "推荐路线",                "추천 경로",            "おすすめルート" },
 
         // ── MAP ──
         ["Map_Header"]       = new[] { "🍜 Phố Vĩnh Khánh",       "🍜 Vinh Khanh Street", "🍜 荣氏街",             "🍜 빈칸 거리",         "🍜 ヴィンカイン通り" },
@@ -142,7 +144,26 @@ public partial class LocalizationService : ObservableObject
         ["Nav_Home"]     = new[] { "Trang chủ", "Home",  "首页",    "홈",     "ホーム" },
         ["Nav_Map"]      = new[] { "Bản đồ",   "Map",   "地图",    "지도",   "マップ" },
         ["Nav_Audio"]    = new[] { "Âm thanh",  "Audio", "音频",    "오디오", "オーディオ" },
+        ["Nav_Favorites"] = new[] { "Yêu thích", "Favorites", "收藏", "즐겨찾기", "お気に入り" },
         ["Nav_Settings"]  = new[] { "Cài đặt",   "Settings","设置",  "설정",   "設定" },
+        ["Tour_Header"]   = new[] { "🧭 Tour ẩm thực", "🧭 Food Tours", "🧭 美食导览", "🧭 푸드 투어", "🧭 フードツアー" },
+        ["Tour_Subtitle"] = new[] { "Lộ trình khám phá Vĩnh Khánh", "Explore routes on Vinh Khanh", "探索荣氏街路线", "빈칸 탐방 경로", "ヴィンカイン探索ルート" },
+        ["Tour_Empty"]    = new[] { "Chưa có tour nào", "No tours yet", "暂无导览路线", "투어가 없습니다", "ツアーはまだありません" },
+
+        // ── FAVORITES PAGE ──
+        ["Fav_Header"]   = new[] { "❤️  Yêu thích",     "❤️  Favorites",      "❤️  收藏",            "❤️  즐겨찾기",          "❤️  お気に入り" },
+        ["Fav_Title"]    = new[] { "Quán yêu thích",    "Favorite Stalls",    "收藏摊位",             "즐겨찾기 매장",          "お気に入り屋台" },
+        ["Fav_Subtitle"] = new[] { "Những quán bạn đã thích",
+                                  "Stalls you've liked",
+                                  "您收藏的摊位",
+                                  "좋아하는 매장",
+                                  "お気に入りに追加した屋台" },
+        ["Fav_Empty"]    = new[] { "Chưa có quán yêu thích", "No favorites yet", "暂无收藏", "아직 즐겨찾기 없음", "お気に入りはまだありません" },
+        ["Fav_EmptyHint"]= new[] { "Bấm ❤️ trên bản đồ để thêm quán vào danh sách",
+                                  "Tap ❤️ on the map to add stalls",
+                                  "点击地图上的❤️添加摊位到收藏",
+                                  "지도에서 ❤️를 탭하여 매장을 추가하세요",
+                                  "マップで❤️をタップして屋台を追加してください" },
 
         // ── POI DETAIL ──
         ["Poi_Location"]      = new[] { "Địa điểm",         "Location",            "地点",               "위치",              "所在地" },

@@ -8,7 +8,6 @@ namespace TasteVinhKhanh.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin")]
 public class TourController : ControllerBase
 {
     private readonly ITourService _tour;
@@ -17,6 +16,7 @@ public class TourController : ControllerBase
 
     /// <summary>Lấy danh sách tours — phân trang, tìm kiếm, lọc trạng thái</summary>
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -29,6 +29,7 @@ public class TourController : ControllerBase
 
     /// <summary>Lấy chi tiết một tour kèm danh sách POI theo thứ tự</summary>
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<IActionResult> GetById(int id)
     {
         var result = await _tour.GetByIdAsync(id);
@@ -37,6 +38,7 @@ public class TourController : ControllerBase
 
     /// <summary>Tạo tour mới</summary>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] CreateTourRequest request)
     {
         try
@@ -53,6 +55,7 @@ public class TourController : ControllerBase
 
     /// <summary>Cập nhật tour (thông tin + POIs)</summary>
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateTourRequest request)
     {
         try
@@ -68,6 +71,7 @@ public class TourController : ControllerBase
 
     /// <summary>Chỉ cập nhật thứ tự POI trong tour</summary>
     [HttpPut("{id}/reorder")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Reorder(int id, [FromBody] ReorderTourRequest request)
     {
         try
@@ -83,6 +87,7 @@ public class TourController : ControllerBase
 
     /// <summary>Xóa tour (soft delete)</summary>
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
         => await _tour.DeleteAsync(id) ? NoContent() : NotFound(new { error = "Tour không tồn tại." });
 }

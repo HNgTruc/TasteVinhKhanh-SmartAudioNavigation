@@ -9,6 +9,7 @@ public class LocationService
 {
     private CancellationTokenSource? _cts;
     private readonly NotificationService _notif;
+    private readonly object _runLock = new();
 
     public event Action<Location>? LocationUpdated;
     public Location? LastLocation { get; private set; }
@@ -20,22 +21,35 @@ public class LocationService
 
     public async Task StartAsync()
     {
+        lock (_runLock)
+        {
+            if (_cts != null && !_cts.IsCancellationRequested)
+                return;
+        }
+
         // Yêu cầu quyền location
         var status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
         if (status != PermissionStatus.Granted)
             return;
 
-        _cts = new CancellationTokenSource();
+        lock (_runLock)
+        {
+            if (_cts != null && !_cts.IsCancellationRequested)
+                return;
+            _cts = new CancellationTokenSource();
+        }
+        var cts = _cts;
+        if (cts == null) return;
 
         _ = Task.Run(async () =>
         {
-            while (!_cts.Token.IsCancellationRequested)
+            while (!cts.Token.IsCancellationRequested)
             {
                 try
                 {
                     var request = new GeolocationRequest(
                         GeolocationAccuracy.High, TimeSpan.FromSeconds(10));
-                    var location = await Geolocation.GetLocationAsync(request, _cts.Token);
+                    var location = await Geolocation.GetLocationAsync(request, cts.Token);
 
                     if (location != null)
                     {
@@ -49,12 +63,19 @@ public class LocationService
 
                 try
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(5), _cts.Token);
+                    await Task.Delay(TimeSpan.FromSeconds(5), cts.Token);
                 }
                 catch (OperationCanceledException) { break; }
             }
-        }, _cts.Token);
+        }, cts.Token);
     }
 
-    public void Stop() => _cts?.Cancel();
+    public void Stop()
+    {
+        lock (_runLock)
+        {
+            _cts?.Cancel();
+            _cts = null;
+        }
+    }
 }

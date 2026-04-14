@@ -12,7 +12,7 @@
              BackgroundColor="#1A0A00">
 
     <ContentPage.Resources>
-        <conv:FavoriteIconConverter x:Key="FavoriteIconConverter"/>
+        <conv:FavoriteHeartConverter x:Key="FavoriteIconConverter"/>
         <conv:NullToBoolConverter x:Key="NullToBoolConverter"/>
         <conv:ImageUrlConverter x:Key="ImageUrlConverter"/>
 
@@ -378,7 +378,7 @@
                     <GradientStop Color="#1A0A00" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+            <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,10,0,24">
 
                 <!-- Home -->
                 <StackLayout Grid.Column="0" Spacing="4"
@@ -406,7 +406,7 @@
                            HorizontalOptions="Center"/>
                 </StackLayout>
 
-                <!-- Audio -->
+                <!-- Audio — center FAB -->
                 <Grid Grid.Column="2" HorizontalOptions="Center">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToAudioCommand}"/>
@@ -428,8 +428,20 @@
                     </Border>
                 </Grid>
 
-                <!-- Settings -->
+                <!-- Favorites -->
                 <StackLayout Grid.Column="3" Spacing="4"
+                             HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToFavoritesCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="❤️" FontSize="22" TextColor="#444444"
+                           HorizontalOptions="Center"/>
+                    <Label Text="{Binding TNavFavorites}" FontSize="10" TextColor="#444444"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+
+                <!-- Settings -->
+                <StackLayout Grid.Column="4" Spacing="4"
                              HorizontalOptions="Center">
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>

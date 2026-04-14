@@ -4,6 +4,9 @@
         <name>TasteVinhKhanh.MauiApp</name>
     </assembly>
     <members>
+        <member name="M:TasteVinhKhanh.MauiApp.AppShell.NotifyFavoriteChanged">
+            <summary>Call this from outside AppShell to fire the FavoriteChanged event.</summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.Converters.CountToVisibilityConverter">
             <summary>True nếu Images.Count > 0</summary>
         </member>
@@ -13,6 +16,12 @@
         <member name="T:TasteVinhKhanh.MauiApp.Converters.InverseBoolToVisibilityConverter">
             <summary>
             True nếu value là false (bool). Dùng cho IsVisible ẩn khi true.
+            </summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.Converters.FavoriteHeartConverter">
+            <summary>
+            Reads favorite state directly from Preferences and returns the heart emoji.
+            Used on MapPage cards and PoiDetailPage Favorite tab.
             </summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Converters.ImageUrlConverter">
@@ -114,12 +123,18 @@
             và phát audio. Hỗ trợ offline từ cache local.
             </summary>
         </member>
-        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.Stop">
+        <member name="E:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.PlaybackPositionChanged">
             <summary>
-            Dừng audio đang phát ngay lập tức.
+            Fire định kỳ khi audio đang phát: (currentPosition seconds, totalDuration seconds).
             </summary>
         </member>
-        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.PlayAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript,System.Threading.CancellationToken)">
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.Stop">
+            <summary>
+            Dừng timer, audio, và dispose player.
+            Trả về vị trí đã phát được (tính bằng giây) để có thể resume.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.PlayAudioAsync(TasteVinhKhanh.MauiApp.Data.LocalAudioScript,System.Threading.CancellationToken,System.Nullable{System.TimeSpan})">
             <summary>
             Đảm bảo audio đã tải về local, rồi phát.
             Priority: local file → download from protected endpoint → TTS fallback.
@@ -130,6 +145,21 @@
             Tải audio từ protected endpoint về thư mục app.
             Dùng device token để xác thực.
             BaseAddress đã được set trong MauiProgram.cs qua DI.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.Pause">
+            <summary>
+            Tạm dừng audio nhưng GIỮ NGUYÊN player để có thể resume đúng vị trí.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.GetCurrentPosition">
+            <summary>
+            Trả về vị trí hiện tại của audio đang phát.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.Resume">
+            <summary>
+            Tiếp tục phát từ vị trí đã tạm dừng.
             </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.AudioPlayerService.RegisterDeviceAsync">
@@ -143,6 +173,17 @@
             <summary>
             Tính khoảng cách Haversine, phát hiện POI trong tầm,
             kích hoạt NarrationEngine khi người dùng đến gần.
+            </summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.Services.GeofenceEngine._geofenceBlocked">
+            <summary>
+            True = geofence đang bị chặn (user đang nghe thủ công từ AudioPage).
+            Set true khi bắt đầu phát thủ công, false khi phát xong hoặc dừng.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.GeofenceEngine.ResetSessionAutoplay">
+            <summary>
+            Reset danh sách đã auto-play (nếu muốn mở lại theo phiên mới).
             </summary>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.Services.GeofenceEngine.HaversineMeters(System.Double,System.Double,System.Double,System.Double)">
@@ -166,7 +207,13 @@
             trong AndroidManifest.xml và MainActivity.
             </summary>
         </member>
-        <member name="M:TasteVinhKhanh.MauiApp.Services.NarrationEngine.PlayAsync(TasteVinhKhanh.MauiApp.Data.LocalPoi,System.Double,Microsoft.Maui.Devices.Sensors.Location,System.String)">
+        <member name="E:TasteVinhKhanh.MauiApp.Services.NarrationEngine.PlaybackPositionChanged">
+            <summary>
+            Fire định kỳ khi audio đang phát: (currentPosition seconds, totalDuration seconds).
+            Duration lấy trực tiếp từ metadata file audio.
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.NarrationEngine.PlayAsync(TasteVinhKhanh.MauiApp.Data.LocalPoi,System.Double,Microsoft.Maui.Devices.Sensors.Location,System.String,System.Nullable{System.TimeSpan})">
             <summary>
             Phát audio cho POI — priority:
             1. Audio file đã tải local → phát ngay (offline OK)
@@ -179,6 +226,17 @@
             Dừng audio đang phát ngay lập tức (TTS hoặc file).
             </summary>
         </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.NarrationEngine.Pause">
+            <summary>
+            Tạm dừng audio — GIỮ player để Resume đúng vị trí.
+            Trả về vị trí đã phát được (để hiển thị progress).
+            </summary>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.Services.NarrationEngine.Resume">
+            <summary>
+            Tiếp tục phát từ vị trí đã Pause.
+            </summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.Services.NotificationService">
             <summary>
             Gửi local notification khi người dùng đến gần 1 POI.
@@ -187,7 +245,7 @@
         <member name="T:TasteVinhKhanh.MauiApp.Services.SyncService">
             <inheritdoc/>
         </member>
-        <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.SyncPoisAsync">
+        <member name="M:TasteVinhKhanh.MauiApp.Services.SyncService.SyncPoisAsync(System.Boolean)">
             <summary>
             Gọi GET /api/sync từ server về.
             Lưu vào SQLite local để app chạy offline.
@@ -215,6 +273,8 @@
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.Services.SyncService._lastSyncAt"/>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
@@ -273,14 +333,28 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.TNavAudio">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._tNavAudio"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.TNavFavorites">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._tNavFavorites"/>
+        </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.TNavSettings">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel._tNavSettings"/>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.OnIsPlayingChanged(System.Boolean)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.IsPlaying"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.IsPlaying"/> is changed.</remarks>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.playPauseCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPauseCommand"/>.</summary>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPauseCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.PlayPause"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.stopCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.StopCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.StopCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.Stop"/>.</summary>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.goToHomeCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToHomeCommand"/>.</summary>
@@ -306,7 +380,111 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToSettingsCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToSettings"/>.</summary>
         </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.goToFavoritesCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToFavoritesCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToFavoritesCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.AudioViewModel.GoToFavorites"/>.</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.ToggleFavorite(System.Int32)">
+            <summary>
+            Remove a POI from favorites (called from the heart button in this list).
+            </summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.FavoritePois">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._favoritePois"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.FavoriteCountLabel">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._favoriteCountLabel"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.IsLoading">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._isLoading"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.HasFavorites">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._hasFavorites"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.THeader">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tHeader"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TTitle">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tTitle"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TSubtitle">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tSubtitle"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TEmpty">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tEmpty"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TEmptyHint">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tEmptyHint"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TNavHome">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tNavHome"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TNavMap">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tNavMap"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TNavAudio">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tNavAudio"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.TNavSettings">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel._tNavSettings"/>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.initCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.InitCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.InitCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.InitAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.toggleFavoriteCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.ToggleFavoriteCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.ToggleFavoriteCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.ToggleFavorite(System.Int32)"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.goToDetailCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToDetailCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToDetailCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToDetail(System.Int32)"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.goToHomeCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToHomeCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToHomeCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToHome"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.goToMapCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToMapCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToMapCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToMap"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.goToAudioCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToAudioCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToAudioCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToAudio"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.goToSettingsCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToSettingsCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToSettingsCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.FavoritesViewModel.GoToSettings"/>.</summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
@@ -351,6 +529,12 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TAudioSub">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._tAudioSub"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TTour">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._tTour"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TTourSub">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._tTourSub"/>
+        </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TNavHome">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._tNavHome"/>
         </member>
@@ -359,6 +543,9 @@
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TNavAudio">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._tNavAudio"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TNavFavorites">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._tNavFavorites"/>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.TNavSettings">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel._tNavSettings"/>
@@ -393,13 +580,26 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToAudioCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToAudio"/>.</summary>
         </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToToursCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToToursCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToToursCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToTours"/>.</summary>
+        </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToSettingsCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToSettingsCommand"/>.</summary>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToSettingsCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToSettings"/>.</summary>
         </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.goToFavoritesCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToFavoritesCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToFavoritesCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToFavorites"/>.</summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel">
+            <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
@@ -444,6 +644,9 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.NearestPoiId">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._nearestPoiId"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.IsInitialized">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._isInitialized"/>
+        </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.THeader">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._tHeader"/>
         </member>
@@ -479,6 +682,9 @@
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.TNavAudio">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._tNavAudio"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.TNavFavorites">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._tNavFavorites"/>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.TNavSettings">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel._tNavSettings"/>
@@ -525,7 +731,14 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToSettingsCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToSettings"/>.</summary>
         </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.goToFavoritesCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToFavoritesCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToFavoritesCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel.GoToFavorites"/>.</summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel">
+            <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
@@ -543,6 +756,12 @@
             Đổi ngôn ngữ AUDIO (cho chip trong POI tab).
             KHÔNG thay đổi ngôn ngữ app.
             </summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.IsFavoritePoi">
+            <summary>True = đang trong danh sách yêu thích. Dùng cho binding trên trang POI Detail.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.IsFavoriteActive">
+            <summary>True khi POI đang được yêu thích — dùng để bật hiệu ứng cam trên tab Yêu thích.</summary>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._poiId"/>
@@ -610,6 +829,9 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNavAudio">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNavAudio"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNavFavorites">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNavFavorites"/>
+        </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TNavSettings">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tNavSettings"/>
         </member>
@@ -642,6 +864,11 @@
             <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentLangCode"/> just changed.</summary>
             <param name="value">The new property value that was set.</param>
             <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentLangCode"/> is changed.</remarks>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnIsPlayingNarrationChanged(System.Boolean)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.IsPlayingNarration"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.IsPlayingNarration"/> is changed.</remarks>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.previousImageCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PreviousImageCommand"/>.</summary>
@@ -677,7 +904,7 @@
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.ToggleFavoriteCommand"/>.</summary>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.ToggleFavoriteCommand">
-            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.ToggleFavoriteAsync"/>.</summary>
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.ToggleFavorite"/>.</summary>
         </member>
         <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToHomeCommand">
             <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToHomeCommand"/>.</summary>
@@ -703,7 +930,14 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToSettingsCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToSettings"/>.</summary>
         </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToFavoritesCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToFavoritesCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToFavoritesCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToFavorites"/>.</summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel">
+            <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
@@ -789,6 +1023,9 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.TNavAudio">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel._tNavAudio"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.TNavFavorites">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel._tNavFavorites"/>
+        </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.TNavSettings">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel._tNavSettings"/>
         </member>
@@ -836,6 +1073,60 @@
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToSettingsCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToSettings"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.goToFavoritesCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToFavoritesCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToFavoritesCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel.GoToFavorites"/>.</summary>
+        </member>
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.Tours">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._tours"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.IsLoading">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._isLoading"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.StatusMessage">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._statusMessage"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.HasStatus">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._hasStatus"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.IsInitialized">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._isInitialized"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.THeader">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._tHeader"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.TSubtitle">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._tSubtitle"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.TEmpty">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel._tEmpty"/>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.initCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.InitCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.InitCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.InitAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.goBackCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.GoBackCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.GoBackCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.GoBack"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.selectTourCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.SelectTourCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.SelectTourCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.ToursViewModel.SelectTour(System.Int32)"/>.</summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.Resource">
             <summary>
@@ -1022,8 +1313,38 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TNavAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TNavAudio" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TNavFavorites">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TNavFavorites" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TNavSettings">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TNavSettings" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.FavoritePois">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "FavoritePois" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.FavoriteCountLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "FavoriteCountLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasFavorites">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasFavorites" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.THeader">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "THeader" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TSubtitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TSubtitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TEmpty">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TEmpty" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TEmptyHint">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TEmptyHint" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TopPois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TopPois" generated properties.</summary>
@@ -1036,9 +1357,6 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TTitleLine2">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TTitleLine2" generated properties.</summary>
-        </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TSubtitle">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TSubtitle" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TStreetEats">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TStreetEats" generated properties.</summary>
@@ -1061,6 +1379,12 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TAudioSub">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TAudioSub" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TTour">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TTour" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TTourSub">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TTourSub" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Pois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Pois" generated properties.</summary>
         </member>
@@ -1076,9 +1400,6 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SyncDetail">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SyncDetail" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsLoading">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsLoading" generated properties.</summary>
-        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PoiCountLabel">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PoiCountLabel" generated properties.</summary>
         </member>
@@ -1088,8 +1409,8 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NearestPoiId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NearestPoiId" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.THeader">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "THeader" generated properties.</summary>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsInitialized">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsInitialized" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TPoiListTitle">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TPoiListTitle" generated properties.</summary>
@@ -1250,6 +1571,12 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TVersionSub">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TVersionSub" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Tours">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Tours" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasStatus">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasStatus" generated properties.</summary>
+        </member>
         <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
             <summary>
             A helper type providing cached, reusable <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instances
@@ -1319,8 +1646,38 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TNavAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TNavAudio" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TNavFavorites">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TNavFavorites" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TNavSettings">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TNavSettings" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.FavoritePois">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "FavoritePois" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.FavoriteCountLabel">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "FavoriteCountLabel" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasFavorites">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasFavorites" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.THeader">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "THeader" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TTitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TTitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TSubtitle">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TSubtitle" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TEmpty">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TEmpty" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TEmptyHint">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TEmptyHint" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TopPois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TopPois" generated properties.</summary>
@@ -1333,9 +1690,6 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TTitleLine2">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TTitleLine2" generated properties.</summary>
-        </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TSubtitle">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TSubtitle" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TStreetEats">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TStreetEats" generated properties.</summary>
@@ -1358,6 +1712,12 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TAudioSub">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TAudioSub" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TTour">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TTour" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TTourSub">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TTourSub" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Pois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Pois" generated properties.</summary>
         </member>
@@ -1373,9 +1733,6 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SyncDetail">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SyncDetail" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsLoading">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsLoading" generated properties.</summary>
-        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PoiCountLabel">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PoiCountLabel" generated properties.</summary>
         </member>
@@ -1385,8 +1742,8 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NearestPoiId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NearestPoiId" generated properties.</summary>
         </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.THeader">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "THeader" generated properties.</summary>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsInitialized">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsInitialized" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TPoiListTitle">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TPoiListTitle" generated properties.</summary>
@@ -1546,6 +1903,12 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TVersionSub">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TVersionSub" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Tours">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Tours" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasStatus">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasStatus" generated properties.</summary>
         </member>
     </members>
 </doc>

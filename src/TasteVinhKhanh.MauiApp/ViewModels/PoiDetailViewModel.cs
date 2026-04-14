@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Storage;
 using TasteVinhKhanh.MauiApp.Data;
 using TasteVinhKhanh.MauiApp.Services;
 
@@ -40,6 +41,7 @@ public partial class PoiDetailViewModel : ObservableObject
     private readonly NarrationEngine _narration;
     private readonly LocationService _location;
     private readonly LocalizationService _i18n;
+    private readonly GeofenceEngine _geofence;
 
     [ObservableProperty] private int _poiId;
     [ObservableProperty] private LocalPoi? _poi;
@@ -65,6 +67,7 @@ public partial class PoiDetailViewModel : ObservableObject
     [ObservableProperty] private string _tNavHome = "";
     [ObservableProperty] private string _tNavMap = "";
     [ObservableProperty] private string _tNavAudio = "";
+    [ObservableProperty] private string _tNavFavorites = "";
     [ObservableProperty] private string _tNavSettings = "";
 
     // ── Language display ──
@@ -87,12 +90,13 @@ public partial class PoiDetailViewModel : ObservableObject
     public bool IsTabFavorite  => SelectedTabIndex == 2;
 
     public PoiDetailViewModel(AppDatabase db, NarrationEngine narration,
-        LocationService location, LocalizationService i18n)
+        LocationService location, LocalizationService i18n, GeofenceEngine geofence)
     {
         _db = db;
         _narration = narration;
         _location = location;
         _i18n = i18n;
+        _geofence = geofence;
 
         // Cập nhật hiển thị ngôn ngữ khi audio bắt đầu phát
         _narration.NarrationStartedWithLang += langCode => {
@@ -142,6 +146,7 @@ public partial class PoiDetailViewModel : ObservableObject
         TNavHome = _i18n.T("Nav_Home");
         TNavMap = _i18n.T("Nav_Map");
         TNavAudio = _i18n.T("Nav_Audio");
+        TNavFavorites = _i18n.T("Nav_Favorites");
         TNavSettings = _i18n.T("Nav_Settings");
     }
 
@@ -256,10 +261,42 @@ public partial class PoiDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async Task ToggleFavoriteAsync()
+    public void ToggleFavorite()
     {
-        await Task.CompletedTask;
+        if (Poi == null) return;
+        var key = "favorite_pois";
+        var stored = Preferences.Get(key, "");
+        var ids = string.IsNullOrEmpty(stored)
+            ? new HashSet<int>()
+            : new HashSet<int>(stored.Split(',').Select(int.Parse));
+
+        if (ids.Contains(Poi.Id)) ids.Remove(Poi.Id);
+        else ids.Add(Poi.Id);
+
+        Preferences.Set(key, string.Join(",", ids));
+
+        // Notify FavoriteIconConverter (static) so MapPage also refreshes
+        AppShell.NotifyFavoriteChanged();
+
+        OnPropertyChanged(nameof(IsFavoritePoi));
+        OnPropertyChanged(nameof(IsFavoriteActive));
     }
+
+    /// <summary>True = đang trong danh sách yêu thích. Dùng cho binding trên trang POI Detail.</summary>
+    public bool IsFavoritePoi
+    {
+        get
+        {
+            var key = "favorite_pois";
+            var stored = Preferences.Get(key, "");
+            if (string.IsNullOrEmpty(stored)) return false;
+            var ids = new HashSet<int>(stored.Split(',').Select(int.Parse));
+            return Poi != null && ids.Contains(Poi.Id);
+        }
+    }
+
+    /// <summary>True khi POI đang được yêu thích — dùng để bật hiệu ứng cam trên tab Yêu thích.</summary>
+    public bool IsFavoriteActive => IsFavoritePoi;
 
     [RelayCommand]
     public void GoToHome() => Shell.Current.GoToAsync("//main");
@@ -272,4 +309,12 @@ public partial class PoiDetailViewModel : ObservableObject
 
     [RelayCommand]
     public void GoToSettings() => Shell.Current.GoToAsync("//settings");
+
+    [RelayCommand]
+    public void GoToFavorites() => Shell.Current.GoToAsync("//favorites");
+
+    partial void OnIsPlayingNarrationChanged(bool value)
+    {
+        _geofence.SetGeofenceBlocked(value);
+    }
 }

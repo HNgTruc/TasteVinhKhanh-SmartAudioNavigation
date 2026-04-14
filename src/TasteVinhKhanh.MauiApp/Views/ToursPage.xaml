@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
+             xmlns:dto="clr-namespace:TasteVinhKhanh.Shared.DTOs;assembly=TasteVinhKhanh.Shared"
+             x:Class="TasteVinhKhanh.MauiApp.Views.ToursPage"
+             x:Name="ToursPageRoot"
+             x:DataType="vm:ToursViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#1A0A00">
+
+    <Grid RowDefinitions="Auto,*">
+        <Grid Grid.Row="0" Padding="20,18,20,12" ColumnDefinitions="Auto,*">
+            <Border BackgroundColor="#1E1E1E"
+                    StrokeShape="RoundRectangle 14"
+                    Stroke="#333333"
+                    WidthRequest="44"
+                    HeightRequest="44">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding GoBackCommand}"/>
+                </Border.GestureRecognizers>
+                <Label Text="←"
+                       FontSize="22"
+                       TextColor="#FFFFFF"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Border>
+            <StackLayout Grid.Column="1" Spacing="3" Margin="12,0,0,0" VerticalOptions="Center">
+                <Label Text="{Binding THeader}" FontSize="24" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                <Label Text="{Binding TSubtitle}" FontSize="12" TextColor="#888888"/>
+            </StackLayout>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <CollectionView ItemsSource="{Binding Tours}" Margin="16,0,16,20" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dto:TourListItemDto">
+                        <Border Margin="0,0,0,10"
+                                BackgroundColor="#161616"
+                                Stroke="#252525"
+                                StrokeShape="RoundRectangle 16"
+                                Padding="14,12">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={x:Reference ToursPageRoot}, Path=BindingContext.SelectTourCommand}"
+                                                      CommandParameter="{Binding Id}"/>
+                            </Border.GestureRecognizers>
+                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" TextColor="#FFFFFF"/>
+                                <Label Grid.Column="1" Text="🧭" FontSize="20" Opacity="0.8"/>
+                                <Label Grid.Row="1"
+                                       Text="{Binding Description}"
+                                       FontSize="12"
+                                       TextColor="#888888"
+                                       MaxLines="2"
+                                       LineBreakMode="TailTruncation"/>
+                                <Border Grid.Row="1" Grid.Column="1"
+                                        BackgroundColor="#FF6B3520"
+                                        Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 10"
+                                        Padding="8,4"
+                                        VerticalOptions="End">
+                                    <Label Text="{Binding PoiCount, StringFormat='{}{0} stops'}"
+                                           FontSize="11"
+                                           FontAttributes="Bold"
+                                           TextColor="#FF6B35"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="{Binding StatusMessage}"
+                   IsVisible="{Binding HasStatus}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="#999999"/>
+        </Grid>
+    </Grid>
+</ContentPage>

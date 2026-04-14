@@ -61,18 +61,22 @@
             </Border>
 
             <!-- CONTROLS -->
-            <Grid Padding="40,32,40,0" ColumnDefinitions="*,Auto,*">
+            <Grid Padding="28,28,28,0" ColumnDefinitions="*,Auto,*" VerticalOptions="Center">
                 <Border Grid.Column="0" BackgroundColor="#1E1E1E"
-                        StrokeShape="RoundRectangle 20" Stroke="#333333"
-                        Padding="16" WidthRequest="52" HeightRequest="52"
-                        HorizontalOptions="Center">
-                    <Label Text="⏮" FontSize="20" TextColor="#888888"
+                        StrokeShape="RoundRectangle 16" Stroke="#333333"
+                        WidthRequest="52" HeightRequest="52"
+                        HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="⏹" FontSize="18" TextColor="#B5B5B5"
                            HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding StopCommand}"/>
+                    </Border.GestureRecognizers>
                 </Border>
 
                 <!-- Play/Pause main button -->
                 <Border Grid.Column="1" StrokeShape="RoundRectangle 40"
-                        Stroke="Transparent" WidthRequest="72" HeightRequest="72">
+                        Stroke="#FF6B3540" WidthRequest="78" HeightRequest="78"
+                        VerticalOptions="Center" Margin="10,0">
                     <Border.Background>
                         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                             <GradientStop Color="#FF6B35" Offset="0"/>
@@ -87,19 +91,19 @@
                 </Border>
 
                 <Border Grid.Column="2" BackgroundColor="#1E1E1E"
-                        StrokeShape="RoundRectangle 20" Stroke="#333333"
-                        Padding="16" WidthRequest="52" HeightRequest="52"
-                        HorizontalOptions="Center">
-                    <Label Text="⏭" FontSize="20" TextColor="#888888"
+                        StrokeShape="RoundRectangle 16" Stroke="#333333"
+                        WidthRequest="52" HeightRequest="52"
+                        HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="🎧" FontSize="18" TextColor="#B5B5B5"
                            HorizontalOptions="Center" VerticalOptions="Center"/>
                 </Border>
             </Grid>
 
             <!-- Speed + Volume -->
-            <Grid Padding="40,24,40,0" ColumnDefinitions="*,*">
+            <Grid Padding="28,20,28,0" ColumnDefinitions="*,*" ColumnSpacing="10">
                 <Border Grid.Column="0" BackgroundColor="#1E1E1E"
                         StrokeShape="RoundRectangle 12" Stroke="#333333"
-                        Padding="16,10" HorizontalOptions="Start">
+                        Padding="12,10" HorizontalOptions="Fill">
                     <Label FontSize="13" TextColor="#AAAAAA">
                         <Label.FormattedText>
                             <FormattedString>
@@ -112,7 +116,7 @@
                 </Border>
                 <Border Grid.Column="1" BackgroundColor="#1E1E1E"
                         StrokeShape="RoundRectangle 12" Stroke="#333333"
-                        Padding="16,10" HorizontalOptions="End">
+                        Padding="12,10" HorizontalOptions="Fill">
                     <Label FontSize="13" TextColor="#AAAAAA">
                         <Label.FormattedText>
                             <FormattedString>
@@ -135,7 +139,7 @@
                     <GradientStop Color="#0D0D0D" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid ColumnDefinitions="*,*,*,*" Padding="0,10,0,24">
+            <Grid ColumnDefinitions="*,*,*,*,*" Padding="0,10,0,24">
                 <StackLayout Grid.Column="0" Spacing="4" HorizontalOptions="Center">
                     <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToHomeCommand}"/>
@@ -166,6 +170,13 @@
                 </Grid>
                 <StackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
                     <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoToFavoritesCommand}"/>
+                    </StackLayout.GestureRecognizers>
+                    <Label Text="❤️" FontSize="22" TextColor="#444444" HorizontalOptions="Center"/>
+                    <Label Text="{Binding TNavFavorites}" FontSize="10" TextColor="#444444" HorizontalOptions="Center"/>
+                </StackLayout>
+                <StackLayout Grid.Column="4" Spacing="4" HorizontalOptions="Center">
+                    <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding GoToSettingsCommand}"/>
                     </StackLayout.GestureRecognizers>
                     <Label Text="⚙" FontSize="24" TextColor="#444444" HorizontalOptions="Center"/>
@@ -173,5 +184,6 @@
                 </StackLayout>
             </Grid>
         </Border>
+
     </Grid>
 </ContentPage>
