@@ -105,6 +105,45 @@
                     </div>
                 </div>
 
+                <div class="card">
+                    <h3 style="font-size:15px; margin-bottom:16px">🔒 Đổi mật khẩu</h3>
+                    <div id="passwordAlert" class="alert alert-error" style="display:none; margin-bottom:12px"></div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Mật khẩu hiện tại *</label>
+                            <input type="password" id="fCurrentPassword" class="form-control"
+                                   placeholder="Nhập mật khẩu hiện tại">
+                        </div>
+                    </div>
+
+                    <div id="newPasswordSection" style="display:none">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Mật khẩu mới *</label>
+                                <input type="password" id="fNewPassword" class="form-control"
+                                       placeholder="Ít nhất 8 kí tự, có số">
+                            </div>
+                            <div class="form-group">
+                                <label>Nhập lại mật khẩu mới *</label>
+                                <input type="password" id="fConfirmNewPassword" class="form-control"
+                                       placeholder="Nhập lại mật khẩu mới">
+                            </div>
+                        </div>
+                    </div>
+
+                    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px; color:var(--gray-500)">
+                        <input type="checkbox" id="togglePasswordVisibility" onchange="togglePasswordVisibility()">
+                        Hiện mật khẩu
+                    </label>
+
+                    <div style="display:flex; justify-content:flex-end; gap:8px">
+                        <button class="btn btn-outline" onclick="enablePasswordChange()" id="enableChangePasswordBtn">🔐 Đổi mật khẩu</button>
+                        <button class="btn btn-outline" onclick="resetPasswordForm()" id="resetPasswordBtn" style="display:none">↺ Khôi phục</button>
+                        <button class="btn btn-primary" onclick="changePassword()" id="changePasswordBtn" style="display:none">💾 Lưu mật khẩu mới</button>
+                    </div>
+                </div>
+
                 <!-- Thông báo thành công -->
                 <div class="card" style="border-left:4px solid var(--primary)">
                     <h4 style="font-size:14px; margin-bottom:8px">💡 Lưu ý</h4>
@@ -224,6 +263,83 @@
         btn.disabled = false;
     }
 
+    function resetPasswordForm() {
+        document.getElementById('fCurrentPassword').value = '';
+        document.getElementById('fNewPassword').value = '';
+        document.getElementById('fConfirmNewPassword').value = '';
+        document.getElementById('newPasswordSection').style.display = 'none';
+        document.getElementById('enableChangePasswordBtn').style.display = 'inline-flex';
+        document.getElementById('resetPasswordBtn').style.display = 'none';
+        document.getElementById('changePasswordBtn').style.display = 'none';
+        document.getElementById('togglePasswordVisibility').checked = false;
+        togglePasswordVisibility();
+        document.getElementById('passwordAlert').style.display = 'none';
+    }
+
+    function enablePasswordChange() {
+        document.getElementById('newPasswordSection').style.display = 'block';
+        document.getElementById('enableChangePasswordBtn').style.display = 'none';
+        document.getElementById('resetPasswordBtn').style.display = 'inline-flex';
+        document.getElementById('changePasswordBtn').style.display = 'inline-flex';
+        document.getElementById('fNewPassword').focus();
+        document.getElementById('passwordAlert').style.display = 'none';
+    }
+
+    function togglePasswordVisibility() {
+        const show = document.getElementById('togglePasswordVisibility').checked;
+        const type = show ? 'text' : 'password';
+        document.getElementById('fCurrentPassword').type = type;
+        document.getElementById('fNewPassword').type = type;
+        document.getElementById('fConfirmNewPassword').type = type;
+    }
+
+    async function changePassword() {
+        const currentPassword = document.getElementById('fCurrentPassword').value;
+        const newPassword = document.getElementById('fNewPassword').value;
+        const confirmNewPassword = document.getElementById('fConfirmNewPassword').value;
+        const alertBox = document.getElementById('passwordAlert');
+        const btn = document.getElementById('changePasswordBtn');
+
+        alertBox.style.display = 'none';
+
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
+            alertBox.textContent = 'Vui lòng nhập đầy đủ các trường mật khẩu.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        if (newPassword.length < 8 || !/\d/.test(newPassword)) {
+            alertBox.textContent = 'Mật khẩu mới phải có ít nhất 8 kí tự và chứa ít nhất 1 chữ số.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            alertBox.textContent = 'Nhập lại mật khẩu mới chưa khớp.';
+            alertBox.style.display = 'block';
+            return;
+        }
+
+        btn.textContent = 'Đang lưu...';
+        btn.disabled = true;
+
+        try {
+            await apiCall('PUT', '/api/vendor/change-password', {
+                currentPassword,
+                newPassword
+            });
+            showToast('Đổi mật khẩu thành công!');
+            resetPasswordForm();
+        } catch (e) {
+            alertBox.textContent = e.message || 'Đổi mật khẩu thất bại. Vui lòng thử lại.';
+            alertBox.style.display = 'block';
+        }
+
+        btn.textContent = '💾 Lưu mật khẩu mới';
+        btn.disabled = false;
+    }
+
+    resetPasswordForm();
     loadProfile();
     </script>
 

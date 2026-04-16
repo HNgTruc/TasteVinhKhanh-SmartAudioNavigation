@@ -101,6 +101,16 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
+[C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Views/LanguageOnboardingPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Views.LanguageOnboardingPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Views\LanguageOnboardingPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Views\LanguageOnboardingPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
 [C:/Users/dell/source/repos/TasteVinhKhanh-SmartAudioNavigation/src/TasteVinhKhanh.MauiApp/Views/MapPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = TasteVinhKhanh.MauiApp.Views.MapPage.xaml

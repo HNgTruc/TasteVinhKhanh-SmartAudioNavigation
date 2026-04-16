@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Maui.Storage;
+using System.Globalization;
 
 namespace TasteVinhKhanh.MauiApp.Services;
 
@@ -22,6 +23,20 @@ public partial class LocalizationService : ObservableObject
     {
         _instance = this;
         _currentLanguage = Preferences.Get("language", "vi");
+    }
+
+    public string GetBestSupportedSystemLanguage()
+    {
+        var lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLowerInvariant();
+        return lang switch
+        {
+            "vi" => "vi",
+            "en" => "en",
+            "zh" => "zh",
+            "ko" => "ko",
+            "ja" => "ja",
+            _ => "en"
+        };
     }
 
     public void SetLanguage(string lang)

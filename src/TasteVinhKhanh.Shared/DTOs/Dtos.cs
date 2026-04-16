@@ -325,6 +325,13 @@ public class UpdateVendorProfileRequest
     public string? Address { get; set; }
 }
 
+/// <summary>Vendor đổi mật khẩu khi đã đăng nhập</summary>
+public class VendorChangePasswordRequest
+{
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════════
 // VENDOR POI UPDATE DTOs
 // ═══════════════════════════════════════════════════════════════════════════════

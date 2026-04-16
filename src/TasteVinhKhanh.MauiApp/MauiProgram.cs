@@ -60,6 +60,7 @@ public static class MauiProgram
         builder.Services.AddTransient<MapViewModel>();
         builder.Services.AddTransient<AudioViewModel>();
         builder.Services.AddTransient<ToursViewModel>();
+        builder.Services.AddTransient<LanguageOnboardingViewModel>();
         builder.Services.AddSingleton<SettingsViewModel>();
         builder.Services.AddTransient<PoiDetailViewModel>();
         builder.Services.AddTransient<FavoritesViewModel>();
@@ -69,6 +70,7 @@ public static class MauiProgram
         builder.Services.AddTransient<MapPage>();
         builder.Services.AddTransient<AudioPage>();
         builder.Services.AddTransient<ToursPage>();
+        builder.Services.AddTransient<LanguageOnboardingPage>();
         builder.Services.AddSingleton<SettingsPage>();
         builder.Services.AddTransient<PoiDetailPage>();
         builder.Services.AddTransient<FavoritesPage>();

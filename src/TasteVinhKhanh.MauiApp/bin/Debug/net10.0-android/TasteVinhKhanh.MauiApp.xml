@@ -598,6 +598,33 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToFavoritesCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.HomeViewModel.GoToFavorites"/>.</summary>
         </member>
+        <member name="T:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.SelectedLanguage">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel._selectedLanguage"/>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.selectLanguageCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.SelectLanguageCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.SelectLanguageCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand`1"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.SelectLanguage(System.String)"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.continueCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.ContinueCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.ContinueCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.ContinueAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.useSystemLanguageCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.UseSystemLanguageCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.UseSystemLanguageCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.LanguageOnboardingViewModel.UseSystemLanguageAsync"/>.</summary>
+        </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.MapViewModel">
             <inheritdoc/>
             <inheritdoc/>
@@ -750,6 +777,8 @@
             <inheritdoc/>
             <inheritdoc/>
             <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.SafeSetAudioLang(System.String)">
             <summary>
@@ -765,6 +794,12 @@
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._poiId"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TourPoiIds">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tourPoiIds"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TourIndex">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tourIndex"/>
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.Poi">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._poi"/>
@@ -850,10 +885,32 @@
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PlayingLangCode">
             <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._playingLangCode"/>
         </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.IsTourMode">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._isTourMode"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.HasPreviousTourStop">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._hasPreviousTourStop"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.HasNextTourStop">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._hasNextTourStop"/>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TourProgressText">
+            <inheritdoc cref="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel._tourProgressText"/>
+        </member>
         <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnPoiIdChanged(System.Int32)">
             <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId"/> just changed.</summary>
             <param name="value">The new property value that was set.</param>
             <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.PoiId"/> is changed.</remarks>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnTourPoiIdsChanged(System.String)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TourPoiIds"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TourPoiIds"/> is changed.</remarks>
+        </member>
+        <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnTourIndexChanged(System.Int32)">
+            <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TourIndex"/> just changed.</summary>
+            <param name="value">The new property value that was set.</param>
+            <remarks>This method is invoked right after the value of <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.TourIndex"/> is changed.</remarks>
         </member>
         <member name="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.OnCurrentImageIndexChanged(System.Int32)">
             <summary>Executes the logic for when <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.CurrentImageIndex"/> just changed.</summary>
@@ -935,6 +992,18 @@
         </member>
         <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToFavoritesCommand">
             <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToFavorites"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToPreviousTourStopCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToPreviousTourStopCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToPreviousTourStopCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToPreviousTourStopAsync"/>.</summary>
+        </member>
+        <member name="F:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.goToNextTourStopCommand">
+            <summary>The backing field for <see cref="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToNextTourStopCommand"/>.</summary>
+        </member>
+        <member name="P:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToNextTourStopCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:TasteVinhKhanh.MauiApp.ViewModels.PoiDetailViewModel.GoToNextTourStopAsync"/>.</summary>
         </member>
         <member name="T:TasteVinhKhanh.MauiApp.ViewModels.SettingsViewModel">
             <inheritdoc/>
@@ -1385,6 +1454,9 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TTourSub">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TTourSub" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedLanguage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedLanguage" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Pois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Pois" generated properties.</summary>
         </member>
@@ -1438,6 +1510,12 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PoiId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PoiId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TourPoiIds">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TourPoiIds" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TourIndex">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TourIndex" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.Poi">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "Poi" generated properties.</summary>
@@ -1508,6 +1586,18 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.PlayingLangCode">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "PlayingLangCode" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsTourMode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsTourMode" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasPreviousTourStop">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasPreviousTourStop" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasNextTourStop">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasNextTourStop" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TourProgressText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TourProgressText" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.AutoPlayAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>
         </member>
@@ -1516,9 +1606,6 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TextSize">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TextSize" generated properties.</summary>
-        </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.SelectedLanguage">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "SelectedLanguage" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TLanguage">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TLanguage" generated properties.</summary>
@@ -1718,6 +1805,9 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TTourSub">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TTourSub" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedLanguage">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedLanguage" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Pois">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Pois" generated properties.</summary>
         </member>
@@ -1771,6 +1861,12 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PoiId">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PoiId" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TourPoiIds">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TourPoiIds" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TourIndex">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TourIndex" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.Poi">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "Poi" generated properties.</summary>
@@ -1841,6 +1937,18 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.PlayingLangCode">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "PlayingLangCode" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsTourMode">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsTourMode" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasPreviousTourStop">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasPreviousTourStop" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasNextTourStop">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasNextTourStop" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TourProgressText">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TourProgressText" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.AutoPlayAudio">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "AutoPlayAudio" generated properties.</summary>
         </member>
@@ -1849,9 +1957,6 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TextSize">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TextSize" generated properties.</summary>
-        </member>
-        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.SelectedLanguage">
-            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "SelectedLanguage" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TLanguage">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TLanguage" generated properties.</summary>

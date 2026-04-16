@@ -76,8 +76,15 @@ public partial class ToursViewModel : ObservableObject
                 return;
             }
 
-            var firstPoiId = detail.Pois.OrderBy(p => p.StopOrder).First().PoiId;
-            await Shell.Current.GoToAsync($"PoiDetailPage?poiId={firstPoiId}");
+            var orderedPoiIds = detail.Pois
+                .OrderBy(p => p.StopOrder)
+                .Select(p => p.PoiId)
+                .ToList();
+
+            var firstPoiId = orderedPoiIds.First();
+            var poiIdsCsv = string.Join(",", orderedPoiIds);
+            await Shell.Current.GoToAsync(
+                $"PoiDetailPage?poiId={firstPoiId}&tourPoiIds={System.Uri.EscapeDataString(poiIdsCsv)}&tourIndex=0");
         }
         catch (Exception ex)
         {

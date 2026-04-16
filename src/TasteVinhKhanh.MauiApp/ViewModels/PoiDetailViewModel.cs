@@ -35,6 +35,8 @@ public static class LanguageNames
 }
 
 [QueryProperty(nameof(PoiId), "poiId")]
+[QueryProperty(nameof(TourPoiIds), "tourPoiIds")]
+[QueryProperty(nameof(TourIndex), "tourIndex")]
 public partial class PoiDetailViewModel : ObservableObject
 {
     private readonly AppDatabase _db;
@@ -44,6 +46,8 @@ public partial class PoiDetailViewModel : ObservableObject
     private readonly GeofenceEngine _geofence;
 
     [ObservableProperty] private int _poiId;
+    [ObservableProperty] private string? _tourPoiIds;
+    [ObservableProperty] private int _tourIndex;
     [ObservableProperty] private LocalPoi? _poi;
     [ObservableProperty] private List<LocalAudioScript> _scripts = new();
     [ObservableProperty] private List<LocalRestaurantImage> _images = new();
@@ -77,6 +81,10 @@ public partial class PoiDetailViewModel : ObservableObject
     // ── Playing state ──
     [ObservableProperty] private bool _isPlayingNarration = false;
     [ObservableProperty] private string? _playingLangCode;
+    [ObservableProperty] private bool _isTourMode = false;
+    [ObservableProperty] private bool _hasPreviousTourStop = false;
+    [ObservableProperty] private bool _hasNextTourStop = false;
+    [ObservableProperty] private string _tourProgressText = "";
 
     public int ImagesCount => Images.Count;
 
@@ -174,6 +182,16 @@ public partial class PoiDetailViewModel : ObservableObject
 
     partial void OnPoiIdChanged(int value) => _ = LoadAsync(value);
 
+    partial void OnTourPoiIdsChanged(string? value)
+    {
+        RecomputeTourState();
+    }
+
+    partial void OnTourIndexChanged(int value)
+    {
+        RecomputeTourState();
+    }
+
     partial void OnCurrentImageIndexChanged(int value)
     {
         OnPropertyChanged(nameof(CurrentImage));
@@ -190,6 +208,33 @@ public partial class PoiDetailViewModel : ObservableObject
         Dots = Enumerable.Range(0, Images.Count)
             .Select(i => new ImageDotItem { Index = i, IsActive = i == CurrentImageIndex })
             .ToList();
+    }
+
+    private List<int> ParseTourPoiIds()
+    {
+        if (string.IsNullOrWhiteSpace(TourPoiIds)) return new List<int>();
+
+        return TourPoiIds
+            .Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => int.TryParse(s, out var id) ? id : 0)
+            .Where(id => id > 0)
+            .ToList();
+    }
+
+    private void RecomputeTourState()
+    {
+        var ids = ParseTourPoiIds();
+        var inRange = ids.Count > 0 && TourIndex >= 0 && TourIndex < ids.Count;
+
+        IsTourMode = inRange;
+        HasPreviousTourStop = inRange && TourIndex > 0;
+        HasNextTourStop = inRange && TourIndex < ids.Count - 1;
+        TourProgressText = inRange ? $"Điểm dừng {TourIndex + 1}/{ids.Count}" : string.Empty;
+
+        OnPropertyChanged(nameof(IsTourMode));
+        OnPropertyChanged(nameof(HasPreviousTourStop));
+        OnPropertyChanged(nameof(HasNextTourStop));
+        OnPropertyChanged(nameof(TourProgressText));
     }
 
     async Task LoadAsync(int id)
@@ -312,6 +357,32 @@ public partial class PoiDetailViewModel : ObservableObject
 
     [RelayCommand]
     public void GoToFavorites() => Shell.Current.GoToAsync("//favorites");
+
+    [RelayCommand]
+    public async Task GoToPreviousTourStopAsync()
+    {
+        var ids = ParseTourPoiIds();
+        if (!IsTourMode || TourIndex <= 0 || TourIndex >= ids.Count) return;
+
+        var nextIndex = TourIndex - 1;
+        var nextPoiId = ids[nextIndex];
+        var poiIdsCsv = string.Join(",", ids);
+        await Shell.Current.GoToAsync(
+            $"PoiDetailPage?poiId={nextPoiId}&tourPoiIds={System.Uri.EscapeDataString(poiIdsCsv)}&tourIndex={nextIndex}");
+    }
+
+    [RelayCommand]
+    public async Task GoToNextTourStopAsync()
+    {
+        var ids = ParseTourPoiIds();
+        if (!IsTourMode || TourIndex < 0 || TourIndex >= ids.Count - 1) return;
+
+        var nextIndex = TourIndex + 1;
+        var nextPoiId = ids[nextIndex];
+        var poiIdsCsv = string.Join(",", ids);
+        await Shell.Current.GoToAsync(
+            $"PoiDetailPage?poiId={nextPoiId}&tourPoiIds={System.Uri.EscapeDataString(poiIdsCsv)}&tourIndex={nextIndex}");
+    }
 
     partial void OnIsPlayingNarrationChanged(bool value)
     {

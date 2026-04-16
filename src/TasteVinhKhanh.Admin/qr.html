@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh Admin — Quản lý QR</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-utensils"/></svg> TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-bar-chart-2"/></svg></span> Dashboard
+                </a>
+                <a href="poi.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map-pin"/></svg></span> Điểm thuyết minh
+                </a>
+                <a href="audio.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clipboard-list"/></svg></span> Quản lý Audio
+                </a>
+                <a href="tour.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-map"/></svg></span> Quản lý Tours
+                </a>
+                <a href="vendors.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-store"/></svg></span> Vendors
+                    <span class="nav-badge" id="vendorBadge" style="display:none;margin-left:auto">0</span>
+                </a>
+                <a href="pending-updates.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clock"/></svg></span> Duyệt cập nhật
+                    <span class="nav-badge nav-badge-warning" id="pendingBadge" style="display:none;margin-left:auto">0</span>
+                </a>
+                <a href="qr.html" class="active">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-smartphone"/></svg></span> Quản lý QR
+                </a>
+                <a href="usage-history.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clipboard-list"/></svg></span> Lịch sử SD
+                </a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Quản trị viên</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center" onclick="logout()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-log-out"/></svg> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="topbar">
+                <h2><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-smartphone"/></svg> Quản lý QR</h2>
+            </div>
+
+            <div class="content">
+                <div class="card">
+                    <div class="table-header">
+                        <h3>QR mở app / tải APK</h3>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Deep link mở app</label>
+                        <input id="deepLinkInput" class="form-control" placeholder="tastevinhkhanh://open">
+                    </div>
+                    <div class="form-group">
+                        <label>Landing URL (URL gắn vào QR)</label>
+                        <input id="landingUrlInput" class="form-control" placeholder="http://localhost:5000/qr/open">
+                    </div>
+                    <div class="form-group">
+                        <label>APK download URL</label>
+                        <input id="apkUrlInput" class="form-control" placeholder="http://localhost:5000/qr/app-latest.apk">
+                    </div>
+
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="btn btn-primary" onclick="saveQrConfig()">Lưu cấu hình</button>
+                        <button class="btn btn-outline" onclick="useCurrentHost()">Dùng host hiện tại</button>
+                        <button class="btn btn-outline" onclick="copyLanding()">Copy URL QR</button>
+                        <button class="btn btn-outline" onclick="openLanding()">Mở trang landing</button>
+                    </div>
+                    <div id="hostHint" style="margin-top:8px;font-size:12px;color:#6b7280"></div>
+                </div>
+
+                <div class="card">
+                    <div class="table-header">
+                        <h3>Tiến độ QR Management</h3>
+                    </div>
+                    <div class="empty-state" style="padding:20px 0">
+                        <p>Đã có cấu hình deep link + fallback APK. Bước tiếp theo: gắn thư viện tạo ảnh QR và thống kê lượt quét.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="table-header">
+                        <h3>Mã QR</h3>
+                    </div>
+                    <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+                        <div id="qrCanvasWrap" style="width:240px;height:240px;background:#fff;border:1px solid #ddd;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:8px">
+                            <canvas id="qrCanvas" width="220" height="220"></canvas>
+                            <img id="qrImage" alt="QR code" style="display:none;width:220px;height:220px" />
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:8px">
+                            <button class="btn btn-primary" onclick="generateQr()">Tạo QR</button>
+                            <button class="btn btn-outline" onclick="downloadQr()">Tải PNG</button>
+                            <div style="font-size:12px;color:#6b7280;max-width:340px">QR sẽ encode Landing URL ở trên. Bạn có thể in hoặc gửi cho người dùng quét trực tiếp.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script>
+    if (!requireAuth()) throw new Error('Not authenticated');
+
+    const QR_CFG_KEY = 'qr_config_v1';
+    const deepLinkEl = document.getElementById('deepLinkInput');
+    const landingUrlEl = document.getElementById('landingUrlInput');
+    const apkUrlEl = document.getElementById('apkUrlInput');
+    const qrCanvasEl = document.getElementById('qrCanvas');
+    const qrImageEl = document.getElementById('qrImage');
+    let qrFallbackUrl = '';
+    function inferApiBase() {
+        const host = window.location.hostname || 'localhost';
+        return `http://${host}:5000`;
+    }
+
+    const defaultCfg = {
+        deepLink: 'tastevinhkhanh://open',
+        landingUrl: `${inferApiBase()}/qr/open`,
+        apkUrl: `${inferApiBase()}/qr/app-latest.apk`
+    };
+
+    function loadQrConfig() {
+        const raw = localStorage.getItem(QR_CFG_KEY);
+        const cfg = raw ? { ...defaultCfg, ...JSON.parse(raw) } : { ...defaultCfg };
+        deepLinkEl.value = cfg.deepLink;
+        landingUrlEl.value = cfg.landingUrl;
+        apkUrlEl.value = cfg.apkUrl;
+        updateHostHint();
+    }
+
+    function saveQrConfig() {
+        const cfg = {
+            deepLink: deepLinkEl.value.trim(),
+            landingUrl: landingUrlEl.value.trim(),
+            apkUrl: apkUrlEl.value.trim()
+        };
+        localStorage.setItem(QR_CFG_KEY, JSON.stringify(cfg));
+        showToast('Đã lưu cấu hình QR (local demo).', 'success');
+        generateQr();
+    }
+
+    function openLanding() {
+        const url = landingUrlEl.value.trim();
+        if (!url) return showToast('Landing URL đang trống.', 'error');
+        window.open(url, '_blank', 'noopener');
+    }
+
+    async function copyLanding() {
+        const url = landingUrlEl.value.trim();
+        if (!url) return showToast('Landing URL đang trống.', 'error');
+        try {
+            await navigator.clipboard.writeText(url);
+            showToast('Đã copy URL QR.', 'success');
+        } catch {
+            showToast('Không thể copy tự động. Hãy copy thủ công.', 'error');
+        }
+    }
+
+    async function generateQr() {
+        const url = landingUrlEl.value.trim();
+        if (!url) return showToast('Landing URL đang trống.', 'error');
+
+        // Ưu tiên thư viện QR local/CDN nếu có
+        if (window.QRCode && typeof QRCode.toCanvas === 'function') {
+            try {
+                qrImageEl.style.display = 'none';
+                qrCanvasEl.style.display = 'block';
+                await QRCode.toCanvas(qrCanvasEl, url, {
+                    width: 220,
+                    margin: 1,
+                    color: { dark: '#111827', light: '#ffffff' }
+                });
+                qrFallbackUrl = '';
+                showToast('Đã tạo mã QR.', 'success');
+                return;
+            } catch {
+                // rơi xuống fallback ảnh QR service
+            }
+        }
+
+        // Fallback: tạo QR qua image API (không phụ thuộc thư viện JS trên trang)
+        qrFallbackUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}`;
+        qrCanvasEl.style.display = 'none';
+        qrImageEl.style.display = 'block';
+        qrImageEl.src = qrFallbackUrl;
+        showToast('Đã tạo mã QR (fallback).', 'success');
+    }
+
+    function downloadQr() {
+        const url = landingUrlEl.value.trim();
+        if (!url) return showToast('Landing URL đang trống.', 'error');
+
+        const a = document.createElement('a');
+        if (qrFallbackUrl) {
+            a.href = qrFallbackUrl;
+        } else {
+            a.href = qrCanvasEl.toDataURL('image/png');
+        }
+        a.download = 'tastevinhkhanh-qr.png';
+        a.click();
+    }
+
+    function useCurrentHost() {
+        const apiBase = inferApiBase();
+        landingUrlEl.value = `${apiBase}/qr/open`;
+        apkUrlEl.value = `${apiBase}/qr/app-latest.apk`;
+        saveQrConfig();
+        updateHostHint();
+    }
+
+    function updateHostHint() {
+        const hintEl = document.getElementById('hostHint');
+        const host = window.location.hostname || 'localhost';
+        if (host === 'localhost' || host === '127.0.0.1') {
+            hintEl.textContent = 'Bạn đang mở bằng localhost/127.0.0.1. Điện thoại sẽ không truy cập được. Hãy mở Admin bằng IP LAN của máy (ví dụ 192.168.x.x:5500) rồi bấm "Dùng host hiện tại".';
+            hintEl.style.color = '#b45309';
+        } else {
+            hintEl.textContent = `Host hiện tại: ${host}. QR sẽ dùng host này để điện thoại truy cập.`;
+            hintEl.style.color = '#6b7280';
+        }
+    }
+
+    loadQrConfig();
+    generateQr();
+    </script>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="icon-utensils" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></symbol>
+  <symbol id="icon-bar-chart-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="icon-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="icon-clipboard-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="11" x2="8" y2="11.01"/><line x1="12" y1="11" x2="12" y2="11.01"/><line x1="16" y1="11" x2="16" y2="11.01"/></symbol>
+  <symbol id="icon-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></symbol>
+  <symbol id="icon-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l2-4h16l2 4"/><path d="M4 7v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="icon-smartphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+  <symbol id="icon-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+</svg>
+</body>
+</html>

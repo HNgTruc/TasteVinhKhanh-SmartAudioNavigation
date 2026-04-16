@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:TasteVinhKhanh.MauiApp.ViewModels"
+             x:Class="TasteVinhKhanh.MauiApp.Views.LanguageOnboardingPage"
+             x:DataType="vm:LanguageOnboardingViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#1A0A00">
+    <ScrollView>
+        <VerticalStackLayout Padding="24,64,24,24" Spacing="18">
+            <Label Text="Choose your language"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#FFFFFF"/>
+            <Label Text="You can change this anytime in Settings."
+                   FontSize="14"
+                   TextColor="#B0B0B0"/>
+
+            <Button Text="Vietnamese (Tiếng Việt)"
+                    Command="{Binding SelectLanguageCommand}"
+                    CommandParameter="vi"
+                    BackgroundColor="{Binding SelectedLanguage, Converter={StaticResource LangButtonBgConverter}, ConverterParameter=vi}"
+                    TextColor="#FFFFFF"
+                    CornerRadius="14"
+                    HeightRequest="52"/>
+            <Button Text="English"
+                    Command="{Binding SelectLanguageCommand}"
+                    CommandParameter="en"
+                    BackgroundColor="{Binding SelectedLanguage, Converter={StaticResource LangButtonBgConverter}, ConverterParameter=en}"
+                    TextColor="#FFFFFF"
+                    CornerRadius="14"
+                    HeightRequest="52"/>
+            <Button Text="中文 (Chinese)"
+                    Command="{Binding SelectLanguageCommand}"
+                    CommandParameter="zh"
+                    BackgroundColor="{Binding SelectedLanguage, Converter={StaticResource LangButtonBgConverter}, ConverterParameter=zh}"
+                    TextColor="#FFFFFF"
+                    CornerRadius="14"
+                    HeightRequest="52"/>
+            <Button Text="한국어 (Korean)"
+                    Command="{Binding SelectLanguageCommand}"
+                    CommandParameter="ko"
+                    BackgroundColor="{Binding SelectedLanguage, Converter={StaticResource LangButtonBgConverter}, ConverterParameter=ko}"
+                    TextColor="#FFFFFF"
+                    CornerRadius="14"
+                    HeightRequest="52"/>
+            <Button Text="日本語 (Japanese)"
+                    Command="{Binding SelectLanguageCommand}"
+                    CommandParameter="ja"
+                    BackgroundColor="{Binding SelectedLanguage, Converter={StaticResource LangButtonBgConverter}, ConverterParameter=ja}"
+                    TextColor="#FFFFFF"
+                    CornerRadius="14"
+                    HeightRequest="52"/>
+
+            <Button Text="Continue"
+                    Command="{Binding ContinueCommand}"
+                    BackgroundColor="#FF6B35"
+                    TextColor="#FFFFFF"
+                    FontAttributes="Bold"
+                    CornerRadius="16"
+                    HeightRequest="54"
+                    Margin="0,6,0,0"/>
+
+            <Button Text="Use system language"
+                    Command="{Binding UseSystemLanguageCommand}"
+                    BackgroundColor="#252525"
+                    TextColor="#FF6B35"
+                    FontAttributes="Bold"
+                    CornerRadius="16"
+                    HeightRequest="54"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

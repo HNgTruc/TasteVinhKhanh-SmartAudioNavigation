@@ -104,6 +104,48 @@ public class VendorController : ControllerBase
         return Ok(new { message = "Cập nhật thông tin thành công." });
     }
 
+    /// <summary>Vendor đổi mật khẩu khi đã đăng nhập</summary>
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] VendorChangePasswordRequest req)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        var currentPassword = req.CurrentPassword?.Trim() ?? string.Empty;
+        var newPassword = req.NewPassword ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(currentPassword) || string.IsNullOrWhiteSpace(newPassword))
+            return BadRequest(new { message = "Vui lòng nhập mật khẩu hiện tại và mật khẩu mới." });
+
+        if (newPassword.Length < 8 || !newPassword.Any(char.IsDigit))
+            return BadRequest(new { message = "Mật khẩu mới phải có ít nhất 8 kí tự và chứa ít nhất 1 chữ số." });
+
+        var userManager = HttpContext.RequestServices.GetRequiredService<UserManager<AppUser>>();
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+            return NotFound(new { message = "Không tìm thấy tài khoản." });
+
+        var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        if (!result.Succeeded)
+        {
+            var msg = string.Join("; ", result.Errors
+                .Select(e => e.Description)
+                .Select(desc => desc switch
+                {
+                    var d when d.Contains("Password", StringComparison.OrdinalIgnoreCase) ||
+                               d.Contains("digit", StringComparison.OrdinalIgnoreCase) ||
+                               d.Contains("length", StringComparison.OrdinalIgnoreCase)
+                        => "Mật khẩu mới phải có ít nhất 8 kí tự và chứa ít nhất 1 chữ số.",
+                    var d when d.Contains("Incorrect password", StringComparison.OrdinalIgnoreCase)
+                        => "Mật khẩu hiện tại không đúng.",
+                    _ => desc
+                }));
+            return BadRequest(new { message = msg });
+        }
+
+        return Ok(new { message = "Đổi mật khẩu thành công." });
+    }
+
     /// <summary>Gửi yêu cầu cập nhật POI</summary>
     [HttpPost("poi/update")]
     public async Task<IActionResult> SubmitPOIUpdate([FromBody] SubmitPOIUpdateRequest req)

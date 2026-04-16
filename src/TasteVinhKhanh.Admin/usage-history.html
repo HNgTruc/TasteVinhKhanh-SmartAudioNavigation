@@ -34,6 +34,9 @@
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clock"/></svg></span> Duyệt cập nhật
                     <span class="nav-badge nav-badge-warning" id="pendingBadge" style="display:none">0</span>
                 </a>
+                <a href="qr.html">
+                    <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-smartphone"/></svg></span> Quản lý QR
+                </a>
                 <a href="usage-history.html" class="active">
                     <span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-clipboard-list"/></svg></span> Lịch sử SD
                 </a>
@@ -120,7 +123,7 @@
                 <!-- USER USAGE CHART -->
                 <div class="card usage-card usage-chart-card">
                     <div class="table-header usage-card-header">
-                        <h3><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-bar-chart-2"/></svg> Biểu đồ user sử dụng (theo Device ID)</h3>
+                        <h3><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-bar-chart-2"/></svg> Biểu đồ POI được nghe nhiều nhất</h3>
                     </div>
                     <div id="deviceChartLoading" class="loading"><div class="spinner"></div></div>
                     <div id="deviceUsageChart" class="device-usage-chart" style="display:none"></div>
@@ -252,7 +255,6 @@
         try {
             const devices = await getTopDevices(1000);
             document.getElementById('topDevicesLoading').style.display = 'none';
-            document.getElementById('deviceChartLoading').style.display = 'none';
             document.getElementById('deviceShownCount').textContent = (devices?.length ?? 0).toLocaleString();
             if (!devices || devices.length === 0) {
                 document.getElementById('topDevicesWrapper').style.display = 'block';
@@ -263,7 +265,6 @@
                         </td>
                     </tr>
                 `;
-                renderDeviceUsageChart([]);
                 return;
             }
             document.getElementById('topDevicesWrapper').style.display = 'block';
@@ -281,10 +282,8 @@
                     <td>${formatDate(d.lastPlay)}</td>
                 </tr>
             `).join('');
-            renderDeviceUsageChart(devices);
         } catch {
             document.getElementById('topDevicesLoading').style.display = 'none';
-            document.getElementById('deviceChartLoading').style.display = 'none';
             document.getElementById('topDevicesWrapper').style.display = 'block';
             document.getElementById('topDevicesBody').innerHTML = `
                 <tr>
@@ -293,35 +292,51 @@
                     </td>
                 </tr>
             `;
-            const chart = document.getElementById('deviceUsageChart');
-            chart.style.display = 'block';
-            chart.innerHTML = '<div class="device-chart-empty">Không tải được dữ liệu biểu đồ user sử dụng</div>';
         }
     }
 
-    function renderDeviceUsageChart(devices) {
+    function renderTopPoiChart(topPois) {
         const chart = document.getElementById('deviceUsageChart');
         if (!chart) return;
         chart.style.display = 'block';
 
-        if (!devices || devices.length === 0) {
-            chart.innerHTML = '<div class="device-chart-empty">Chưa có dữ liệu để vẽ biểu đồ</div>';
+        if (!topPois || topPois.length === 0) {
+            chart.innerHTML = '<div class="device-chart-empty">Chưa có dữ liệu POI để vẽ biểu đồ</div>';
             return;
         }
 
-        const maxPlays = Math.max(...devices.map(d => d.totalPlays), 1);
-        chart.innerHTML = devices.map(d => {
-            const pct = Math.max(2, Math.round((d.totalPlays / maxPlays) * 100));
-            return `
-                <div class="device-chart-row">
-                    <button type="button" class="device-chart-label" onclick='selectDevice(${JSON.stringify(d.deviceId)})'>${maskDeviceId(d.deviceId)}</button>
-                    <div class="device-chart-bar-wrap">
-                        <div class="device-chart-bar" style="width:${pct}%"></div>
-                    </div>
-                    <div class="device-chart-value">${d.totalPlays}</div>
-                </div>
-            `;
-        }).join('');
+        const maxPlays = Math.max(...topPois.map(p => p.playCount), 1);
+        chart.innerHTML = `
+            <div class="poi-column-chart">
+                ${topPois.map(p => {
+                    const name = (p.poiName || 'POI không xác định');
+                    const pct = Math.max(6, Math.round((p.playCount / maxPlays) * 100));
+                    return `
+                        <div class="poi-column-item" title="${name}: ${p.playCount} lượt nghe">
+                            <div class="poi-column-value">${p.playCount}</div>
+                            <div class="poi-column-bar-wrap">
+                                <div class="poi-column-bar" style="height:${pct}%"></div>
+                            </div>
+                            <div class="poi-column-label">${name}</div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        `;
+    }
+
+    async function loadTopPoiChart() {
+        const chartLoading = document.getElementById('deviceChartLoading');
+        const chart = document.getElementById('deviceUsageChart');
+        try {
+            const topPois = await getTopPois(20);
+            chartLoading.style.display = 'none';
+            renderTopPoiChart(topPois || []);
+        } catch {
+            chartLoading.style.display = 'none';
+            chart.style.display = 'block';
+            chart.innerHTML = '<div class="device-chart-empty">Không tải được dữ liệu biểu đồ POI</div>';
+        }
     }
 
     async function loadStats() {
@@ -452,6 +467,7 @@
         document.getElementById('deviceShownCount').textContent = '0';
         document.getElementById('deviceTotalCount').textContent = '0';
         loadTopDevices();
+        loadTopPoiChart();
         loadStats();
         const restoredPage = restoreHistoryState();
         loadHistory(restoredPage);

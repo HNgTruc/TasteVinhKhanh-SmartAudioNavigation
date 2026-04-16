@@ -727,6 +727,59 @@ table tbody td {
     padding: 10px 0;
 }
 
+.poi-column-chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+    align-items: end;
+    gap: 12px;
+    min-height: 300px;
+    max-height: 360px;
+    overflow-y: auto;
+    padding: 8px 4px 10px;
+}
+
+.poi-column-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.poi-column-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gray-700);
+    line-height: 1;
+}
+
+.poi-column-bar-wrap {
+    width: 36px;
+    height: 220px;
+    border-radius: 10px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.poi-column-bar {
+    width: 100%;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #7c3aed 0%, #4f46e5 55%, #2563eb 100%);
+    min-height: 4px;
+}
+
+.poi-column-label {
+    max-width: 76px;
+    font-size: 11px;
+    color: var(--gray-600);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ── USAGE HISTORY PAGE ─────────────────────────────────────── */
 .usage-history-page .content {
     padding-top: 18px;
@@ -852,6 +905,22 @@ table tbody td {
     .device-chart-row {
         grid-template-columns: 120px 1fr 38px;
         gap: 8px;
+    }
+
+    .poi-column-chart {
+        grid-template-columns: repeat(auto-fit, minmax(62px, 1fr));
+        gap: 10px;
+        min-height: 240px;
+    }
+
+    .poi-column-bar-wrap {
+        width: 28px;
+        height: 170px;
+    }
+
+    .poi-column-label {
+        max-width: 62px;
+        font-size: 10px;
     }
 }
 

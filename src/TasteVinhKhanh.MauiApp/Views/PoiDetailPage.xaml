@@ -116,6 +116,41 @@
                     <Label Text="{Binding Poi.ShortDescription}" FontSize="14" TextColor="#888888" LineBreakMode="WordWrap"/>
                 </StackLayout>
 
+                <!-- ĐIỀU HƯỚNG TOUR -->
+                <Border BackgroundColor="#1A1A1A"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#252525"
+                        Padding="12"
+                        IsVisible="{Binding IsTourMode}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10" VerticalOptions="Center">
+                        <Button Grid.Column="0"
+                                Text="◀ Trước"
+                                Command="{Binding GoToPreviousTourStopCommand}"
+                                IsEnabled="{Binding HasPreviousTourStop}"
+                                BackgroundColor="#252525"
+                                TextColor="#FF6B35"
+                                FontAttributes="Bold"
+                                CornerRadius="10"
+                                HeightRequest="40"/>
+                        <Label Grid.Column="1"
+                               Text="{Binding TourProgressText}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               TextColor="#CCCCCC"
+                               FontSize="13"
+                               FontAttributes="Bold"/>
+                        <Button Grid.Column="2"
+                                Text="Tiếp ▶"
+                                Command="{Binding GoToNextTourStopCommand}"
+                                IsEnabled="{Binding HasNextTourStop}"
+                                BackgroundColor="#252525"
+                                TextColor="#FF6B35"
+                                FontAttributes="Bold"
+                                CornerRadius="10"
+                                HeightRequest="40"/>
+                    </Grid>
+                </Border>
+
                 <!-- TABS CÓ THỂ CLICK -->
                 <Border BackgroundColor="#1A1A1A" StrokeShape="RoundRectangle 16" Stroke="#252525" Padding="16">
                     <Grid ColumnDefinitions="*,*,*">
