@@ -1,4 +1,5 @@
 using System.Globalization;
+using TasteVinhKhanh.MauiApp.Services;
 
 namespace TasteVinhKhanh.MauiApp.Converters;
 
@@ -21,9 +22,8 @@ public class ImageUrlConverter : IValueConverter
             return url;
         }
 
-        // Tương đối → nối base URL
-        var cleanPath = url.TrimStart('/');
-        return $"http://10.0.2.2:5000/{cleanPath}";
+        // Tương đối → nối base URL cấu hình hiện tại
+        return ApiConfig.ToAbsoluteUrl(url);
     }
 
     public object? ConvertBack(object? value, Type targetType,

@@ -1,0 +1,48 @@
+# Build results
+
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+
+# .NET
+
+_.user
+_.suo
+_.userosscache
+_.sln.docstates
+\*.rsuser
+
+# NuGet
+
+_.nupkg
+_.snupkg
+packages/
+
+# Visual Studio
+
+.vs/
+_.vsprops
+_.vssscc
+\*.DotSettings.user
+
+# Rider / IntelliJ
+
+.idea/
+
+# OS generated
+
+.DS_Store
+Thumbs.db
+
+# Logs
+
+\*.log
+
+# User-specific files
+
+_.rsuser
+bin/
+obj/
+_.pdb
+_.apk
+_.cache

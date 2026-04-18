@@ -27,17 +27,14 @@ public static class MauiProgram
         builder.Services.AddSingleton<AppDatabase>();
 
         // ── HTTP CLIENT → API ─────────────────────────────────
-        // Android emulator: 10.0.2.2 trỏ về localhost máy host
-        // iOS simulator:    localhost trỏ thẳng
-        var apiBaseUrl = DeviceInfo.Platform == DevicePlatform.Android
-            ? "http://10.0.2.2:5000/"
-            : "http://localhost:5000/";
+        // Dùng URL cấu hình chung để chạy được cả emulator, máy thật và bản APK phát hành.
+        var apiBaseUrl = ApiConfig.GetApiBaseUrl();
 
         // AddHttpClient injects HttpClient vào SyncService constructor
         builder.Services.AddHttpClient<SyncService>(client =>
         {
             client.BaseAddress = new Uri(apiBaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(10);
+            client.Timeout = TimeSpan.FromSeconds(30);
         });
 
         // AudioPlayerService cũng cần HttpClient để tải audio từ protected endpoint

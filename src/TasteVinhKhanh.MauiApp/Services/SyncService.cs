@@ -80,8 +80,8 @@ public partial class SyncService : ObservableObject
 
             SyncStatus = $"Đang gọi: {url}";
 
-            // Timeout 10 giây để không treo app
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            // Tăng timeout cho mạng di động/tunnel để giảm false-timeout khi tải POI lần đầu.
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var response = await _http.GetFromJsonAsync<SyncResponse>(url, cts.Token);
 
             if (response == null)
@@ -152,7 +152,7 @@ public partial class SyncService : ObservableObject
         {
             // Timeout — API không phản hồi
             SyncStatus = "⚠️ Server không phản hồi (timeout)";
-            var result = await BuildOfflineResult("Server không phản hồi sau 10 giây");
+            var result = await BuildOfflineResult("Server không phản hồi sau 30 giây");
             _lastSyncResult = result;
             return result;
         }

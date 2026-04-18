@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -175,8 +176,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Cho phép serve file ảnh từ wwwroot (staging images + approved images)
-app.UseStaticFiles();
+// Cho phép serve static files từ wwwroot (bao gồm APK trong /qr)
+var staticFileProvider = new FileExtensionContentTypeProvider();
+staticFileProvider.Mappings[".apk"] = "application/vnd.android.package-archive";
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = staticFileProvider
+});
 
 app.UseCors("AllowAll");
 
