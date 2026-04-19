@@ -381,6 +381,62 @@ public class VendorUpdateHistoryDto
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// VENDOR BILLING DTOs
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// <summary>Admin tạo đơn thanh toán cho vendor.</summary>
+public class CreateVendorPaymentRequest
+{
+    public int VendorId { get; set; }
+    public decimal Amount { get; set; }
+    public string ReceiverAccountNumber { get; set; } = string.Empty;
+    public string ReceiverAccountName { get; set; } = string.Empty;
+    public string ReceiverBankName { get; set; } = string.Empty;
+    public string ReceiverBankType { get; set; } = string.Empty;
+    public string? Note { get; set; }
+    public DateTime? DueDate { get; set; }
+}
+
+/// <summary>Vendor gửi thông tin chuyển khoản cho đơn đã tạo.</summary>
+public class SubmitVendorPaymentRequest
+{
+    public int PaymentId { get; set; }
+    public string BankName { get; set; } = string.Empty;
+    public string TransactionId { get; set; } = string.Empty;
+    public string? VendorNote { get; set; }
+}
+
+/// <summary>Admin cập nhật trạng thái thanh toán.</summary>
+public class UpdateVendorPaymentStatusRequest
+{
+    public string Status { get; set; } = string.Empty; // Paid | Unpaid
+    public string? AdminNote { get; set; }
+}
+
+/// <summary>Dữ liệu thanh toán dùng cho cả Admin và Vendor.</summary>
+public class VendorPaymentDto
+{
+    public int Id { get; set; }
+    public int VendorId { get; set; }
+    public string VendorName { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public string BankName { get; set; } = string.Empty;
+    public string TransactionId { get; set; } = string.Empty;
+    public string ReceiverAccountNumber { get; set; } = string.Empty;
+    public string ReceiverAccountName { get; set; } = string.Empty;
+    public string ReceiverBankName { get; set; } = string.Empty;
+    public string ReceiverBankType { get; set; } = string.Empty;
+    public string ReceiptUrl { get; set; } = string.Empty;
+    public string Status { get; set; } = "Unpaid";
+    public DateTime? DueDate { get; set; }
+    public string? Note { get; set; }
+    public string? VendorNote { get; set; }
+    public string? AdminNote { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? ReviewedAt { get; set; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN VENDOR MANAGEMENT DTOs
 // ═══════════════════════════════════════════════════════════════════════════════
 

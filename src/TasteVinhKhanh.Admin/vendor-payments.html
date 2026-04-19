@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TasteVinhKhanh Admin — Thanh toán Vendor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-logo"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#icon-utensils"/></svg> TasteVinhKhanh</div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-bar-chart-2"/></svg></span> Dashboard</a>
+                <a href="poi.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-map-pin"/></svg></span> Điểm thuyết minh</a>
+                <a href="audio.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-clipboard-list"/></svg></span> Quản lý Audio</a>
+                <a href="tour.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-map"/></svg></span> Quản lý Tours</a>
+                <a href="vendors.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-store"/></svg></span> Vendors</a>
+                <a href="vendor-payments.html" class="active"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-tag"/></svg></span> Thanh toán Vendor</a>
+                <a href="pending-updates.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-clock"/></svg></span> Duyệt cập nhật</a>
+                <a href="qr.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-smartphone"/></svg></span> Quản lý QR</a>
+                <a href="usage-history.html"><span class="icon"><svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-clipboard-list"/></svg></span> Lịch sử SD</a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Quản trị viên</div>
+                    </div>
+                </div>
+                <button class="btn btn-outline" style="width:100%; justify-content:center" onclick="logout()">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><use href="#icon-log-out"/></svg> Đăng xuất
+                </button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <div class="topbar"><h2>Thanh toán Vendor</h2></div>
+
+            <div class="content">
+                <div class="tabs">
+                    <div class="tab active" onclick="setStatus('Unpaid')" id="tabUnpaid">Chưa thanh toán</div>
+                    <div class="tab" onclick="setStatus('PendingVerification')" id="tabPendingVerification">Đã gửi, chờ kiểm tra</div>
+                    <div class="tab" onclick="setStatus('Paid')" id="tabPaid">Đã thanh toán</div>
+                    <div class="tab" onclick="setStatus('all')" id="tabAll">Tất cả</div>
+                </div>
+
+                <div class="card">
+                    <div class="form-row" style="margin-bottom:12px">
+                        <div class="form-group">
+                            <label>Vendor *</label>
+                            <select id="createVendorId" class="form-control"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Số tiền (VNĐ) *</label>
+                            <input type="number" id="createAmount" class="form-control" min="1000" step="1000" placeholder="VD: 500000">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:12px">
+                        <div class="form-group">
+                            <label>Hạn thanh toán</label>
+                            <input type="date" id="createDueDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Ghi chú đơn</label>
+                            <input type="text" id="createNote" class="form-control" placeholder="VD: Phí hợp tác tháng 04/2026">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:12px">
+                        <div class="form-group">
+                            <label>STK nhận tiền *</label>
+                            <input type="text" id="createReceiverAccountNumber" class="form-control" placeholder="VD: 0123456789">
+                        </div>
+                        <div class="form-group">
+                            <label>Tên chủ tài khoản *</label>
+                            <input type="text" id="createReceiverAccountName" class="form-control" placeholder="VD: NGUYEN VAN A">
+                        </div>
+                    </div>
+                    <div class="form-row" style="margin-bottom:12px">
+                        <div class="form-group">
+                            <label>Tên ngân hàng *</label>
+                            <input type="text" id="createReceiverBankName" class="form-control" placeholder="VD: Vietcombank">
+                        </div>
+                        <div class="form-group">
+                            <label>Loại ngân hàng *</label>
+                            <select id="createReceiverBankType" class="form-control">
+                                <option value="">-- Chọn loại ngân hàng --</option>
+                                <option value="Nội địa">Nội địa</option>
+                                <option value="Quốc tế">Quốc tế</option>
+                                <option value="Ngân hàng số">Ngân hàng số</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:12px">
+                        <button class="btn btn-primary" id="createBtn" onclick="createInvoice()">Tạo đơn thanh toán</button>
+                    </div>
+
+                    <div id="loading" class="loading"><div class="spinner"></div></div>
+                    <div id="error" class="empty-state" style="display:none">
+                        <p id="errorMsg">Không thể tải danh sách thanh toán.</p>
+                    </div>
+                    <div class="table-wrapper" id="tableWrap" style="display:none">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Vendor</th>
+                                    <th>Số tiền</th>
+                                    <th>Hạn TT</th>
+                                    <th>TT nhận tiền</th>
+                                    <th>Ngân hàng</th>
+                                    <th>Mã GD</th>
+                                    <th>Biên lai</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thời gian</th>
+                                    <th style="width:180px">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                    </div>
+                    <div id="empty" class="empty-state" style="display:none"><p>Không có dữ liệu thanh toán.</p></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+    if (!requireAuth()) throw new Error("Not authenticated");
+
+    let currentStatus = "Unpaid";
+    let vendors = [];
+
+    function getBadge(status) {
+        if (status === "Paid") return '<span class="badge badge-success">Đã thanh toán</span>';
+        if (status === "PendingVerification") return '<span class="badge badge-warning">Chờ kiểm tra</span>';
+        return '<span class="badge badge-danger">Chưa thanh toán</span>';
+    }
+
+    function setStatus(status) {
+        currentStatus = status;
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        const tabId = status === "Unpaid" ? "tabUnpaid"
+            : status === "PendingVerification" ? "tabPendingVerification"
+            : status === "Paid" ? "tabPaid"
+            : "tabAll";
+        document.getElementById(tabId).classList.add("active");
+        loadPayments();
+    }
+
+    async function markAsPaid(id) {
+        try {
+            await updateVendorPaymentStatus(id, "Paid", "Đã xác nhận thanh toán");
+            showToast("Đã cập nhật: Đã thanh toán.");
+            await loadPayments();
+        } catch (e) {
+            showToast(e.message || "Cập nhật thất bại.", "error");
+        }
+    }
+
+    async function loadVendorsForCreate() {
+        const select = document.getElementById("createVendorId");
+        try {
+            const data = await getVendors("Approved");
+            vendors = data?.items || data || [];
+            select.innerHTML = vendors.length
+                ? vendors.map(v => `<option value="${v.id}">${escapeHtml(v.businessName || v.name || v.email)}</option>`).join("")
+                : '<option value="">Không có vendor khả dụng</option>';
+        } catch {
+            select.innerHTML = '<option value="">Không tải được vendor</option>';
+        }
+    }
+
+    async function createInvoice() {
+        const vendorId = Number(document.getElementById("createVendorId").value);
+        const amount = Number(document.getElementById("createAmount").value);
+        const dueDate = document.getElementById("createDueDate").value || null;
+        const note = document.getElementById("createNote").value.trim();
+        const receiverAccountNumber = document.getElementById("createReceiverAccountNumber").value.trim();
+        const receiverAccountName = document.getElementById("createReceiverAccountName").value.trim();
+        const receiverBankName = document.getElementById("createReceiverBankName").value.trim();
+        const receiverBankType = document.getElementById("createReceiverBankType").value.trim();
+        const btn = document.getElementById("createBtn");
+
+        if (!vendorId || !amount || amount <= 0) {
+            showToast("Vui lòng chọn vendor và nhập số tiền hợp lệ.", "error");
+            return;
+        }
+        if (!receiverAccountNumber || !receiverAccountName || !receiverBankName || !receiverBankType) {
+            showToast("Vui lòng nhập đầy đủ STK, chủ TK, tên ngân hàng và loại ngân hàng.", "error");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Đang tạo...";
+        try {
+            await createVendorPayment({
+                vendorId,
+                amount,
+                receiverAccountNumber,
+                receiverAccountName,
+                receiverBankName,
+                receiverBankType,
+                note,
+                dueDate
+            });
+            showToast("Đã tạo đơn thanh toán.");
+            document.getElementById("createAmount").value = "";
+            document.getElementById("createDueDate").value = "";
+            document.getElementById("createNote").value = "";
+            document.getElementById("createReceiverAccountNumber").value = "";
+            document.getElementById("createReceiverAccountName").value = "";
+            document.getElementById("createReceiverBankName").value = "";
+            document.getElementById("createReceiverBankType").value = "";
+            await loadPayments();
+        } catch (e) {
+            showToast(e.message || "Tạo đơn thất bại.", "error");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Tạo đơn thanh toán";
+        }
+    }
+
+    async function loadPayments() {
+        document.getElementById("loading").style.display = "block";
+        document.getElementById("tableWrap").style.display = "none";
+        document.getElementById("empty").style.display = "none";
+        document.getElementById("error").style.display = "none";
+        try {
+            const items = await getVendorPayments(currentStatus);
+            if (!items || items.length === 0) {
+                document.getElementById("empty").style.display = "flex";
+                return;
+            }
+
+            document.getElementById("tbody").innerHTML = items.map(p => `
+                <tr>
+                    <td>${escapeHtml(p.vendorName || "")}</td>
+                    <td>${Number(p.amount || 0).toLocaleString("vi-VN")} đ</td>
+                    <td>${p.dueDate ? formatDateTime(p.dueDate) : "—"}</td>
+                    <td style="font-size:12px">
+                        <div><strong>STK:</strong> ${escapeHtml(p.receiverAccountNumber || "—")}</div>
+                        <div><strong>Chủ TK:</strong> ${escapeHtml(p.receiverAccountName || "—")}</div>
+                        <div><strong>NH:</strong> ${escapeHtml(p.receiverBankName || "—")} (${escapeHtml(p.receiverBankType || "—")})</div>
+                    </td>
+                    <td>${escapeHtml(p.bankName || "—")}</td>
+                    <td>${escapeHtml(p.transactionId || "—")}</td>
+                    <td>${p.receiptUrl ? `<a href="${toAbsoluteReceiptUrl(p.receiptUrl)}" target="_blank" rel="noopener">Xem biên lai</a>` : "—"}</td>
+                    <td>${getBadge(p.status)}</td>
+                    <td>${formatDateTime(p.createdAt)}</td>
+                    <td>
+                        ${(p.status === "PendingVerification" || p.status === "Unpaid")
+                            ? `<button class="btn btn-sm btn-primary" onclick="markAsPaid(${p.id})">Đã thanh toán</button>`
+                            : `<span style="color:var(--gray-500); font-size:12px">${escapeHtml(p.adminNote || "Đã xử lý")}</span>`}
+                    </td>
+                </tr>
+            `).join("");
+            document.getElementById("tableWrap").style.display = "block";
+        } catch (e) {
+            document.getElementById("errorMsg").textContent = e.message || "Không thể tải danh sách thanh toán.";
+            document.getElementById("error").style.display = "flex";
+        } finally {
+            document.getElementById("loading").style.display = "none";
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function toAbsoluteReceiptUrl(url) {
+        if (!url) return "#";
+        if (url.startsWith("http://") || url.startsWith("https://")) return url;
+        if (url.startsWith("/")) return `${API_BASE}${url}`;
+        return `${API_BASE}/${url}`;
+    }
+
+    loadVendorsForCreate();
+    loadPayments();
+    </script>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="icon-utensils" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v7"/></symbol>
+  <symbol id="icon-bar-chart-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+  <symbol id="icon-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="icon-log-out" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+  <symbol id="icon-clipboard-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol>
+  <symbol id="icon-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></symbol>
+  <symbol id="icon-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 7l2-4h16l2 4"/><path d="M4 7v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7"/></symbol>
+  <symbol id="icon-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="icon-smartphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+</svg>
+</body>
+</html>

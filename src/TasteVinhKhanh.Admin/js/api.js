@@ -457,3 +457,43 @@ async function rejectDeletionRequest(id, reason = "") {
     { reason },
   );
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// VENDOR BILLING APIs (Admin)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+async function getVendorPayments(status = "Unpaid") {
+  let url = "/api/admin/payments";
+  if (status === "all") {
+    url += "?status=";
+  } else if (status) {
+    url += `?status=${encodeURIComponent(status)}`;
+  }
+  return await apiCall("GET", url);
+}
+
+async function createVendorPayment({
+  vendorId,
+  amount,
+  receiverAccountNumber,
+  receiverAccountName,
+  receiverBankName,
+  receiverBankType,
+  note = "",
+  dueDate = null,
+}) {
+  return await apiCall("POST", "/api/admin/payments", {
+    vendorId,
+    amount,
+    receiverAccountNumber,
+    receiverAccountName,
+    receiverBankName,
+    receiverBankType,
+    note,
+    dueDate,
+  });
+}
+
+async function updateVendorPaymentStatus(id, status, adminNote = "") {
+  return await apiCall("PUT", `/api/admin/payments/${id}/status`, { status, adminNote });
+}

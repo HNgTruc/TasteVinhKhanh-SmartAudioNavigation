@@ -329,3 +329,39 @@ async function requestDeleteLogo() {
     throw new Error(data.message || `Request failed: HTTP ${res.status}`);
   return { success: true, stagingId: data.stagingId };
 }
+
+// ── BILLING ──────────────────────────────────────────────────────────────
+
+async function submitVendorPayment({ paymentId, bankName, transactionId, vendorNote, receiptFile }) {
+  const token = localStorage.getItem("vendorToken");
+  const formData = new FormData();
+  formData.append("paymentId", paymentId);
+  formData.append("bankName", bankName || "");
+  formData.append("transactionId", transactionId || "");
+  formData.append("vendorNote", vendorNote || "");
+  formData.append("receipt", receiptFile);
+
+  const res = await fetch(`${API_BASE}/api/vendor/payments/submit`, {
+    method: "POST",
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: formData,
+  });
+
+  if (res.status === 401) {
+    vendorLogout();
+    return null;
+  }
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data.message || `Submit payment failed: HTTP ${res.status}`);
+  }
+
+  return data;
+}
+
+async function getMyPaymentHistory() {
+  return await apiCall("GET", "/api/vendor/payments/history");
+}

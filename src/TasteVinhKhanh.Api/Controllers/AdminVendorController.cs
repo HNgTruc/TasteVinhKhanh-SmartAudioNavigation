@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TasteVinhKhanh.Api.Data;
 using TasteVinhKhanh.Shared.DTOs;
+using TasteVinhKhanh.Shared.Models;
 
 namespace TasteVinhKhanh.Api.Controllers;
 
@@ -200,6 +201,118 @@ public class AdminVendorController : ControllerBase
                 ImageUrl = i.ImageUrl, IsPrimary = i.IsPrimary, SortOrder = i.SortOrder
             }).ToList()
         }).ToList());
+    }
+
+    /// <summary>Danh sách đơn thanh toán vendor.</summary>
+    [HttpGet("payments")]
+    public async Task<IActionResult> GetVendorPayments([FromQuery] string status = "Unpaid")
+    {
+        status = NormalizeStatusFilter(status, defaultStatus: "Unpaid");
+
+        var query = _db.VendorPayments
+            .Include(p => p.Vendor)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(p => p.Status == status);
+        }
+
+        var items = await query
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => new VendorPaymentDto
+            {
+                Id = p.Id,
+                VendorId = p.VendorId,
+                VendorName = p.Vendor.BusinessName,
+                Amount = p.Amount,
+                BankName = p.BankName,
+                TransactionId = p.TransactionId,
+                ReceiverAccountNumber = p.ReceiverAccountNumber,
+                ReceiverAccountName = p.ReceiverAccountName,
+                ReceiverBankName = p.ReceiverBankName,
+                ReceiverBankType = p.ReceiverBankType,
+                ReceiptUrl = p.ReceiptUrl,
+                Status = p.Status,
+                DueDate = p.DueDate,
+                Note = p.Note,
+                VendorNote = p.Note,
+                AdminNote = p.AdminNote,
+                CreatedAt = p.CreatedAt,
+                ReviewedAt = p.ReviewedAt
+            })
+            .ToListAsync();
+
+        return Ok(items);
+    }
+
+    /// <summary>Admin tạo đơn thanh toán cho vendor.</summary>
+    [HttpPost("payments")]
+    public async Task<IActionResult> CreateVendorPayment([FromBody] CreateVendorPaymentRequest req)
+    {
+        if (req == null || req.VendorId <= 0)
+            return BadRequest(new { message = "Vendor không hợp lệ." });
+        if (req.Amount <= 0)
+            return BadRequest(new { message = "Số tiền phải lớn hơn 0." });
+        if (string.IsNullOrWhiteSpace(req.ReceiverAccountNumber)
+            || string.IsNullOrWhiteSpace(req.ReceiverAccountName)
+            || string.IsNullOrWhiteSpace(req.ReceiverBankName)
+            || string.IsNullOrWhiteSpace(req.ReceiverBankType))
+        {
+            return BadRequest(new { message = "Thiếu thông tin tài khoản nhận tiền (STK, chủ TK, ngân hàng, loại ngân hàng)." });
+        }
+
+        var vendor = await _db.Vendors.FindAsync(req.VendorId);
+        if (vendor == null)
+            return NotFound(new { message = "Vendor không tồn tại." });
+
+        var payment = new VendorPayment
+        {
+            VendorId = req.VendorId,
+            Amount = req.Amount,
+            DueDate = req.DueDate,
+            Status = "Unpaid",
+            Note = string.IsNullOrWhiteSpace(req.Note) ? null : req.Note.Trim(),
+            ReceiverAccountNumber = req.ReceiverAccountNumber.Trim(),
+            ReceiverAccountName = req.ReceiverAccountName.Trim(),
+            ReceiverBankName = req.ReceiverBankName.Trim(),
+            ReceiverBankType = req.ReceiverBankType.Trim(),
+            BankName = string.Empty,
+            TransactionId = string.Empty,
+            ReceiptUrl = string.Empty,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _db.VendorPayments.Add(payment);
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Đã tạo đơn thanh toán cho vendor.", paymentId = payment.Id });
+    }
+
+    /// <summary>Admin cập nhật trạng thái thanh toán: Paid hoặc Unpaid.</summary>
+    [HttpPut("payments/{id}/status")]
+    public async Task<IActionResult> UpdateVendorPaymentStatus(int id, [FromBody] UpdateVendorPaymentStatusRequest req)
+    {
+        var payment = await _db.VendorPayments.FindAsync(id);
+        if (payment == null) return NotFound(new { message = "Đơn thanh toán không tồn tại." });
+        if (req == null || string.IsNullOrWhiteSpace(req.Status))
+            return BadRequest(new { message = "Trạng thái không hợp lệ." });
+
+        var normalizedStatus = req.Status.Trim();
+        if (!string.Equals(normalizedStatus, "Paid", StringComparison.OrdinalIgnoreCase) &&
+            !string.Equals(normalizedStatus, "Unpaid", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new { message = "Chỉ hỗ trợ trạng thái Paid hoặc Unpaid." });
+        }
+
+        var adminEmail = User.FindFirstValue(ClaimTypes.Email) ?? "admin";
+        payment.Status = string.Equals(normalizedStatus, "Paid", StringComparison.OrdinalIgnoreCase) ? "Paid" : "Unpaid";
+        payment.AdminNote = string.IsNullOrWhiteSpace(req.AdminNote) ? null : req.AdminNote.Trim();
+        payment.ReviewedBy = adminEmail;
+        payment.ReviewedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Đã cập nhật trạng thái thanh toán." });
     }
 
     /// <summary>Danh sách POIs chưa có vendor</summary>

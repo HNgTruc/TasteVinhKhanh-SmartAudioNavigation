@@ -29,6 +29,7 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<TourStop> TourStops => Set<TourStop>();
     public DbSet<RestaurantImage> RestaurantImages => Set<RestaurantImage>();
     public DbSet<Vendor> Vendors => Set<Vendor>();
+    public DbSet<VendorPayment> VendorPayments => Set<VendorPayment>();
     public DbSet<PendingPOIUpdate> PendingPOIUpdates => Set<PendingPOIUpdate>();
     public DbSet<StagingImage> StagingImages => Set<StagingImage>();
 
@@ -147,6 +148,35 @@ public class AppDbContext : IdentityDbContext<AppUser>
              .WithMany()
              .HasForeignKey(v => v.PoiPointId)
              .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // ── VendorPayment ──────────────────────────────────────────────────────
+        builder.Entity<VendorPayment>(e =>
+        {
+            e.HasKey(p => p.Id);
+            e.Property(p => p.Amount).HasColumnType("decimal(18,2)");
+            e.Property(p => p.BankName).IsRequired().HasMaxLength(100);
+            e.Property(p => p.TransactionId).IsRequired().HasMaxLength(100);
+            e.Property(p => p.ReceiverAccountNumber).IsRequired().HasMaxLength(50);
+            e.Property(p => p.ReceiverAccountName).IsRequired().HasMaxLength(120);
+            e.Property(p => p.ReceiverBankName).IsRequired().HasMaxLength(120);
+            e.Property(p => p.ReceiverBankType).IsRequired().HasMaxLength(50);
+            e.Property(p => p.ReceiptUrl).IsRequired().HasMaxLength(500);
+            e.Property(p => p.Status).IsRequired().HasMaxLength(20);
+            e.Property(p => p.Note).HasMaxLength(500);
+            e.Property(p => p.AdminNote).HasMaxLength(500);
+            e.Property(p => p.ReviewedBy).HasMaxLength(256);
+
+            e.HasIndex(p => p.Status);
+            e.HasIndex(p => p.VendorId);
+            e.HasIndex(p => p.CreatedAt);
+            e.HasIndex(p => p.TransactionId);
+            e.HasIndex(p => p.DueDate);
+
+            e.HasOne(p => p.Vendor)
+             .WithMany()
+             .HasForeignKey(p => p.VendorId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ── PendingPOIUpdate ─────────────────────────────────────────────────

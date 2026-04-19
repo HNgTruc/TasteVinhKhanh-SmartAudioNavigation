@@ -843,4 +843,101 @@ public class VendorController : ControllerBase
             message = "Đã gửi yêu cầu xóa logo. Quản trị viên sẽ duyệt trong thời gian sớm nhất."
         });
     }
+
+    /// <summary>Vendor nộp thanh toán theo đơn do admin tạo.</summary>
+    [HttpPost("payments/submit")]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    public async Task<IActionResult> SubmitPayment([FromForm] SubmitVendorPaymentRequest req, [FromForm] IFormFile receipt)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == userId);
+        if (vendor == null) return NotFound(new { message = "Vendor không tồn tại." });
+
+        if (receipt == null || receipt.Length == 0)
+            return BadRequest(new { message = "Vui lòng tải lên biên lai thanh toán." });
+
+        if (req.PaymentId <= 0)
+            return BadRequest(new { message = "Đơn thanh toán không hợp lệ." });
+        if (string.IsNullOrWhiteSpace(req.BankName) || string.IsNullOrWhiteSpace(req.TransactionId))
+            return BadRequest(new { message = "Vui lòng nhập ngân hàng và mã giao dịch." });
+
+        const long maxSize = 5 * 1024 * 1024;
+        if (receipt.Length > maxSize)
+            return BadRequest(new { message = "Biên lai vượt quá 5MB." });
+
+        var ext = Path.GetExtension(receipt.FileName).ToLowerInvariant();
+        var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp", ".pdf" };
+        if (!allowed.Contains(ext))
+            return BadRequest(new { message = "Biên lai chỉ chấp nhận: jpg, png, webp, pdf." });
+
+        var folder = Path.Combine(WwwRoot, "payments", $"vendor_{vendor.Id}");
+        Directory.CreateDirectory(folder);
+
+        var fileName = $"{Guid.NewGuid()}{ext}";
+        var savePath = Path.Combine(folder, fileName);
+        await using (var stream = new FileStream(savePath, FileMode.Create))
+        {
+            await receipt.CopyToAsync(stream);
+        }
+
+        var payment = await _db.VendorPayments
+            .FirstOrDefaultAsync(p => p.Id == req.PaymentId && p.VendorId == vendor.Id);
+        if (payment == null)
+            return NotFound(new { message = "Không tìm thấy đơn thanh toán cho vendor này." });
+        if (payment.Status == "Paid")
+            return BadRequest(new { message = "Đơn này đã được xác nhận thanh toán." });
+
+        payment.BankName = req.BankName.Trim();
+        payment.TransactionId = req.TransactionId.Trim();
+        payment.ReceiptUrl = $"/payments/vendor_{vendor.Id}/{fileName}";
+        payment.Status = "PendingVerification";
+        payment.Note = string.IsNullOrWhiteSpace(req.VendorNote) ? payment.Note : req.VendorNote.Trim();
+        payment.ReviewedAt = null;
+        payment.ReviewedBy = null;
+        payment.AdminNote = null;
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Đã gửi thông tin thanh toán, đang chờ quản trị viên kiểm tra.", paymentId = payment.Id });
+    }
+
+    /// <summary>Lịch sử thanh toán của vendor hiện tại.</summary>
+    [HttpGet("payments/history")]
+    public async Task<IActionResult> GetPaymentHistory()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId == null) return Unauthorized();
+
+        var vendor = await _db.Vendors.FirstOrDefaultAsync(v => v.UserId == userId);
+        if (vendor == null) return NotFound(new { message = "Vendor không tồn tại." });
+
+        var items = await _db.VendorPayments
+            .Where(p => p.VendorId == vendor.Id)
+            .OrderByDescending(p => p.CreatedAt)
+            .Select(p => new VendorPaymentDto
+            {
+                Id = p.Id,
+                VendorId = p.VendorId,
+                VendorName = vendor.BusinessName,
+                Amount = p.Amount,
+                BankName = p.BankName,
+                TransactionId = p.TransactionId,
+                ReceiverAccountNumber = p.ReceiverAccountNumber,
+                ReceiverAccountName = p.ReceiverAccountName,
+                ReceiverBankName = p.ReceiverBankName,
+                ReceiverBankType = p.ReceiverBankType,
+                ReceiptUrl = p.ReceiptUrl,
+                Status = p.Status,
+                DueDate = p.DueDate,
+                Note = p.Note,
+                VendorNote = p.Note,
+                AdminNote = p.AdminNote,
+                CreatedAt = p.CreatedAt,
+                ReviewedAt = p.ReviewedAt
+            })
+            .ToListAsync();
+
+        return Ok(items);
+    }
 }
