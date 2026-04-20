@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net" agent="copilot-cli">
+  <diagram id="usecase-vendor" name="Use Case - Vendor">
+    <mxGraphModel dx="1639" dy="797" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="3" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Vendor" vertex="1">
+          <mxGeometry height="80" width="40" x="40" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=top;fontStyle=1;spacingTop=8;" value="TasteVinhKhanh Smart Audio Navigation" vertex="1">
+          <mxGeometry height="700" width="1100" x="150" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="102" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="Vendor register" vertex="1">
+          <mxGeometry height="70" width="238.33333333333331" x="100.00333333333333" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="103" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="Vendor login" vertex="1">
+          <mxGeometry height="70" width="238.33333333333331" x="350" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="113" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="Vendor update profile" vertex="1">
+          <mxGeometry height="70" width="275" x="418.3366666666666" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="114" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="Vendor change password" vertex="1">
+          <mxGeometry height="70" width="275" x="418.3333333333333" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="115" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="Vendor submit POI update" vertex="1">
+          <mxGeometry height="70" width="275" x="394.16666666666663" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="116" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="Vendor submit image/logo" vertex="1">
+          <mxGeometry height="70" width="275" x="270" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="119" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="Vendor submit payment proof" vertex="1">
+          <mxGeometry height="70" width="348.3333333333333" x="70" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="210" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="102">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="211" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="103">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="212" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="113">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="213" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="114">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="214" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="115">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="215" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="116">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="216" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="119">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

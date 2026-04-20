@@ -1,0 +1,9 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant UIA as Admin_UI
+    participant AC as AdminVendorController
+    participant DB as AppDbContext_SQL
+    UIA->>AC: ApproveRejectPending
+    AC->>DB: ApplyOrRejectPending
+    AC-->>UIA: review_ok

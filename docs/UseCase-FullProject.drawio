@@ -1,0 +1,136 @@
+<mxfile host="app.diagrams.net" agent="copilot-cli">
+  <diagram id="usecase-full-project" name="Use Case Full Project">
+    <mxGraphModel dx="1639" dy="2197" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2200" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Admin" vertex="1">
+          <mxGeometry height="80" width="40" x="40" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Vendor" vertex="1">
+          <mxGeometry height="80" width="40" x="40" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" value="Mobile User / Device" vertex="1">
+          <mxGeometry height="80" width="40" x="40" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=center;verticalAlign=top;fontStyle=1;spacingTop=8;" value="TasteVinhKhanh Smart Audio Navigation" vertex="1">
+          <mxGeometry height="1560" width="1300" x="660" y="-510" as="geometry" />
+        </mxCell>
+        <mxCell id="101" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-01 Admin login" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="40" y="82.10526315789475" as="geometry" />
+        </mxCell>
+        <mxCell id="102" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-02 Vendor register" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="290" y="82.10526315789475" as="geometry" />
+        </mxCell>
+        <mxCell id="103" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-03 Vendor login" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="540" y="82.10526315789475" as="geometry" />
+        </mxCell>
+        <mxCell id="104" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-04 Device register" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="790" y="82.10526315789475" as="geometry" />
+        </mxCell>
+        <mxCell id="105" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-05 Admin CRUD POI" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="1040" y="82.10526315789475" as="geometry" />
+        </mxCell>
+        <mxCell id="106" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-06 Admin upsert script" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="40" y="410.5263157894737" as="geometry" />
+        </mxCell>
+        <mxCell id="107" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-07 Admin upload/generate audio" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="290" y="410.5263157894737" as="geometry" />
+        </mxCell>
+        <mxCell id="108" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-08 MAUI sync POIs" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="540" y="410.5263157894737" as="geometry" />
+        </mxCell>
+        <mxCell id="109" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-09 Upload playback logs" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="790" y="410.5263157894737" as="geometry" />
+        </mxCell>
+        <mxCell id="110" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-10 Xem analytics" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="1040" y="410.5263157894737" as="geometry" />
+        </mxCell>
+        <mxCell id="111" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-11 Tao tour" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="40" y="738.9473684210527" as="geometry" />
+        </mxCell>
+        <mxCell id="112" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-12 Reorder tour" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="290" y="738.9473684210527" as="geometry" />
+        </mxCell>
+        <mxCell id="113" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-13 Vendor update profile" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="540" y="738.9473684210527" as="geometry" />
+        </mxCell>
+        <mxCell id="114" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-14 Vendor change password" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="790" y="738.9473684210527" as="geometry" />
+        </mxCell>
+        <mxCell id="115" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-15 Vendor submit POI update" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="1040" y="738.9473684210527" as="geometry" />
+        </mxCell>
+        <mxCell id="116" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-16 Vendor submit image/logo" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="40" y="1067.3684210526317" as="geometry" />
+        </mxCell>
+        <mxCell id="117" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-17 Admin approve/reject pending" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="290" y="1067.3684210526317" as="geometry" />
+        </mxCell>
+        <mxCell id="118" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-18 Admin invoice + mark paid" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="540" y="1067.3684210526317" as="geometry" />
+        </mxCell>
+        <mxCell id="119" parent="5" style="ellipse;whiteSpace=wrap;html=1;" value="UC-19 Vendor submit payment proof" vertex="1">
+          <mxGeometry height="143.6842105263158" width="210" x="790" y="1067.3684210526317" as="geometry" />
+        </mxCell>
+        <mxCell id="201" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="101">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="202" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="105">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="203" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="106">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="204" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="107">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="205" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="110">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="206" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="111">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="207" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="112">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="208" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="117">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="209" edge="1" parent="1" source="2" style="endArrow=none;html=1;" target="118">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="210" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="102">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="211" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="103">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="212" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="113">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="213" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="114">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="214" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="115">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="215" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="116">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="216" edge="1" parent="1" source="3" style="endArrow=none;html=1;" target="119">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="217" edge="1" parent="1" source="4" style="endArrow=none;html=1;" target="104">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="218" edge="1" parent="1" source="4" style="endArrow=none;html=1;" target="108">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="219" edge="1" parent="1" source="4" style="endArrow=none;html=1;" target="109">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

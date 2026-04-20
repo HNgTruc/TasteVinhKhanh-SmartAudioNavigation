@@ -290,9 +290,9 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <summary>Số thiết bị đang hoạt động trong N phút gần nhất.</summary>
-    public async Task<ActiveUsersDto> GetActiveUsersAsync(int windowMinutes = 5)
+    public async Task<ActiveUsersDto> GetActiveUsersAsync(int windowMinutes = 1)
     {
-        if (windowMinutes <= 0) windowMinutes = 5;
+        if (windowMinutes <= 0) windowMinutes = 1;
         if (windowMinutes > 120) windowMinutes = 120;
 
         var fromUtc = DateTime.UtcNow.AddMinutes(-windowMinutes);

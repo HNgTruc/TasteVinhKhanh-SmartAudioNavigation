@@ -1,0 +1,11 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant UI as Admin_UI
+    participant PoiC as PoiController
+    participant PoiS as PoiService
+    participant DB as AppDbContext_SQL
+    UI->>PoiC: Create_Update_Delete_POI
+    PoiC->>PoiS: CreateAsync_UpdateAsync_DeleteAsync
+    PoiS->>DB: SavePoiChanges
+    PoiC-->>UI: poi_ok

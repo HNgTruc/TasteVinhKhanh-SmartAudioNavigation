@@ -20,7 +20,8 @@ function resolveApiBase() {
   }
 
   const configured = localStorage.getItem("api_base_url");
-  const defaultCloudflare = "https://pennsylvania-detailed-pieces-happy.trycloudflare.com";
+  const defaultCloudflare =
+    "https://pennsylvania-detailed-pieces-happy.trycloudflare.com";
   const isLocalPage =
     window.location.protocol === "file:" ||
     window.location.hostname === "127.0.0.1" ||
@@ -227,7 +228,7 @@ async function getTopDevices(top = 20) {
 }
 
 /** GET /api/analytics/active-users — thiết bị active gần realtime */
-async function getActiveUsers(windowMinutes = 5) {
+async function getActiveUsers(windowMinutes = 1) {
   return await apiCall(
     "GET",
     `/api/analytics/active-users?windowMinutes=${windowMinutes}`,
@@ -542,5 +543,8 @@ async function createVendorPayment({
 }
 
 async function updateVendorPaymentStatus(id, status, adminNote = "") {
-  return await apiCall("PUT", `/api/admin/payments/${id}/status`, { status, adminNote });
+  return await apiCall("PUT", `/api/admin/payments/${id}/status`, {
+    status,
+    adminNote,
+  });
 }

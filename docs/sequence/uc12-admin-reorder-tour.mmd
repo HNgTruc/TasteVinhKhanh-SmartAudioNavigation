@@ -1,0 +1,11 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant UIA as Admin_UI
+    participant TourC as TourController
+    participant TourS as TourService
+    participant DB as AppDbContext_SQL
+    UIA->>TourC: Reorder
+    TourC->>TourS: ReorderAsync
+    TourS->>DB: UpdateTourStopsOrder
+    TourC-->>UIA: tour_detail
