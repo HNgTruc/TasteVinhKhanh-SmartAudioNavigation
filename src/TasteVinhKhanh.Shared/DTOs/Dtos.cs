@@ -723,3 +723,14 @@ public class TopDeviceDto
     public DateTime? FirstPlay { get; set; }
     public DateTime LastPlay { get; set; }
 }
+
+/// <summary>Số thiết bị đang hoạt động gần realtime.</summary>
+public class ActiveUsersDto
+{
+    /// <summary>Số thiết bị có phát sinh log trong N phút gần nhất.</summary>
+    public int ActiveUsers { get; set; }
+    /// <summary>Cửa sổ thời gian (phút) dùng để tính active.</summary>
+    public int WindowMinutes { get; set; }
+    /// <summary>Thời điểm server tính toán (UTC).</summary>
+    public DateTime CalculatedAtUtc { get; set; }
+}

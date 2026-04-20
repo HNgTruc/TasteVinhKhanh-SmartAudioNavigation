@@ -143,6 +143,7 @@ public partial class MapViewModel : ObservableObject
         if (IsInitialized)
         {
             await _location.StartAsync();
+            _ = _sync.UploadActiveHeartbeatAsync();
             _ = _sync.UploadPendingLogsAsync();
             return;
         }
@@ -192,6 +193,7 @@ public partial class MapViewModel : ObservableObject
         IsLoading = false;
 
         // Upload log cũ nếu có mạng
+        _ = _sync.UploadActiveHeartbeatAsync();
         _ = _sync.UploadPendingLogsAsync();
         IsInitialized = true;
     }

@@ -1,5 +1,44 @@
-// Mở file HTML trực tiếp (file://) nên phải ghi đầy đủ URL API
-const API_BASE = "http://localhost:5000";
+// Admin có thể chạy từ file://, nên cần URL API tuyệt đối.
+// Ưu tiên:
+// 1) query param ?apiBase=... (tự lưu localStorage)
+// 2) localStorage["api_base_url"]
+// 3) mặc định trùng với MAUI để tránh lệch môi trường
+function normalizeApiBase(url) {
+  const raw = (url || "").trim();
+  if (!raw) return "";
+  const withScheme =
+    raw.startsWith("http://") || raw.startsWith("https://")
+      ? raw
+      : `https://${raw}`;
+  return withScheme.endsWith("/") ? withScheme.slice(0, -1) : withScheme;
+}
+
+function resolveApiBase() {
+  const queryBase = new URLSearchParams(window.location.search).get("apiBase");
+  if (queryBase) {
+    localStorage.setItem("api_base_url", queryBase);
+  }
+
+  const configured = localStorage.getItem("api_base_url");
+  const defaultCloudflare = "https://pennsylvania-detailed-pieces-happy.trycloudflare.com";
+  const isLocalPage =
+    window.location.protocol === "file:" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === "localhost";
+
+  if (isLocalPage && !queryBase) {
+    return "http://localhost:5000";
+  }
+
+  return (
+    normalizeApiBase(queryBase) ||
+    normalizeApiBase(configured) ||
+    normalizeApiBase(defaultCloudflare) ||
+    "http://localhost:5000"
+  );
+}
+
+const API_BASE = resolveApiBase();
 
 async function apiCall(method, endpoint, body = null) {
   const token = localStorage.getItem("token");
@@ -185,6 +224,14 @@ async function getUsageHistory({
 /** GET /api/analytics/devices — top thiết bị hoạt động */
 async function getTopDevices(top = 20) {
   return await apiCall("GET", `/api/analytics/devices?top=${top}`);
+}
+
+/** GET /api/analytics/active-users — thiết bị active gần realtime */
+async function getActiveUsers(windowMinutes = 5) {
+  return await apiCall(
+    "GET",
+    `/api/analytics/active-users?windowMinutes=${windowMinutes}`,
+  );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

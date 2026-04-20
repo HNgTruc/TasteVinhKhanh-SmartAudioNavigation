@@ -71,4 +71,10 @@ public class AnalyticsController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> TopDevices([FromQuery] int top = 20)
         => Ok(await _analytics.GetTopDevicesAsync(top));
+
+    /// <summary>Số user (device) đang truy cập trong N phút gần nhất.</summary>
+    [HttpGet("active-users")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ActiveUsers([FromQuery] int windowMinutes = 5)
+        => Ok(await _analytics.GetActiveUsersAsync(windowMinutes));
 }

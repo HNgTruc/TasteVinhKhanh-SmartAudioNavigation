@@ -14,6 +14,7 @@ public interface IAnalyticsService
     Task<List<HeatmapByHourDto>> GetHeatmapByHourAsync(DateTime? from = null, DateTime? to = null);
     Task<UsageHistoryResponseDto> GetUsageHistoryAsync(UsageHistoryFilterDto filter, int page = 1, int pageSize = 50);
     Task<List<TopDeviceDto>> GetTopDevicesAsync(int top = 20);
+    Task<ActiveUsersDto> GetActiveUsersAsync(int windowMinutes = 5);
 }
 
 public record AnalyticsSummary(int TotalPlays, int TodayPlays, int UniqueDevices);
@@ -25,24 +26,78 @@ public record TopDeviceResult(string DeviceId, int TotalPlays, int UniquePois, D
 public class AnalyticsService : IAnalyticsService
 {
     private readonly AppDbContext _db;
+    private const string AppActiveTrigger = "app_active";
 
     public AnalyticsService(AppDbContext db) => _db = db;
+
+    private IQueryable<PlaybackLog> QueryPlaybackLogs(bool includeAppActive = false)
+    {
+        var query = _db.PlaybackLogs.AsNoTracking().AsQueryable();
+        if (!includeAppActive)
+        {
+            query = query.Where(l => l.TriggerType != AppActiveTrigger);
+        }
+        return query;
+    }
 
     /// <summary>Nhận batch log từ MauiApp gửi lên — lưu vào SQL Server</summary>
     public async Task SaveLogsAsync(List<PlaybackLogRequest> logs)
     {
-        var entities = logs.Select(l => new PlaybackLog
+        if (logs.Count == 0) return;
+
+        var fallbackPoiId = await _db.PoiPoints
+            .AsNoTracking()
+            .OrderBy(p => p.Id)
+            .Select(p => p.Id)
+            .FirstOrDefaultAsync();
+
+        if (fallbackPoiId <= 0) return;
+
+        var requestedPoiIds = logs
+            .Where(l => l.PoiPointId > 0)
+            .Select(l => l.PoiPointId)
+            .Distinct()
+            .ToList();
+
+        var validPoiIds = requestedPoiIds.Count == 0
+            ? new HashSet<int>()
+            : (await _db.PoiPoints
+                .AsNoTracking()
+                .Where(p => requestedPoiIds.Contains(p.Id))
+                .Select(p => p.Id)
+                .ToListAsync())
+            .ToHashSet();
+
+        var entities = logs
+            .Select(l =>
+            {
+                var resolvedPoiId = l.PoiPointId;
+                var isAppActive = string.Equals(l.TriggerType, AppActiveTrigger, StringComparison.OrdinalIgnoreCase);
+                if (isAppActive && (resolvedPoiId <= 0 || !validPoiIds.Contains(resolvedPoiId)))
+                {
+                    resolvedPoiId = fallbackPoiId;
+                }
+
+                return new { Log = l, ResolvedPoiId = resolvedPoiId, IsAppActive = isAppActive };
+            })
+            .Where(x =>
+                x.ResolvedPoiId > 0 &&
+                (x.IsAppActive || validPoiIds.Contains(x.ResolvedPoiId)))
+            .Select(x => new PlaybackLog
         {
-            PoiPointId = l.PoiPointId,
-            LanguageCode = l.LanguageCode,
-            PlayedAt = l.PlayedAt,
-            UserLatitude = l.UserLatitude,
-            UserLongitude = l.UserLongitude,
-            DistanceMeters = l.DistanceMeters,
-            TriggerType = l.TriggerType,
-            AnonymousDeviceId = l.AnonymousDeviceId,
+            PoiPointId = x.ResolvedPoiId,
+            LanguageCode = x.Log.LanguageCode,
+            PlayedAt = x.Log.PlayedAt,
+            UserLatitude = x.Log.UserLatitude,
+            UserLongitude = x.Log.UserLongitude,
+            DistanceMeters = x.Log.DistanceMeters,
+            TriggerType = x.Log.TriggerType,
+            AnonymousDeviceId = x.Log.AnonymousDeviceId,
             IsSynced = true
-        });
+        })
+            .ToList();
+
+        if (entities.Count == 0) return;
 
         await _db.PlaybackLogs.AddRangeAsync(entities);
         await _db.SaveChangesAsync();
@@ -51,13 +106,14 @@ public class AnalyticsService : IAnalyticsService
     /// <summary>Tổng quan cho Dashboard của Admin</summary>
     public async Task<AnalyticsSummary> GetSummaryAsync()
     {
-        var total = await _db.PlaybackLogs.CountAsync();
+        var query = QueryPlaybackLogs();
+        var total = await query.CountAsync();
         var todayStart = DateTime.UtcNow.Date;
         var todayEnd = todayStart.AddDays(1);
-        var today = await _db.PlaybackLogs
+        var today = await query
             .Where(l => l.PlayedAt >= todayStart && l.PlayedAt < todayEnd)
             .CountAsync();
-        var uniqueDevices = await _db.PlaybackLogs
+        var uniqueDevices = await QueryPlaybackLogs(includeAppActive: true)
             .Select(l => l.AnonymousDeviceId)
             .Distinct()
             .CountAsync();
@@ -69,7 +125,7 @@ public class AnalyticsService : IAnalyticsService
     public async Task<List<TopPoiResult>> GetTopPoisAsync(int top = 10)
     {
         // GroupBy chỉ chứa cột primitive (PoiPointId) — navigation property không translate được sang SQL
-        var raw = await _db.PlaybackLogs
+        var raw = await QueryPlaybackLogs()
             .GroupBy(l => l.PoiPointId)
             .Select(g => new { PoiPointId = g.Key, Count = g.Count(), MaxPlayedAt = g.Max(l => l.PlayedAt) })
             .OrderByDescending(x => x.Count)
@@ -92,7 +148,7 @@ public class AnalyticsService : IAnalyticsService
     /// <summary>Bản đồ nhiệt — tọa độ + số lượt phát của mỗi điểm</summary>
     public async Task<HeatmapDataDto> GetHeatmapDataAsync(DateTime? from = null, DateTime? to = null)
     {
-        var query = _db.PlaybackLogs.AsQueryable();
+        var query = QueryPlaybackLogs();
 
         if (from.HasValue) query = query.Where(l => l.PlayedAt >= from.Value);
         if (to.HasValue)   query = query.Where(l => l.PlayedAt < to.Value.AddDays(1));
@@ -121,7 +177,7 @@ public class AnalyticsService : IAnalyticsService
     /// <summary>Heatmap theo giờ trong ngày (0–23)</summary>
     public async Task<List<HeatmapByHourDto>> GetHeatmapByHourAsync(DateTime? from = null, DateTime? to = null)
     {
-        var query = _db.PlaybackLogs.AsNoTracking().AsQueryable();
+        var query = QueryPlaybackLogs();
 
         if (from.HasValue) query = query.Where(l => l.PlayedAt >= from.Value);
         if (to.HasValue)   query = query.Where(l => l.PlayedAt < to.Value.AddDays(1));
@@ -148,7 +204,7 @@ public class AnalyticsService : IAnalyticsService
     public async Task<UsageHistoryResponseDto> GetUsageHistoryAsync(
         UsageHistoryFilterDto filter, int page = 1, int pageSize = 50)
     {
-        var query = _db.PlaybackLogs.AsQueryable();
+        var query = QueryPlaybackLogs();
 
         if (filter.PoiPointId.HasValue)
             query = query.Where(l => l.PoiPointId == filter.PoiPointId.Value);
@@ -205,8 +261,7 @@ public class AnalyticsService : IAnalyticsService
     /// <summary>Top thiết bị hoạt động nhiều nhất</summary>
     public async Task<List<TopDeviceDto>> GetTopDevicesAsync(int top = 20)
     {
-        var logs = await _db.PlaybackLogs
-            .AsNoTracking()
+        var logs = await QueryPlaybackLogs()
             .Select(l => new { l.AnonymousDeviceId, l.PoiPointId, l.PlayedAt })
             .ToListAsync();
 
@@ -232,5 +287,26 @@ public class AnalyticsService : IAnalyticsService
             FirstPlay = r.FirstPlay,
             LastPlay = r.LastPlay ?? DateTime.UtcNow
         }).ToList();
+    }
+
+    /// <summary>Số thiết bị đang hoạt động trong N phút gần nhất.</summary>
+    public async Task<ActiveUsersDto> GetActiveUsersAsync(int windowMinutes = 5)
+    {
+        if (windowMinutes <= 0) windowMinutes = 5;
+        if (windowMinutes > 120) windowMinutes = 120;
+
+        var fromUtc = DateTime.UtcNow.AddMinutes(-windowMinutes);
+        var activeUsers = await QueryPlaybackLogs(includeAppActive: true)
+            .Where(l => l.PlayedAt >= fromUtc && !string.IsNullOrWhiteSpace(l.AnonymousDeviceId))
+            .Select(l => l.AnonymousDeviceId)
+            .Distinct()
+            .CountAsync();
+
+        return new ActiveUsersDto
+        {
+            ActiveUsers = activeUsers,
+            WindowMinutes = windowMinutes,
+            CalculatedAtUtc = DateTime.UtcNow
+        };
     }
 }

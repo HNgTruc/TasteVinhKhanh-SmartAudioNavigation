@@ -24,6 +24,7 @@ public partial class SyncService : ObservableObject
     [ObservableProperty] private string _syncStatus = "Chưa đồng bộ";
     [ObservableProperty] private bool _isSyncing = false;
     [ObservableProperty] private DateTime? _lastSyncAt;
+    private static readonly TimeSpan ActiveHeartbeatInterval = TimeSpan.FromMinutes(1);
 
     public SyncService(HttpClient http, AppDatabase db)
     {
@@ -236,6 +237,62 @@ public partial class SyncService : ObservableObject
             var resp = await _http.PostAsJsonAsync("api/analytics/logs", req, cts.Token);
             if (resp.IsSuccessStatusCode)
                 await _db.MarkLogsSyncedAsync(logs.Select(l => l.Id));
+        }
+        catch
+        {
+            // Chạy nền — bỏ qua lỗi
+        }
+    }
+
+    /// <summary>
+    /// Gửi heartbeat để đánh dấu thiết bị đang online, không phụ thuộc vào việc phát audio.
+    /// Dùng triggerType = app_active để backend tách khỏi analytics nghe audio.
+    /// </summary>
+    public async Task UploadActiveHeartbeatAsync()
+    {
+        if (Connectivity.NetworkAccess != NetworkAccess.Internet) return;
+
+        var nowUtc = DateTime.UtcNow;
+        var lastSentTicks = Preferences.Get("active_heartbeat_last_sent_utc_ticks", 0L);
+        if (lastSentTicks > 0)
+        {
+            var lastSentUtc = new DateTime(lastSentTicks, DateTimeKind.Utc);
+            if (nowUtc - lastSentUtc < ActiveHeartbeatInterval) return;
+        }
+
+        var deviceId = Preferences.Get("device_id", string.Empty);
+        if (string.IsNullOrWhiteSpace(deviceId))
+        {
+            deviceId = Guid.NewGuid().ToString();
+            Preferences.Set("device_id", deviceId);
+        }
+
+        try
+        {
+            var req = new BatchPlaybackLogRequest
+            {
+                Logs = new List<PlaybackLogRequest>
+                {
+                    new()
+                    {
+                        PoiPointId = 0,
+                        LanguageCode = "vi",
+                        PlayedAt = nowUtc,
+                        UserLatitude = 0,
+                        UserLongitude = 0,
+                        DistanceMeters = 0,
+                        TriggerType = "app_active",
+                        AnonymousDeviceId = deviceId
+                    }
+                }
+            };
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(8));
+            var resp = await _http.PostAsJsonAsync("api/analytics/logs", req, cts.Token);
+            if (resp.IsSuccessStatusCode)
+            {
+                Preferences.Set("active_heartbeat_last_sent_utc_ticks", nowUtc.Ticks);
+            }
         }
         catch
         {
