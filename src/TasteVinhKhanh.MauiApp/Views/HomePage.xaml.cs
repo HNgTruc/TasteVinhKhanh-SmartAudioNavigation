@@ -25,6 +25,7 @@ public partial class HomePage : ContentPage
         {
             _loadedOnce = true;
             await _vm.InitAsync();
+            _ = _sync.UploadActiveHeartbeatAsync();
             _ = Task.Run(async () =>
             {
                 await _sync.SyncPoisAsync();

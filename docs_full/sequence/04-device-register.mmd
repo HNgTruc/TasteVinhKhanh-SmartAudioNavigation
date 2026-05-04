@@ -1,0 +1,10 @@
+sequenceDiagram
+    autonumber
+    actor Device
+    participant UI as MAUI_UI
+    participant AuthC as AuthController
+    participant AuthS as AuthService
+    UI->>AuthC: DeviceRegister
+    AuthC->>AuthS: GetOrCreateDeviceTokenAsync
+    AuthC-->>UI: device_token
+

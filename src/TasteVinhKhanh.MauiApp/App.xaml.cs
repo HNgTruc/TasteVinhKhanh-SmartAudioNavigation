@@ -17,7 +17,7 @@ public partial class App : Microsoft.Maui.Controls.Application
 
     protected override Microsoft.Maui.Controls.Window CreateWindow(IActivationState? activationState)
     {
-        var shell = new AppShell();
+        var shell = _services.GetRequiredService<AppShell>();
         var window = new Microsoft.Maui.Controls.Window(shell);
 
         var picked = Preferences.Get("language_onboarding_done", false);

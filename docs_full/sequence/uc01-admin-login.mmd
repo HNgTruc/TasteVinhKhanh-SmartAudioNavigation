@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant UI as Admin_UI
+    participant AuthC as AuthController
+    participant AuthS as AuthService
+    participant UM as UserManager
+    participant JWT as JwtToken
+    Admin->>UI: login
+    UI->>AuthC: Login
+    AuthC->>AuthS: LoginAsync
+    AuthS->>UM: FindByEmail_CheckPassword
+    AuthS->>JWT: GenerateToken
+    AuthS-->>AuthC: LoginResponse
+    AuthC-->>UI: token

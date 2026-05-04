@@ -1,0 +1,10 @@
+sequenceDiagram
+    autonumber
+    actor Vendor
+    participant UIV as Vendor_UI
+    participant VC as VendorController
+    participant DB as AppDbContext_SQL
+    UIV->>VC: SubmitPOIUpdate
+    VC->>DB: InsertPendingPOIUpdate
+    VC-->>UIV: pending_ok
+

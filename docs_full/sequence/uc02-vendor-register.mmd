@@ -1,0 +1,14 @@
+sequenceDiagram
+    autonumber
+    actor Vendor
+    participant UI as Vendor_UI
+    participant AuthC as AuthController
+    participant AuthS as AuthService
+    participant UM as UserManager
+    participant DB as AppDbContext_SQL
+    Vendor->>UI: register
+    UI->>AuthC: VendorRegister
+    AuthC->>AuthS: VendorRegisterAsync
+    AuthS->>UM: CreateUser_AddVendorRole
+    AuthS->>DB: InsertVendorPending
+    AuthC-->>UI: register_ok

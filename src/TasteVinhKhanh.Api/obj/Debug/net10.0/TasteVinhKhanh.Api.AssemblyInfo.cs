@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TasteVinhKhanh.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1420ed016f179bd240c856d3ff16521d0709401c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd12831c72f9f2b070d505d4991fd74d3f03590b")]
 [assembly: System.Reflection.AssemblyProductAttribute("TasteVinhKhanh.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TasteVinhKhanh.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

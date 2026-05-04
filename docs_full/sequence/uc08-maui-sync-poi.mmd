@@ -1,0 +1,14 @@
+sequenceDiagram
+    autonumber
+    actor Device
+    participant UIM as MAUI_UI
+    participant SyncM as SyncService_Maui
+    participant SyncC as SyncController
+    participant SyncApiS as SyncService_Api
+    participant DB as AppDbContext_SQL
+    UIM->>SyncM: SyncPoisAsync
+    SyncM->>SyncC: Sync
+    SyncC->>SyncApiS: GetChangesAsync
+    SyncApiS->>DB: QueryChangedPois
+    SyncC-->>SyncM: SyncResponse
+    SyncM-->>UIM: UpsertLocalSQLite

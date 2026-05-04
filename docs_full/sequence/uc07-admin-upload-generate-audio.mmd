@@ -1,0 +1,17 @@
+sequenceDiagram
+    autonumber
+    actor Admin
+    participant UI as Admin_UI
+    participant AudioC as AudioController
+    participant Store as AudioStorageService
+    participant TTS as TtsGenerationService
+    participant DB as AppDbContext_SQL
+    alt upload_audio
+        UI->>AudioC: AdminUploadAudio
+        AudioC->>Store: SaveAudioFileAsync
+    else generate_tts
+        UI->>AudioC: AdminGenerateAudio
+        AudioC->>TTS: GenerateFromTextAsync
+    end
+    AudioC->>DB: UpdateAudioPath
+    AudioC-->>UI: audio_ok

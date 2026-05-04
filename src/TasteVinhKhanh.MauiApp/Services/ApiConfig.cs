@@ -7,7 +7,7 @@ public static class ApiConfig
     public const string ApiBaseUrlPreferenceKey = "api_base_url";
 
     // TODO: Replace with your stable API domain when available.
-    private const string DefaultApiBaseUrl = "https://modification-recording-instances-pack.trycloudflare.com/";
+    private const string DefaultApiBaseUrl = "https://troubleshooting-laboratories-genres-trembl.trycloudflare.com/";
 
     public static string GetApiBaseUrl()
     {

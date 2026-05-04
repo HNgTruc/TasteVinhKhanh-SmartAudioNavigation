@@ -63,6 +63,7 @@ public static class MauiProgram
         builder.Services.AddTransient<FavoritesViewModel>();
 
         // Views
+        builder.Services.AddSingleton<AppShell>();
         builder.Services.AddTransient<HomePage>();
         builder.Services.AddTransient<MapPage>();
         builder.Services.AddTransient<AudioPage>();

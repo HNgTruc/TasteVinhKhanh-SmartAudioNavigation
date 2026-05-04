@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor Vendor
+    participant UI as Vendor_UI
+    participant AuthC as AuthController
+    participant AuthS as AuthService
+    UI->>AuthC: VendorLogin
+    AuthC->>AuthS: LoginAsync
+    AuthC->>AuthS: GetVendorStatusByEmailAsync
+    AuthC->>AuthS: IsVendorApprovedAsync
+    alt approved
+        AuthC-->>UI: token
+    else blocked
+        AuthC-->>UI: forbidden
+    end
+

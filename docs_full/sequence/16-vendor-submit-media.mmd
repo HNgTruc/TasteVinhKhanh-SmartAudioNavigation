@@ -1,0 +1,16 @@
+sequenceDiagram
+    autonumber
+    actor Vendor
+    participant UIV as Vendor_UI
+    participant VC as VendorController
+    participant Store as AudioStorageService
+    participant DB as AppDbContext_SQL
+    alt upload_staging_image
+        UIV->>VC: UploadStaging
+    else upload_logo
+        UIV->>VC: UploadLogo
+    end
+    VC->>Store: SaveTempMedia
+    VC->>DB: InsertStagingImage
+    VC-->>UIV: pending_ok
+

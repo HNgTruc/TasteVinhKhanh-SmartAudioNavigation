@@ -1,0 +1,10 @@
+sequenceDiagram
+    autonumber
+    actor Vendor
+    participant UIV as Vendor_UI
+    participant VC as VendorController
+    participant DB as AppDbContext_SQL
+    UIV->>VC: UpdateProfile
+    VC->>DB: SaveVendorProfile
+    VC-->>UIV: profile_ok
+
